@@ -1,73 +1,127 @@
-# Shareo_Frontend
+# Shareo - Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Frontend de l'application **Shareo**, développé en Vue 3 avec TypeScript.  
+Cette application utilise **Tailwind CSS**, **PrimeVue** pour l'UI, **Pinia** pour la gestion d'état, et **Axios** pour les appels API.  
+Les tests end-to-end sont réalisés avec **Playwright**.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Table des matières
 
-## Recommended Browser Setup
+- [Technologies](#technologies)  
+- [Installation](#installation)  
+- [Structure du projet](#structure-du-projet)  
+- [Configuration des variables d'environnement](#configuration-des-variables-denvironnement)  
+- [Plugins](#plugins)  
+- [Stores](#stores)  
+- [Services](#services)  
+- [Tests E2E](#tests-e2e)  
+- [Scripts](#scripts)  
+- [Conventions](#conventions)  
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+---
 
-## Type Support for `.vue` Imports in TS
+## Technologies
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- [Vue 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/)  
+- [Vite](https://vitejs.dev/)  
+- [Tailwind CSS](https://tailwindcss.com/)  
+- [PrimeVue](https://www.primefaces.org/primevue/)  
+- [Pinia](https://pinia.vuejs.org/)  
+- [Axios](https://axios-http.com/)  
+- [Playwright](https://playwright.dev/) pour les tests end-to-end  
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Installation
 
-## Project Setup
+1. Cloner le projet :  
+```bash
+git clone <repository-url>
+cd shareo-frontend
+```
 
-```sh
+2. Installer kes dépendances :
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+3. Créer le fichier .env à la racine (exemple minimal) :
+```bash
+VITE_API_BASE_URL=https://api.monapp.com
+VITE_API_TIMEOUT_MS=5000
+```
 
-```sh
+4. Lancer le serveur de développement :
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+# Structure du projet 
 
-```sh
-npm run build
+```python
+src/
+├─ assets/           # Images, polices, fichiers statiques
+├─ components/       # Composants réutilisables
+│   ├─ ui/           # Composants UI génériques (Button, Input, etc.)
+│   └─ layout/       # Header, Footer, Sidebar
+├─ views/            # Pages principales
+├─ router/           # Configuration Vue Router
+│   └─ index.ts
+├─ store/            # Pinia stores
+│   └─ *.ts
+├─ services/         # Appels API (Axios)
+│   └─ api.ts
+├─ plugins/          # Plugins Vue (PrimeVue, Toast)
+│   └─ primevue.ts
+├─ constants/        # Constantes globales
+│   └─ globals.ts
+├─ styles/           # Styles globaux Tailwind
+│   └─ main.css
+└─ main.ts           # Point d'entrée de l'application
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Récapitulatif Technique du Projet
 
-```sh
-npm run test:unit
+---
+
+### Plugins & UI
+
+Ce projet utilise **PrimeVue** pour la bibliothèque de composants UI.
+
+* **Composants de base** : Nombreux composants (Boutons, Inputs, Dialogues, Tables, etc.) sont enregistrés **globalement** pour une utilisation aisée.
+    ```javascript
+    // Extrait du Plugin PrimeVue
+    app.component('Button', Button)
+    // ... plusieurs autres composants
+    app.component('Toast', Toast)
+    ```
+* **Notifications** : Le `ToastService` est employé pour les **notifications globales**.
+* **Styling** : Le style principal repose sur **Tailwind CSS**, avec une personnalisation limitée de certains composants PrimeVue.
+
+---
+
+### Gestion d'État (Stores)
+
+L'état global est géré via **Pinia**. Les stores sont organisés par domaine métier :
+
+* `userStore.ts` : Gestion des **utilisateurs** et des **permissions**.
+* `authStore.ts` : Gestion de l'**authentification**.
+
+**Exemple d'utilisation :**
+```javascript
+import { useUserStore } from '@/store/userStore'
+const userStore = useUserStore()
+userStore.fetchUsers()
 ```
 
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
+### Tests & Scripts
 
-```sh
-# Install browsers for the first run
-npx playwright install
+Tests E2E
+Outil : Playwright est utilisé pour les tests de bout en bout.
 
-# When testing on CI, must build the project first
-npm run build
+Exécution :
 
-# Runs the end-to-end tests
+```bash
 npm run test:e2e
-# Runs the tests only on Chromium
-npm run test:e2e -- --project=chromium
-# Runs the tests of a specific file
-npm run test:e2e -- tests/example.spec.ts
-# Runs the tests in debug mode
-npm run test:e2e -- --debug
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```
