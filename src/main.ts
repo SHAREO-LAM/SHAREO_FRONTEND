@@ -11,5 +11,3 @@ app.use(createPinia())
 app.use(PrimeVuePlugin)
 app.use(router)
 app.mount('#app')
-
-
