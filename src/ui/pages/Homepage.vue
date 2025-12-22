@@ -3,7 +3,7 @@
     <div class="homepage">
 
         <!-- Header -->
-        <Header :current-page="ROUTES.HOME.name" user-role="guest" :cart-item-count="0" @navigate="onNavigate" />
+        <Header :current-page="ROUTES.COMMON.HOME.name" user-role="guest" :cart-item-count="0" @navigate="onNavigate" />
 
         <div class="flex flex-col gap-16">
 
@@ -192,7 +192,7 @@ const benefits = ref([
 
 function onSearch() {
     router.push({
-        path: ROUTES.SEARCH.path,
+        path: ROUTES.COMMON.SEARCH.path,
         query: { q: searchQuery.value }
     })
 }

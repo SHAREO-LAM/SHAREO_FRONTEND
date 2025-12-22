@@ -24,8 +24,9 @@
 
 <script setup lang="ts">
 import Card from 'primevue/card';
-import { defineProps } from 'vue';
+import { computed } from 'vue'  
 
+// A bouger dans des fichiers
 interface Listing {
   id: number;
   name: string;
