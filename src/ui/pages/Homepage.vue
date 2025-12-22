@@ -1,13 +1,9 @@
+
 <template>
     <div class="homepage">
 
         <!-- Header -->
-        <Header
-            current-page="home"
-            user-role="guest"
-            :cart-item-count="0"
-            @navigate="onNavigate"
-        />
+        <Header :current-page="ROUTES.HOME.name" user-role="guest" :cart-item-count="0" @navigate="onNavigate" />
 
         <div class="flex flex-col gap-16">
 
@@ -20,32 +16,22 @@
                     </p>
 
                     <div class="search">
-                        <InputText
-                            v-model="searchQuery"
-                            placeholder="Search venues or equipment..."
-                            class="w-full md:w-96"
-                        />
+                        <InputText v-model="searchQuery" placeholder="Search venues or equipment..."
+                            class="" />
                         <Button label="Search" @click="onSearch" />
                     </div>
                 </div>
             </section>
 
             <!-- Featured Venues -->
-            <section class="section bg-gray-50">
+            <section class="section">
                 <div class="container">
                     <h2>Featured Venues</h2>
 
                     <div class="cards-row">
-                        <Card
-                            v-for="venue in featuredVenues"
-                            :key="venue.id"
-                            class="card"
-                        >
+                        <Card v-for="venue in featuredVenues" :key="venue.id" class="card">
                             <template #header>
-                                <img
-                                    :src="venue.image"
-                                    :alt="venue.name"
-                                />
+                                <img :src="venue.image" :alt="venue.name" />
                             </template>
 
                             <div class="card-body">
@@ -64,16 +50,9 @@
                     <h2>Featured Equipment</h2>
 
                     <div class="cards-row">
-                        <Card
-                            v-for="equipment in featuredEquipment"
-                            :key="equipment.id"
-                            class="card"
-                        >
+                        <Card v-for="equipment in featuredEquipment" :key="equipment.id" class="card">
                             <template #header>
-                                <img
-                                    :src="equipment.image"
-                                    :alt="equipment.name"
-                                />
+                                <img :src="equipment.image" :alt="equipment.name" />
                             </template>
 
                             <div class="card-body">
@@ -86,13 +65,37 @@
                 </div>
             </section>
 
-            <!-- CTA -->
-            <section class="cta">
-                <h2>Start Booking Today</h2>
-                <p>
-                    Sign up now and discover hundreds of venues and equipment
-                </p>
-                <Button label="Get Started" @click="onNavigateAccount" />
+            <!-- Benefits Section -->
+            <section class="section-benefits">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Why Choose VenueBook?</h2>
+                        <p>The easiest way to book venues and equipment</p>
+                    </div>
+
+                    <div class="benefits-grid">
+                        <div v-for="(benefit, index) in benefits" :key="index" class="benefit-item">
+                            <div class="benefit-icon">
+                                <i :class="benefit.icon"></i>
+                            </div>
+                            <h3>{{ benefit.title }}</h3>
+                            <p>{{ benefit.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="section-cta">
+                <div class="container">
+                    <h2>Ready to List Your Venue?</h2>
+                    <p>
+                        Join thousands of vendors earning revenue by listing their venues and equipment
+                    </p>
+                    <Button class="cta-button" size="large" @click="onNavigate('vendor')">
+                        Become a Vendor
+                    </Button>
+                </div>
             </section>
 
         </div>
@@ -102,6 +105,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { APP, ROUTES } from '../../constants/const.ts'
 
 import Header from '../components/Header.vue'
 
@@ -175,11 +179,20 @@ const featuredEquipment: Equipment[] = [
         price: 150,
         image: 'https://images.unsplash.com/photo-1582719478806-d1b4a4d5e734?w=400'
     }
-]
+];
+const benefits = ref([
+    { title: 'Easy Booking', description: 'Quickly reserve venues', icon: 'pi pi-check' },
+    { title: 'Trusted Vendors', description: 'Verified suppliers', icon: 'pi pi-users' },
+    { title: 'Secure Payments', description: 'Safe and reliable', icon: 'pi pi-lock' },
+    { title: '24/7 Support', description: 'Always here to help', icon: 'pi pi-headset' },
+])
+
+
+
 
 function onSearch() {
     router.push({
-        path: '/search',
+        path: ROUTES.SEARCH.path,
         query: { q: searchQuery.value }
     })
 }
@@ -188,101 +201,9 @@ function onNavigate(page: string) {
     router.push(`/${page}`)
 }
 
-function onNavigateAccount() {
-    router.push('/account')
-}
+
 </script>
 
 <style scoped lang="scss">
-.homepage {
-    display: flex;
-    flex-direction: column;
-}
-
-.hero {
-    background: #2563eb;
-    color: white;
-    padding: 5rem 1rem;
-    text-align: center;
-
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    p {
-        font-size: 1.125rem;
-    }
-
-    .search {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-
-        @media (min-width: 768px) {
-            flex-direction: row;
-            justify-content: center;
-        }
-    }
-}
-
-.section {
-    padding: 4rem 1rem;
-
-    h2 {
-        text-align: center;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-}
-
-.cards-row {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-}
-
-.card {
-    width: 18rem;
-    flex-shrink: 0;
-
-    img {
-        width: 100%;
-        height: 12rem;
-        object-fit: cover;
-    }
-
-    .card-body {
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-}
-
-.cta {
-    background: #2563eb;
-    color: white;
-    text-align: center;
-    padding: 5rem 1rem;
-
-    h2 {
-        font-size: 2.25rem;
-        margin-bottom: 1rem;
-    }
-
-    p {
-        font-size: 1.125rem;
-        margin-bottom: 2rem;
-    }
-}
+@use '../../assets/scss/views/homepage.scss';
 </style>

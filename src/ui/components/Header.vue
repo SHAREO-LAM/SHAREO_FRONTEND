@@ -14,7 +14,7 @@
 
                 <!-- Desktop navigation -->
                 <nav class="nav nav--desktop">
-                    <Button v-for="item in navItems" :key="item.value" text class="nav__item"
+                    <Button v-for="item in navItems" :key="item.value" text class="nav-item bg-color-secondary"
                         :class="{ active: currentPage === item.value }" @click="navigate(item.value)">
                         {{ item.label }}
                     </Button>

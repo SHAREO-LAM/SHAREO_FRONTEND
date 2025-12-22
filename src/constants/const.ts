@@ -26,6 +26,7 @@ export const API = {
 
 export const ROUTES = {
     HOME: { name: 'home', path: '/' },
+    SEARCH: { name: 'search', path: '/search' },
     LOGIN: { name: 'login', path: '/login' },
     REGISTER: { name: 'register', path: '/register' },
     DASHBOARD: { name: 'dashboard', path: '/dashboard' },
