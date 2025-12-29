@@ -1,8 +1,12 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import PrimeVuePlugin from './plugins/primevue'
-import App from './App.vue'
-import router from './router'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import PrimeVuePlugin from './plugins/primevue';
+import App from './ui/App.vue';
+import router from './router';
+import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/saga-blue/theme.css';
+import 'primeicons/primeicons.css';
+import './assets/scss/main.scss';
 
 
 const app = createApp(App)

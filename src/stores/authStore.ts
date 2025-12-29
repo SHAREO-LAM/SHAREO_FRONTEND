@@ -1,20 +1,23 @@
-import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { defineStore } from 'pinia';
+
+type UserRole = 'guest' | 'user' | 'vendor' | 'admin';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: '' as string | null,
-    user: null as any | null,
+    isLoggedIn: false,
+    userRole: 'guest' as UserRole,
+    userInfo: null as null | { id: number; firstName: string; lastName: string; email: string },
   }),
   actions: {
-    async login(credentials: { email: string, password: string }) {
-      const res = await api.post('/login', credentials)
-      this.token = res.data.token
-      this.user = res.data.user
+    login(role: UserRole = 'user', info: any = null) {
+      this.isLoggedIn = true;
+      this.userRole = role;
+      this.userInfo = info;
     },
     logout() {
-      this.token = null
-      this.user = null
-    }
-  }
-})
+      this.isLoggedIn = false;
+      this.userRole = 'guest';
+      this.userInfo = null;
+    },
+  },
+});

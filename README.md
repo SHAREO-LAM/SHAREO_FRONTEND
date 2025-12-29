@@ -1,7 +1,7 @@
 # Shareo - Frontend
 
 Frontend de l'application **Shareo**, développé en Vue 3 avec TypeScript.  
-Cette application utilise **Tailwind CSS**, **PrimeVue** pour l'UI, **Pinia** pour la gestion d'état, et **Axios** pour les appels API.  
+Cette application utilise **SCSS**, **PrimeVue** pour l'UI, **Pinia** pour la gestion d'état, et **Axios** pour les appels API.  
 Les tests end-to-end sont réalisés avec **Playwright**.
 
 ---
@@ -25,7 +25,6 @@ Les tests end-to-end sont réalisés avec **Playwright**.
 
 - [Vue 3](https://vuejs.org/) + [TypeScript](https://www.typescriptlang.org/)  
 - [Vite](https://vitejs.dev/)  
-- [Tailwind CSS](https://tailwindcss.com/)  
 - [PrimeVue](https://www.primefaces.org/primevue/)  
 - [Pinia](https://pinia.vuejs.org/)  
 - [Axios](https://axios-http.com/)  
@@ -76,7 +75,7 @@ src/
 │   └─ primevue.ts
 ├─ constants/        # Constantes globales
 │   └─ globals.ts
-├─ styles/           # Styles globaux Tailwind
+├─ styles/           # Styles globaux
 │   └─ main.css
 └─ main.ts           # Point d'entrée de l'application
 ```
@@ -97,7 +96,7 @@ Ce projet utilise **PrimeVue** pour la bibliothèque de composants UI.
     app.component('Toast', Toast)
     ```
 * **Notifications** : Le `ToastService` est employé pour les **notifications globales**.
-* **Styling** : Le style principal repose sur **Tailwind CSS**, avec une personnalisation limitée de certains composants PrimeVue.
+* **Styling** : Le style principal repose sur **SCSS**, avec une personnalisation limitée de certains composants PrimeVue.
 
 ---
 
