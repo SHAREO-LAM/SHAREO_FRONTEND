@@ -25,13 +25,25 @@ export const API = {
 } as const;
 
 export const ROUTES = {
+  COMMON: {
     HOME: { name: 'home', path: '/' },
+    SEARCH: { name: 'search', path: '/search' },
     LOGIN: { name: 'login', path: '/login' },
     REGISTER: { name: 'register', path: '/register' },
-    DASHBOARD: { name: 'dashboard', path: '/dashboard' },
-    PROFILE: { name: 'profile', path: '/profile' },
     NOT_FOUND: { name: 'not-found', path: '/:pathMatch(.*)*' },
-} as const;
+  },
+  VENDOR: {
+    DASHBOARD: { name: 'vendor-dashboard', path: '/vendor/dashboard' },
+    LIST_VENUE: { name: 'vendor-list-venue', path: '/vendor/list-venue' },
+    PROFILE: { name: 'vendor-profile', path: '/vendor/profile' },
+  },
+  ADMIN: {
+    DASHBOARD: { name: 'admin-dashboard', path: '/admin/dashboard' },
+    USERS: { name: 'admin-users', path: '/admin/users' },
+    SETTINGS: { name: 'admin-settings', path: '/admin/settings' },
+  },
+} as const
+
 
 
 export enum ROLES {
