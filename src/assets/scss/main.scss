@@ -3,7 +3,11 @@
 @use './abstracts/mixins.scss';
 
 // @use 'base/reset';
-@use './base/header.scss';
-@use './base/typography.scss';
+
+@use './layout/base.scss';
+@use './layout/header.scss';
+@use './layout/footer.scss';
+
+@use './layout/typography.scss';
 
 

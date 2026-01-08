@@ -2,11 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 
 // Pages
-const Homepage = () => import('../ui/pages/Homepage.vue');
+const HomePage = () => import('../ui/pages/HomePage.vue');
 
 
 const routes = [
-  { path: '/', component: Homepage },
+  { path: '/', component: HomePage },
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
   // { path: '/cart', component: CartBooking },
