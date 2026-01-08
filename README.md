@@ -56,29 +56,7 @@ VITE_API_TIMEOUT_MS=5000
 npm run dev
 ```
 
-# Structure du projet 
 
-```python
-src/
-├─ assets/           # Images, polices, fichiers statiques
-├─ components/       # Composants réutilisables
-│   ├─ ui/           # Composants UI génériques (Button, Input, etc.)
-│   └─ layout/       # Header, Footer, Sidebar
-├─ views/            # Pages principales
-├─ router/           # Configuration Vue Router
-│   └─ index.ts
-├─ store/            # Pinia stores
-│   └─ *.ts
-├─ services/         # Appels API (Axios)
-│   └─ api.ts
-├─ plugins/          # Plugins Vue (PrimeVue, Toast)
-│   └─ primevue.ts
-├─ constants/        # Constantes globales
-│   └─ globals.ts
-├─ styles/           # Styles globaux
-│   └─ main.css
-└─ main.ts           # Point d'entrée de l'application
-```
 
 ## Récapitulatif Technique du Projet
 
