@@ -95,6 +95,9 @@
                 <Button label="Get Started" @click="onNavigateAccount" />
             </section>
 
+            <Footer>
+                
+            </Footer>
         </div>
     </div>
 </template>
@@ -109,6 +112,7 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Card from 'primevue/card'
 import Badge from 'primevue/badge'
+import Footer from '../components/Footer.vue'
 
 interface Venue {
     id: number

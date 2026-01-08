@@ -33,17 +33,6 @@ export const ROUTES = {
     NOT_FOUND: { name: 'not-found', path: '/:pathMatch(.*)*' },
 } as const;
 
-export const STORAGE_KEYS = {
-    AUTH_TOKEN: 'shareo_auth_token',
-    REFRESH_TOKEN: 'shareo_refresh_token',
-    USER_PREFS: 'shareo_user_prefs',
-} as const;
-
-export const REGEX = {
-    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    PHONE_INTERNATIONAL: /^\+?[1-9]\d{1,14}$/,
-    STRONG_PASSWORD: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-} as const;
 
 export enum ROLES {
     ADMIN = 'admin',
