@@ -1,15 +1,16 @@
-
 <template>
     <div class="homepage">
 
         <!-- Header -->
-        <Header :current-page="ROUTES.COMMON.HOME.name" user-role="guest" :cart-item-count="0" @navigate="onNavigate" />
+        <Header
+            :current-page="ROUTES.COMMON.HOME.name"
+            user-role="guest"
+            :cart-item-count="0"
+            @navigate="onNavigate"
+        />
 
         <div class="flex flex-col gap-16">
 
-            <DatePicker  inline showWeek class="w-full sm:w-[30rem]" />
-
-            <Button></Button>
             <!-- Hero Section -->
             <section class="hero">
                 <div class="container">
@@ -19,8 +20,10 @@
                     </p>
 
                     <div class="search">
-                        <InputText v-model="searchQuery" placeholder="Search venues or equipment..."
-                            class="" />
+                        <InputText
+                            v-model:modelValue="searchQuery"
+                            placeholder="Search venues or equipment..."
+                        />
                         <Button label="Search" @click="onSearch" />
                     </div>
                 </div>
@@ -32,7 +35,11 @@
                     <h2>Featured Venues</h2>
 
                     <div class="cards-row">
-                        <Card v-for="venue in featuredVenues" :key="venue.id" class="card">
+                        <Card
+                            v-for="venue in featuredVenues"
+                            :key="venue.id"
+                            class="card"
+                        >
                             <template #header>
                                 <img :src="venue.image" :alt="venue.name" />
                             </template>
@@ -53,7 +60,11 @@
                     <h2>Featured Equipment</h2>
 
                     <div class="cards-row">
-                        <Card v-for="equipment in featuredEquipment" :key="equipment.id" class="card">
+                        <Card
+                            v-for="equipment in featuredEquipment"
+                            :key="equipment.id"
+                            class="card"
+                        >
                             <template #header>
                                 <img :src="equipment.image" :alt="equipment.name" />
                             </template>
@@ -68,7 +79,7 @@
                 </div>
             </section>
 
-            <!-- Benefits Section -->
+            <!-- Benefits -->
             <section class="section-benefits">
                 <div class="container">
                     <div class="section-header">
@@ -77,7 +88,11 @@
                     </div>
 
                     <div class="benefits-grid">
-                        <div v-for="(benefit, index) in benefits" :key="index" class="benefit-item">
+                        <div
+                            v-for="(benefit, index) in benefits"
+                            :key="index"
+                            class="benefit-item"
+                        >
                             <div class="benefit-icon">
                                 <i :class="benefit.icon"></i>
                             </div>
@@ -88,25 +103,27 @@
                 </div>
             </section>
 
-            <!-- CTA Section -->
+            <!-- CTA -->
             <section class="section-cta">
                 <div class="container">
                     <h2>Ready to List Your Venue?</h2>
                     <p>
                         Join thousands of vendors earning revenue by listing their venues and equipment
                     </p>
-                    <Button class="cta-button" size="large" @click="onNavigate('vendor')">
-                        Become a Vendor
-                    </Button>
+                    <Button
+                        class="cta-button"
+                        size="large"
+                        label="Become a Vendor"
+                        @click="onNavigate('vendor')"
+                    />
                 </div>
             </section>
 
-            <Footer>
-                
-            </Footer>
+            <Footer />
         </div>
     </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from 'vue'

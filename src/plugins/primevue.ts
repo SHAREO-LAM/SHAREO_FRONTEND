@@ -1,32 +1,36 @@
 
 // Composants de base
+import Aura from '@primevue/themes/aura'
+import { DatePicker, Drawer } from 'primevue'
+import Badge from 'primevue/badge'
 import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Checkbox from 'primevue/checkbox'
-import RadioButton from 'primevue/radiobutton'
-import Dropdown from 'primevue/dropdown'
-import InputNumber from 'primevue/inputnumber'
-import Calendar from 'primevue/calendar'
-import Dialog from 'primevue/dialog'
-import Panel from 'primevue/panel'
 import Card from 'primevue/card'
-import Toolbar from 'primevue/toolbar'
-import DataTable from 'primevue/datatable'
+import Checkbox from 'primevue/checkbox'
 import Column from 'primevue/column'
+import PrimeVue from "primevue/config"
+import DataTable from 'primevue/datatable'
+import Dialog from 'primevue/dialog'
+import InputNumber from 'primevue/inputnumber'
+import InputText from 'primevue/inputtext'
 import Paginator from 'primevue/paginator'
+import Panel from 'primevue/panel'
+import ProgressBar from 'primevue/progressbar'
+import RadioButton from 'primevue/radiobutton'
+import Textarea from 'primevue/textarea'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
-import ProgressBar from 'primevue/progressbar'
-import Badge from 'primevue/badge'
+import Toolbar from 'primevue/toolbar'
 import type { App } from 'vue'
-import { DatePicker } from 'primevue'
 
 
 
 export default {
   install(app: App) {
-    
+    app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    }
+})
     app.use(ToastService) // service global pour Toast
 
     // Enregistrement global des composants de base
@@ -47,5 +51,6 @@ export default {
     app.component('Toast', Toast)
     app.component('ProgressBar', ProgressBar)
     app.component('Badge', Badge)
+    app.component('Drawer', Drawer)
   }
 }
