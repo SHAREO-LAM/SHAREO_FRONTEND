@@ -7,6 +7,9 @@
 
         <div class="flex flex-col gap-16">
 
+            <DatePicker  inline showWeek class="w-full sm:w-[30rem]" />
+
+            <Button></Button>
             <!-- Hero Section -->
             <section class="hero">
                 <div class="container">

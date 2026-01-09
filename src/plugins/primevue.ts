@@ -1,5 +1,3 @@
-import type { App } from 'vue'
-import PrimeVue from 'primevue/config'
 
 // Composants de base
 import Button from 'primevue/button'
@@ -21,14 +19,14 @@ import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import ProgressBar from 'primevue/progressbar'
 import Badge from 'primevue/badge'
+import type { App } from 'vue'
+import { DatePicker } from 'primevue'
 
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
+
 
 export default {
   install(app: App) {
-    app.use(PrimeVue)
+    
     app.use(ToastService) // service global pour Toast
 
     // Enregistrement global des composants de base
@@ -37,9 +35,8 @@ export default {
     app.component('Textarea', Textarea)
     app.component('Checkbox', Checkbox)
     app.component('RadioButton', RadioButton)
-    app.component('Dropdown', Dropdown)
     app.component('InputNumber', InputNumber)
-    app.component('Calendar', Calendar)
+    app.component('DatePicker', DatePicker)
     app.component('Dialog', Dialog)
     app.component('Panel', Panel)
     app.component('Card', Card)
