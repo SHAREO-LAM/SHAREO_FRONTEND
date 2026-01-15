@@ -1,3 +1,4 @@
+import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 
@@ -7,6 +8,7 @@ const HomePage = () => import('../ui/pages/HomePage.vue');
 
 const routes = [
   { path: '/', component: HomePage },
+  { path: '/productDetails/:id', component: ProductDetailsPage },
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
   // { path: '/cart', component: CartBooking },
