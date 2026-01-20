@@ -6,11 +6,12 @@
 
       <div class="info">
         <h3 class="company-name">{{ vendor.name }}</h3>
-        <Button
+        <!-- <Button
             label="Contacter"
             severity="info"
+            hidden
             @click="contactCompany"
-          />
+          /> -->
       </div>
     </div>
   </div>

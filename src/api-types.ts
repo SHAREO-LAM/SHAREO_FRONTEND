@@ -753,6 +753,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID de l’équipement */
+            companyId: string;
         };
         CreateUserCompanyDto: {
             /** @description ID de l’entreprise associée */

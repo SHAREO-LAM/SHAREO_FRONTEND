@@ -47,13 +47,9 @@
                         class="icon-button"
                         icon="pi pi-shopping-cart"
                         @click="navigate('cart')"
+                        :badge="String(cart.cartItems.length)"
+                        badge-severity="warn"
                     >
-                        <Badge
-                            v-if="cartItemCount > 0"
-                            :value="cartItemCount"
-                            severity="warning"
-                            class="cart-badge"
-                        />
                     </Button>
 
                     <Button
@@ -107,6 +103,7 @@
 
 
 <script setup lang="ts">
+import { useCartStore } from '@/stores/cartStore';
 import { ref } from 'vue'
 
 interface NavItem {
@@ -114,15 +111,15 @@ interface NavItem {
     value: string
 }
 
+const cart = useCartStore();
+
 const props = withDefaults(
     defineProps<{
         currentPage: string
         userRole?: 'guest' | 'user' | 'vendor' | 'admin'
-        cartItemCount?: number
     }>(),
     {
         userRole: 'guest',
-        cartItemCount: 0
     }
 )
 

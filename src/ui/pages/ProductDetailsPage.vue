@@ -232,38 +232,29 @@ import { getDomain } from '@/services/domain'
 import { getEquipementCompany } from '@/services/equipementCompany'
 import type { Domain } from '@/types/domain'
 import type { EquipementCompanyRead } from '@/types/equipementCompany'
-import type { OrderItem } from '@/types/orderItem'
 import CompanyCard from '@/ui/components/CompanyCard.vue'
 import type { Company } from '@/types/company'
 import { getCompany } from '@/services/company'
+import { useCartStore } from '@/stores/cartStore'
 
-// ----------------------
 // Props
-// ----------------------
 const props = defineProps({
   type: {
     type: String as () => 'domain' | 'equipment',
     default: 'equipment'
   }
 })
+const cart = useCartStore();
 
-// ----------------------
 // Router + Route
-// ----------------------
 const router = useRouter()
 const route = useRoute()
 const id = route.params.id as string
 
-// ----------------------
 // State
-// ----------------------
 const domain = ref<Domain | null>(null)
 const equipement = ref<EquipementCompanyRead | null>(null)
 const company = ref<Company>()
-
-// ----------------------
-// Gallery State
-// ----------------------
 const displayGallery = ref(false)
 const activeIndex = ref(0)
 
@@ -281,40 +272,27 @@ function openGallery(index: number) {
   displayGallery.value = true
 }
 
-// ----------------------
 // Fetch dynamique selon le type
-// ----------------------
 async function loadData() {
   if (props.type === 'domain') {
     domain.value = await getDomain(id)
     company.value = await getCompany(domain.value.companyId!)
-    console.log('Fetched domain:', domain.value)
   } else if (props.type === 'equipment') {
     equipement.value = await getEquipementCompany(id)
     company.value = await getCompany(equipement.value.companyId!)
-    console.log('Fetched equipementCompany:', equipement.value)
   }
-
-  console.log('Fetched company:', company.value)
 }
 
-// ----------------------
 // Mounted
-// ----------------------
 onMounted(() => {
   loadData()
 })
 
-// ----------------------
 // Navigation
-// ----------------------
 function onNavigate(page: string) {
   router.push(`/${page}`)
 }
 
-// ----------------------
-// Normalisation pour le template
-// ----------------------
 const productTitle = computed(() => {
   if (props.type === 'domain') return domain.value?.name ?? ''
   if (props.type === 'equipment') return equipement.value?.displayName ?? ''
@@ -333,11 +311,8 @@ const productPrice = computed(() => {
   return 0
 })
 
-// ----------------------
 // Date picker
-// ----------------------
 const quantity = ref(1)
-const orderItems = ref<OrderItem>()
 const startDate = ref<Date | null>(null)
 const endDate = ref<Date | null>(null)
 const minDate = new Date()
@@ -363,18 +338,14 @@ function formatDateLocal(date?: Date | null): string | undefined {
 }
 
 function handleBookNow() {
-  orderItems.value = {
+  cart.addItem({
+    productId: id,
+    companyId: company.value?.companyId,
+    unitPrice: totalPrice.value,
     startDate: formatDateLocal(startDate.value),
     endDate: formatDateLocal(endDate.value),
-    unitPrice: totalPrice.value,
     quantity: props.type === 'equipment' ? quantity.value.toString() : undefined,
-    ...(props.type === 'domain' ? { domainId: id } : { equipementCompanyId: id }),
-  }
-  console.log('Booking', {
-    startDate: startDate.value,
-    endDate: endDate.value,
-    days: numberOfDays.value,
-    total: totalPrice.value,
+    type: props.type
   })
 }
 </script>
