@@ -753,6 +753,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID de l’équipement */
+            companyId: string;
         };
         CreateUserCompanyDto: {
             /** @description ID de l’entreprise associée */
@@ -945,6 +947,46 @@ export interface components {
             userUpdateId?: string;
         };
         EquipementCompany: Record<string, never>;
+        EquipementTypeReadDto: {
+            /** @description Nom du type d’équipement */
+            name?: string;
+            /** @description Code du type d’équipement */
+            code?: string;
+            /** @description ID de la catégorie associée */
+            equipementCategoryId?: string;
+            /** @description Date de création */
+            datetimeCreate?: string;
+            /** @description Date de mise à jour */
+            datetimeUpdate?: string;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string;
+            /** @description ID de l’utilisateur modificateur */
+            userUpdateId?: string;
+            equipementCategory?: components["schemas"]["UpdateEquipementCategoryDto"];
+        };
+        EquipementCompanyReadDto: {
+            /** @description Nom affiché de l’équipement */
+            displayName?: string;
+            /** @description Description de l’équipement */
+            description?: string;
+            /** @description Prix par jour */
+            pricePerDay?: number;
+            /** @description Stock disponible */
+            stock?: string;
+            /** @description ID de la société */
+            companyId?: string;
+            /** @description ID du type d’équipement */
+            equipementTypeId?: string;
+            /** @description Date de création */
+            datetimeCreate?: string;
+            /** @description Date de mise à jour */
+            datetimeUpdate?: string;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string;
+            /** @description ID de l’utilisateur modificateur */
+            userUpdateId?: string;
+            equipementType?: components["schemas"]["EquipementTypeReadDto"];
+        };
         UpdateEquipementCompanyDto: {
             /** @description Nom affiché de l’équipement */
             displayName?: string;
@@ -2074,7 +2116,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"];
                 };
             };
         };

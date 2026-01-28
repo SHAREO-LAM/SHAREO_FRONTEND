@@ -2,7 +2,7 @@
 import type { components } from '@/api-types';
 
 // DTO principal (réponse = DTO update)
-export type CompanyPayout = components['schemas']['UpdateCompanyPayoutDto'];
+export type Company = components['schemas']['UpdateCompanyDto'];
 
 // DTO création
-export type CreateCompanyPayout = components['schemas']['CreateCompanyPayoutDto'];
+export type CreateCompany = components['schemas']['CreateCompanyDto'];
