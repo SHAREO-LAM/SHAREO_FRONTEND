@@ -1,10 +1,13 @@
 .header {
-    .container {
-        .content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
+  .container {
+    margin: 0 auto;
+    padding: 0 1rem;
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
     }
+  }
 }

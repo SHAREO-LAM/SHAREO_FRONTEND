@@ -53,22 +53,33 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import Checkbox from 'primevue/checkbox';
 import Slider from 'primevue/slider';
-import { ref } from 'vue';
 
-const types = ref({ venue: true, equipment: true });
-const priceRange = ref([0, 5000]);
-const capacities = {
-  cap1: '0-50 guests',
-  cap2: '50-100 guests',
-  cap3: '100-200 guests',
-  cap4: '200-500 guests',
-  cap5: '500+ guests'
-};
-const selectedCapacities = ref<string[]>([]);
-const amenities = ['WiFi', 'Parking', 'Catering', 'AV Equipment'];
-const selectedAmenities = ref<string[]>([]);
-const availableOnly = ref(false);
+export default defineComponent({
+  name: 'FilterPanel',
+  components: {
+    Checkbox,
+    Slider,
+  },
+  data() {
+    return {
+      types: { venue: true, equipment: true },
+      priceRange: [0, 5000],
+      capacities: {
+        cap1: '0-50 guests',
+        cap2: '50-100 guests',
+        cap3: '100-200 guests',
+        cap4: '200-500 guests',
+        cap5: '500+ guests',
+      },
+      selectedCapacities: [] as string[],
+      amenities: ['WiFi', 'Parking', 'Catering', 'AV Equipment'],
+      selectedAmenities: [] as string[],
+      availableOnly: false,
+    };
+  },
+});
 </script>

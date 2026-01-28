@@ -1,233 +1,166 @@
 <template>
-    <div class="homepage">
+  <div class="min-h-screen">
+    <div class="flex flex-col gap-16">
 
-        <!-- Header -->
-        <Header
-            :current-page="ROUTES.COMMON.HOME.name"
-            user-role="guest"
-            :cart-item-count="0"
-            @navigate="onNavigate"
-        />
+      <!-- Hero Section -->
+      <section class="bg-(--primary-color) text-(--primary-color-text) py-20 px-4 text-center">
+        <div class="max-w-3xl mx-auto flex flex-col gap-6">
+          <h1 class="text-4xl font-bold">Book the Perfect Venue or Equipment</h1>
+          <p class="text-lg">Easily find and reserve venues and event equipment for any occasion</p>
 
-        <div class="flex flex-col gap-16">
-
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="container">
-                    <h1>Book the Perfect Venue or Equipment</h1>
-                    <p>
-                        Easily find and reserve venues and event equipment for any occasion
-                    </p>
-
-                    <div class="search">
-                        <InputText
-                            v-model:modelValue="searchQuery"
-                            placeholder="Search venues or equipment..."
-                        />
-                        <Button label="Search" @click="onSearch" />
-                    </div>
-                </div>
-            </section>
-
-            <!-- Featured Venues -->
-            <section class="section">
-                <div class="container">
-                    <h2>Featured Venues</h2>
-
-                    <div class="cards-row">
-                        <Card
-                            v-for="venue in featuredVenues"
-                            :key="venue.id"
-                            class="card"
-                        >
-                            <template #header>
-                                <img :src="venue.image" :alt="venue.name" />
-                            </template>
-
-                            <div class="card-body">
-                                <h3>{{ venue.name }}</h3>
-                                <p>{{ venue.location }}</p>
-                                <Badge :value="`$${venue.price}/day`" />
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Featured Equipment -->
-            <section class="section">
-                <div class="container">
-                    <h2>Featured Equipment</h2>
-
-                    <div class="cards-row">
-                        <Card
-                            v-for="equipment in featuredEquipment"
-                            :key="equipment.id"
-                            class="card"
-                        >
-                            <template #header>
-                                <img :src="equipment.image" :alt="equipment.name" />
-                            </template>
-
-                            <div class="card-body">
-                                <h3>{{ equipment.name }}</h3>
-                                <p>{{ equipment.type }}</p>
-                                <Badge :value="`$${equipment.price}/day`" />
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Benefits -->
-            <section class="section-benefits">
-                <div class="container">
-                    <div class="section-header">
-                        <h2>Why Choose VenueBook?</h2>
-                        <p>The easiest way to book venues and equipment</p>
-                    </div>
-
-                    <div class="benefits-grid">
-                        <div
-                            v-for="(benefit, index) in benefits"
-                            :key="index"
-                            class="benefit-item"
-                        >
-                            <div class="benefit-icon">
-                                <i :class="benefit.icon"></i>
-                            </div>
-                            <h3>{{ benefit.title }}</h3>
-                            <p>{{ benefit.description }}</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CTA -->
-            <section class="section-cta">
-                <div class="container">
-                    <h2>Ready to List Your Venue?</h2>
-                    <p>
-                        Join thousands of vendors earning revenue by listing their venues and equipment
-                    </p>
-                    <Button
-                        class="cta-button"
-                        size="large"
-                        label="Become a Vendor"
-                        @click="onNavigate('vendor')"
-                    />
-                </div>
-            </section>
-
-            <Footer />
+          <div class="flex flex-col gap-4 md:flex-row md:justify-center">
+            <InputText v-model:modelValue="searchQuery" placeholder="Search venues or equipment..."
+              class="w-full md:w-md" />
+            <Button label="Search" @click="onSearch" />
+          </div>
         </div>
+      </section>
+
+      <!-- Featured Venues -->
+      <section class="py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-center text-3xl font-semibold mb-8">Featured Venues</h2>
+
+          <div class="flex flex-wrap justify-center gap-6">
+            <Card v-for="venue in featuredVenues" :key="venue.id" class="w-72 shrink-0 overflow-hidden">
+              <template #header>
+                <img :src="venue.image" :alt="venue.name" class="w-full h-48 object-cover" />
+              </template>
+
+              <div class="p-4 flex flex-col gap-1">
+                <h3 class="text-lg font-medium">{{ venue.name }}</h3>
+                <p class="text-(--muted-color)">{{ venue.location }}</p>
+                <div class="mt-2">
+                  <Badge :value="`$${venue.price}/day`" />
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Equipment -->
+      <section class="py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-center text-3xl font-semibold mb-8">Featured Equipment</h2>
+
+          <div class="flex flex-wrap justify-center gap-6">
+            <Card v-for="equipment in featuredEquipment" :key="equipment.id" class="w-72 shrink-0 overflow-hidden">
+              <template #header>
+                <img :src="equipment.image" :alt="equipment.name" class="w-full h-48 object-cover" />
+              </template>
+
+              <div class="p-4 flex flex-col gap-1">
+                <h3 class="text-lg font-medium">{{ equipment.name }}</h3>
+                <p class="text-(--muted-color)">{{ equipment.type }}</p>
+                <div class="mt-2">
+                  <Badge :value="`$${equipment.price}/day`" />
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
     </div>
+  </div>
 </template>
 
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { APP, ROUTES } from '../../constants/const.ts'
-
-import Header from '../components/Header.vue'
-
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import Card from 'primevue/card'
-import Badge from 'primevue/badge'
-import Footer from '../components/Footer.vue'
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { ROUTES } from '../../constants/const';
+import InputText from 'primevue/inputtext';
+import Card from 'primevue/card';
+import Badge from 'primevue/badge';
 
 interface Venue {
-    id: number
-    name: string
-    location: string
-    price: number
-    image: string
+  id: number;
+  name: string;
+  location: string;
+  price: number;
+  image: string;
 }
 
 interface Equipment {
-    id: number
-    name: string
-    type: string
-    price: number
-    image: string
+  id: number;
+  name: string;
+  type: string;
+  price: number;
+  image: string;
 }
 
-const router = useRouter()
-const searchQuery = ref('')
-
-const featuredVenues: Venue[] = [
-    {
-        id: 1,
-        name: 'Grand Ballroom',
-        location: 'New York',
-        price: 2500,
-        image: 'https://images.unsplash.com/photo-1759519238029-689e99c6d19e?w=400'
-    },
-    {
-        id: 2,
-        name: 'Conference Hall',
-        location: 'Los Angeles',
-        price: 1800,
-        image: 'https://images.unsplash.com/photo-1603430416744-a47cee46b0ae?w=400'
-    },
-    {
-        id: 3,
-        name: 'Garden Event Space',
-        location: 'Chicago',
-        price: 2000,
-        image: 'https://images.unsplash.com/photo-1760972594010-e217e2f2845c?w=400'
-    }
-]
-
-const featuredEquipment: Equipment[] = [
-    {
-        id: 1,
-        name: 'Professional Audio System',
-        type: 'Audio',
-        price: 350,
-        image: 'https://images.unsplash.com/photo-1745848413083-cfea604edb6a?w=400'
-    },
-    {
-        id: 2,
-        name: 'Lighting Package',
-        type: 'Lighting',
-        price: 200,
-        image: 'https://images.unsplash.com/photo-1582719478250-93f1b20a0372?w=400'
-    },
-    {
-        id: 3,
-        name: 'Projector & Screen',
-        type: 'AV',
-        price: 150,
-        image: 'https://images.unsplash.com/photo-1582719478806-d1b4a4d5e734?w=400'
-    }
-];
-const benefits = ref([
-    { title: 'Easy Booking', description: 'Quickly reserve venues', icon: 'pi pi-check' },
-    { title: 'Trusted Vendors', description: 'Verified suppliers', icon: 'pi pi-users' },
-    { title: 'Secure Payments', description: 'Safe and reliable', icon: 'pi pi-lock' },
-    { title: '24/7 Support', description: 'Always here to help', icon: 'pi pi-headset' },
-])
-
-
-
-
-function onSearch() {
-    router.push({
+export default defineComponent({
+  name: 'HomePage',
+  components: {
+    InputText,
+    Card,
+    Badge,
+  },
+  data() {
+    return {
+      ROUTES,
+      searchQuery: '',
+      featuredVenues: [
+        {
+          id: 1,
+          name: 'Grand Ballroom',
+          location: 'New York',
+          price: 2500,
+          image: 'https://images.unsplash.com/photo-1759519238029-689e99c6d19e?w=400',
+        },
+        {
+          id: 2,
+          name: 'Conference Hall',
+          location: 'Los Angeles',
+          price: 1800,
+          image: 'https://images.unsplash.com/photo-1603430416744-a47cee46b0ae?w=400',
+        },
+        {
+          id: 3,
+          name: 'Garden Event Space',
+          location: 'Chicago',
+          price: 2000,
+          image: 'https://images.unsplash.com/photo-1760972594010-e217e2f2845c?w=400',
+        },
+      ] as Venue[],
+      featuredEquipment: [
+        {
+          id: 1,
+          name: 'Professional Audio System',
+          type: 'Audio',
+          price: 350,
+          image: 'https://images.unsplash.com/photo-1745848413083-cfea604edb6a?w=400',
+        },
+        {
+          id: 2,
+          name: 'Lighting Package',
+          type: 'Lighting',
+          price: 200,
+          image: 'https://images.unsplash.com/photo-1582719478250-93f1b20a0372?w=400',
+        },
+        {
+          id: 3,
+          name: 'Projector & Screen',
+          type: 'AV',
+          price: 150,
+          image: 'https://images.unsplash.com/photo-1582719478806-d1b4a4d5e734?w=400',
+        },
+      ] as Equipment[],
+      benefits: [
+        { title: 'Easy Booking', description: 'Quickly reserve venues', icon: 'pi pi-check' },
+        { title: 'Trusted Vendors', description: 'Verified suppliers', icon: 'pi pi-users' },
+        { title: 'Secure Payments', description: 'Safe and reliable', icon: 'pi pi-lock' },
+        { title: '24/7 Support', description: 'Always here to help', icon: 'pi pi-headset' },
+      ],
+    };
+  },
+  methods: {
+    onSearch() {
+      this.$router.push({
         path: ROUTES.COMMON.SEARCH.path,
-        query: { q: searchQuery.value }
-    })
-}
-
-function onNavigate(page: string) {
-    router.push(`/${page}`)
-}
-
-
+        query: { q: this.searchQuery },
+      });
+    },
+  },
+});
 </script>
-
-<style scoped lang="scss">
-@use '../../assets/scss/views/homepage.scss';
-</style>

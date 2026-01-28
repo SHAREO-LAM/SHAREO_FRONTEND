@@ -1,8 +1,5 @@
-
 @use './abstracts/variables.scss';
 @use './abstracts/mixins.scss';
-
-// @use 'base/reset';
 
 @use './layout/base.scss';
 @use './layout/header.scss';
@@ -10,4 +7,17 @@
 
 @use './layout/typography.scss';
 
+/* Light mode par défaut */
+body {
+  background-color: #f0f0f0;
+  color: #111827;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
 
+/* Dark mode */
+.dark body {
+  background-color: #111827;
+  color: #f9fafb;
+}

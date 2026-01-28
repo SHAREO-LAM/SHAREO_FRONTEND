@@ -1,10 +1,11 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-import PrimeVuePlugin from './plugins/primevue';
-import App from './ui/App.vue';
-import router from './router';
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import PrimeVuePlugin from './plugins/primevue'
+import App from './ui/App.vue'
+import router from './router'
 
-import './assets/scss/main.scss';
+import './assets/tailwind.css'
+import './assets/scss/main.scss'
 
 const app = createApp(App)
 
