@@ -1,13 +1,13 @@
-import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue';
-import { createRouter, createWebHistory } from 'vue-router';
-
-
-// Pages
-const HomePage = () => import('../ui/pages/HomePage.vue');
-
+import HomePage from '@/ui/pages/HomePage.vue'
+import DomainsCatalogPage from '@/ui/pages/DomainsCatalogPage.vue'
+import EquipmentsCatalogPage from '@/ui/pages/EquipmentsCatalogPage.vue'
+import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   { path: '/', component: HomePage },
+  { path: '/domains', component: DomainsCatalogPage },
+  { path: '/equipments', component: EquipmentsCatalogPage },
   { path: '/productDetails/:id', component: ProductDetailsPage },
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
@@ -16,12 +16,12 @@ const routes = [
   // { path: '/vendor', component: VendorDashboard, meta: { requiresRole: 'vendor' } },
   // { path: '/admin', component: AdminDashboard, meta: { requiresRole: 'admin' } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
 // Navigation guards
 router.beforeEach((to, from, next) => {
@@ -36,7 +36,7 @@ router.beforeEach((to, from, next) => {
   //   return next('/'); // redirect to home if role doesn't match
   // }
 
-  next();
-});
+  next()
+})
 
-export default router;
+export default router

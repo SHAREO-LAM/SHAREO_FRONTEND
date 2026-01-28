@@ -1,4 +1,3 @@
-
 // Composants de base
 import Aura from '@primevue/themes/aura'
 import { DatePicker, Drawer } from 'primevue'
@@ -7,7 +6,7 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Checkbox from 'primevue/checkbox'
 import Column from 'primevue/column'
-import PrimeVue from "primevue/config"
+import PrimeVue from 'primevue/config'
 import DataTable from 'primevue/datatable'
 import Dialog from 'primevue/dialog'
 import InputNumber from 'primevue/inputnumber'
@@ -20,18 +19,18 @@ import Textarea from 'primevue/textarea'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
 import Toolbar from 'primevue/toolbar'
+import Tooltip from 'primevue/tooltip'
 import type { App } from 'vue'
-
-
 
 export default {
   install(app: App) {
     app.use(PrimeVue, {
-    theme: {
-        preset: Aura
-    }
-})
+      theme: {
+        preset: Aura,
+      },
+    })
     app.use(ToastService) // service global pour Toast
+    app.directive('tooltip', Tooltip) // directive pour les tooltips
 
     // Enregistrement global des composants de base
     app.component('Button', Button)
@@ -52,5 +51,5 @@ export default {
     app.component('ProgressBar', ProgressBar)
     app.component('Badge', Badge)
     app.component('Drawer', Drawer)
-  }
+  },
 }

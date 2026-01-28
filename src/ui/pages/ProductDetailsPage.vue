@@ -1,63 +1,31 @@
 <template>
   <div class="product-details-page">
-    <Header
-      current-page="home"
-      user-role="guest"
-      :cart-item-count="0"
-      @navigate="onNavigate"
-    />
-
-    <main
-      class="product-details"
-      v-if="(props.type === 'domain' && domain) || (props.type === 'equipment' && equipement)"
-    >
+    <main class="product-details"
+      v-if="(productType === 'domain' && domain) || (productType === 'equipment' && equipement)">
       <!-- IMAGE GALLERY -->
       <section class="gallery">
         <div class="gallery-grid">
           <!-- Image principale à gauche -->
           <div class="gallery-main" @click="openGallery(0)">
-            <img
-              :src="images[0]"
-              alt="Image principale"
-            />
+            <img :src="images[0]" alt="Image principale" />
           </div>
 
           <!-- 4 images à droite -->
           <div class="gallery-side">
-            <div
-              v-for="i in 4"
-              :key="i"
-              class="gallery-thumb"
-              @click="openGallery(i)"
-            >
-              <img
-                :src="images[i]"
-                alt="Image produit"
-              />
+            <div v-for="i in 4" :key="i" class="gallery-thumb" @click="openGallery(i)">
+              <img :src="images[i]" alt="Image produit" />
             </div>
           </div>
         </div>
       </section>
 
       <!-- GALLERIA LIGHTBOX -->
-      <Galleria
-        v-model:visible="displayGallery"
-        v-model:activeIndex="activeIndex"
-        :value="images"
-        :numVisible="5"
-        containerStyle="max-width: 90vw"
-        :circular="true"
-        :fullScreen="true"
-        :showItemNavigators="true"
-        :showThumbnails="false"
-      >
+      <Galleria v-model:visible="displayGallery" v-model:activeIndex="activeIndex" :value="images" :numVisible="5"
+        containerStyle="max-width: 90vw" :circular="true" :fullScreen="true" :showItemNavigators="true"
+        :showThumbnails="false">
         <template #item="slotProps">
           <div style="display: flex; justify-content: center; align-items: center; height: 80vh; padding: 20px;">
-            <img
-              :src="slotProps.item"
-              alt="Image"
-              style="width: 50vw; height: auto;"
-            />
+            <img :src="slotProps.item" alt="Image" style="width: 50vw; height: auto;" />
           </div>
         </template>
       </Galleria>
@@ -71,7 +39,7 @@
 
             <div class="badges">
               <!-- Domain badges -->
-              <template v-if="props.type === 'domain' && domain">
+              <template v-if="productType === 'domain' && domain">
                 <Badge severity="info" class="mr-2">
                   <i class="pi pi-users" style="margin-right: 6px;"></i>
                   {{ domain.capacity }} personnes
@@ -84,7 +52,7 @@
               </template>
 
               <!-- Equipment badges -->
-              <template v-else-if="props.type === 'equipment' && equipement">
+              <template v-else-if="type === 'equipment' && equipement">
                 <Badge severity="info" class="mr-2">
                   <i class="pi pi-box" style="margin-right: 6px;"></i>
                   {{ equipement.equipementType?.name }}
@@ -107,7 +75,7 @@
           </section>
 
           <!-- ADRESSE (Domain uniquement) -->
-          <section class="address" v-if="props.type === 'domain' && domain">
+          <section class="address" v-if="type === 'domain' && domain">
             <h2>Adresse</h2>
 
             <p>
@@ -140,18 +108,10 @@
           </div>
 
           <!-- Quantity (only for equipment) -->
-          <div
-            class="quantity-field"
-            v-if="props.type === 'equipment' && equipement"
-          >
+          <div class="quantity-field" v-if="type === 'equipment' && equipement">
             <label for="quantity">Quantité</label>
-            <InputNumber
-              v-model="quantity"
-              :min="1"
-              :max="equipement?.stock ? Number(equipement.stock) : 100"
-              showButtons
-              inputId="quantity"
-            />
+            <InputNumber v-model="quantity" :min="1" :max="equipement?.stock ? Number(equipement.stock) : 100"
+              showButtons inputId="quantity" />
             <small v-if="equipement?.stock">
               Stock disponible : {{ equipement.stock }}
             </small>
@@ -161,27 +121,14 @@
           <div class="date-fields">
             <div class="date-field">
               <label>Début</label>
-              <DatePicker
-                v-model="startDate"
-                showIcon
-                fluid
-                :min-date="minDate"
-                date-format="dd/mm/yy"
-                placeholder="Choisir une date"
-              />
+              <DatePicker v-model="startDate" showIcon fluid :min-date="minDate" date-format="dd/mm/yy"
+                placeholder="Choisir une date" />
             </div>
 
             <div class="date-field">
               <label>Fin</label>
-              <DatePicker
-                v-model="endDate"
-                showIcon
-                fluid
-                :min-date="startDate || minDate"
-                date-format="dd/mm/yy"
-                placeholder="Choisir une date"
-                :disabled="!startDate"
-              />
+              <DatePicker v-model="endDate" showIcon fluid :min-date="startDate || minDate" date-format="dd/mm/yy"
+                placeholder="Choisir une date" :disabled="!startDate" />
             </div>
           </div>
 
@@ -191,163 +138,151 @@
               <span>{{ numberOfDays }} jour(s)</span>
               <span>{{ totalPrice }} €</span>
             </div>
-            <div class="line" v-if="props.type === 'equipment'">
+            <div class="line" v-if="type === 'equipment'">
               <span>Quantité</span>
               <span>{{ quantity }}</span>
             </div>
             <div class="line total">
               <span>Total</span>
-              <span>{{ totalPrice * (props.type === 'equipment' ? quantity : 1) }} €</span>
+              <span>{{ totalPrice * (type === 'equipment' ? quantity : 1) }} €</span>
             </div>
           </div>
 
-          <Button
-            label="Réserver"
-            severity="warn"
-            :disabled="!startDate || !endDate"
-            @click="handleBookNow"
-          />
+          <Button label="Réserver" severity="warn" :disabled="!startDate || !endDate" @click="handleBookNow" />
         </aside>
       </div>
     </main>
-
-    <Footer />
   </div>
 </template>
 
-<script setup lang="ts">
-import 'primeicons/primeicons.css'
+<script lang="ts">
+import 'primeicons/primeicons.css';
 
-import { onMounted, ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import Header from '../components/Header.vue'
-import Footer from '../components/Footer.vue'
-import Button from 'primevue/button'
-import DatePicker from 'primevue/datepicker'
-import Badge from 'primevue/badge'
-import Galleria from 'primevue/galleria'
-import InputNumber from 'primevue/inputnumber'
+import { defineComponent } from 'vue';
+import Button from 'primevue/button';
+import DatePicker from 'primevue/datepicker';
+import Badge from 'primevue/badge';
+import Galleria from 'primevue/galleria';
+import InputNumber from 'primevue/inputnumber';
 
-import { getDomain } from '@/services/domain'
-import { getEquipementCompany } from '@/services/equipementCompany'
-import type { Domain } from '@/types/domain'
-import type { EquipementCompanyRead } from '@/types/equipementCompany'
-import CompanyCard from '@/ui/components/CompanyCard.vue'
-import type { Company } from '@/types/company'
-import { getCompany } from '@/services/company'
-import { useCartStore } from '@/stores/cartStore'
+import { getDomain } from '@/services/domain';
+import { getEquipementCompany } from '@/services/equipementCompany';
+import type { Domain } from '@/types/domain';
+import type { EquipementCompanyRead } from '@/types/equipementCompany';
+import CompanyCard from '@/ui/components/CompanyCard.vue';
+import type { Company } from '@/types/company';
+import { getCompany } from '@/services/company';
+import { useCartStore } from '@/stores/cartStore';
 
-// Props
-const props = defineProps({
-  type: {
-    type: String as () => 'domain' | 'equipment',
-    default: 'equipment'
-  }
-})
-const cart = useCartStore();
+export default defineComponent({
+  name: 'ProductDetailsPage',
+  components: {
+    Button,
+    DatePicker,
+    Badge,
+    Galleria,
+    InputNumber,
+    CompanyCard,
+  },
+  props: {
+    type: {
+      type: String as () => 'domain' | 'equipment',
+      default: 'domain',
+    },
+  },
+  data() {
+    return {
+      domain: null as Domain | null,
+      equipement: null as EquipementCompanyRead | null,
+      company: undefined as Company | undefined,
+      displayGallery: false,
+      activeIndex: 0,
+      images: [
+        'https://placehold.co/1200x900',
+        'https://placehold.co/800x800',
+        'https://placehold.co/800x800',
+        'https://placehold.co/800x800',
+        'https://placehold.co/800x800',
+      ],
+      quantity: 1,
+      startDate: null as Date | null,
+      endDate: null as Date | null,
+      minDate: new Date(),
+    };
+  },
+  computed: {
+    cart() {
+      return useCartStore();
+    },
+    id(): string {
+      return this.$route.params.id as string;
+    },
+    productType(): 'domain' | 'equipment' {
+      return (this.$route.query.type as 'domain' | 'equipment') || this.$props.type || 'domain';
+    },
+    productTitle(): string {
+      if (this.productType === 'domain') return this.domain?.name ?? '';
+      if (this.productType === 'equipment') return this.equipement?.displayName ?? '';
+      return '';
+    },
+    productDescription(): string {
+      if (this.productType === 'domain') return this.domain?.description ?? '';
+      if (this.productType === 'equipment') return this.equipement?.description ?? '';
+      return '';
+    },
+    productPrice(): number {
+      if (this.productType === 'domain') return this.domain?.pricePerDay ?? 0;
+      if (this.productType === 'equipment') return this.equipement?.pricePerDay ?? 0;
+      return 0;
+    },
+    numberOfDays(): number {
+      if (!this.startDate || !this.endDate) return 0;
+      const diff = this.endDate.getTime() - this.startDate.getTime();
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    },
+    totalPrice(): number {
+      return this.numberOfDays * this.productPrice;
+    },
+  },
+  mounted() {
+    this.loadData();
+  },
+  methods: {
+    openGallery(index: number) {
+      this.activeIndex = index;
+      this.displayGallery = true;
+    },
+    async loadData() {
+      if (this.productType === 'domain') {
+        this.domain = await getDomain(this.id);
+        this.company = await getCompany(this.domain.companyId!);
+      } else if (this.productType === 'equipment') {
+        this.equipement = await getEquipementCompany(this.id);
+        this.company = await getCompany(this.equipement.companyId!);
+      }
+    },
+    formatDateLocal(date?: Date | null): string | undefined {
+      if (!date) return undefined;
 
-// Router + Route
-const router = useRouter()
-const route = useRoute()
-const id = route.params.id as string
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
 
-// State
-const domain = ref<Domain | null>(null)
-const equipement = ref<EquipementCompanyRead | null>(null)
-const company = ref<Company>()
-const displayGallery = ref(false)
-const activeIndex = ref(0)
-
-// Images pour la galerie (remplace par tes vraies images)
-const images = ref([
-  'https://placehold.co/1200x900',
-  'https://placehold.co/800x800',
-  'https://placehold.co/800x800',
-  'https://placehold.co/800x800',
-  'https://placehold.co/800x800'
-])
-
-function openGallery(index: number) {
-  activeIndex.value = index
-  displayGallery.value = true
-}
-
-// Fetch dynamique selon le type
-async function loadData() {
-  if (props.type === 'domain') {
-    domain.value = await getDomain(id)
-    company.value = await getCompany(domain.value.companyId!)
-  } else if (props.type === 'equipment') {
-    equipement.value = await getEquipementCompany(id)
-    company.value = await getCompany(equipement.value.companyId!)
-  }
-}
-
-// Mounted
-onMounted(() => {
-  loadData()
-})
-
-// Navigation
-function onNavigate(page: string) {
-  router.push(`/${page}`)
-}
-
-const productTitle = computed(() => {
-  if (props.type === 'domain') return domain.value?.name ?? ''
-  if (props.type === 'equipment') return equipement.value?.displayName ?? ''
-  return ''
-})
-
-const productDescription = computed(() => {
-  if (props.type === 'domain') return domain.value?.description ?? ''
-  if (props.type === 'equipment') return equipement.value?.description ?? ''
-  return ''
-})
-
-const productPrice = computed(() => {
-  if (props.type === 'domain') return domain.value?.pricePerDay ?? 0
-  if (props.type === 'equipment') return equipement.value?.pricePerDay ?? 0
-  return 0
-})
-
-// Date picker
-const quantity = ref(1)
-const startDate = ref<Date | null>(null)
-const endDate = ref<Date | null>(null)
-const minDate = new Date()
-
-const numberOfDays = computed(() => {
-  if (!startDate.value || !endDate.value) return 0
-  const diff = endDate.value.getTime() - startDate.value.getTime()
-  return Math.ceil(diff / (1000 * 60 * 60 * 24))
-})
-
-const totalPrice = computed(() => {
-  return numberOfDays.value * productPrice.value
-})
-
-function formatDateLocal(date?: Date | null): string | undefined {
-  if (!date) return undefined
-
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
-}
-
-function handleBookNow() {
-  cart.addItem({
-    productId: id,
-    companyId: company.value?.companyId,
-    unitPrice: totalPrice.value,
-    startDate: formatDateLocal(startDate.value),
-    endDate: formatDateLocal(endDate.value),
-    quantity: props.type === 'equipment' ? quantity.value.toString() : undefined,
-    type: props.type
-  })
-}
+      return `${year}-${month}-${day}`;
+    },
+    handleBookNow() {
+      this.cart.addItem({
+        productId: this.id,
+        companyId: this.company?.companyId,
+        unitPrice: this.totalPrice,
+        startDate: this.formatDateLocal(this.startDate),
+        endDate: this.formatDateLocal(this.endDate),
+        quantity: this.productType === 'equipment' ? this.quantity.toString() : undefined,
+        type: this.productType,
+      });
+    },
+  },
+});
 </script>
 
 <style scoped lang="scss">

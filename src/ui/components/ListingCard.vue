@@ -22,11 +22,10 @@
   </Card>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue';
 import Card from 'primevue/card';
-import { computed } from 'vue'  
 
-// A bouger dans des fichiers
 interface Listing {
   id: number;
   name: string;
@@ -37,13 +36,31 @@ interface Listing {
   capacity?: number;
 }
 
-const props = defineProps<{
-  listing: Listing;
-  viewMode: 'grid' | 'list';
-  onNavigate: (page: string) => void;
-}>();
-
-const cardClass = computed(() =>
-  props.viewMode === 'grid' ? 'hover:shadow-lg transition-shadow cursor-pointer' : 'mb-4 hover:shadow-lg'
-);
+export default defineComponent({
+  name: 'ListingCard',
+  components: {
+    Card,
+  },
+  props: {
+    listing: {
+      type: Object as PropType<Listing>,
+      required: true,
+    },
+    viewMode: {
+      type: String as PropType<'grid' | 'list'>,
+      required: true,
+    },
+    onNavigate: {
+      type: Function as PropType<(page: string) => void>,
+      required: true,
+    },
+  },
+  computed: {
+    cardClass(): string {
+      return this.viewMode === 'grid'
+        ? 'hover:shadow-lg transition-shadow cursor-pointer'
+        : 'mb-4 hover:shadow-lg';
+    },
+  },
+});
 </script>

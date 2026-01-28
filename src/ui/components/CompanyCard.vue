@@ -17,17 +17,30 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue';
 import type { Company } from '@/types/company';
-import Avatar from 'primevue/avatar'
-import Button from 'primevue/button'
+import Avatar from 'primevue/avatar';
+import Button from 'primevue/button';
 
-
-const props = defineProps<{ vendor: Company }>()
-
-function contactCompany() {
-  console.log('Contact company', props.vendor.name)
-}
+export default defineComponent({
+  name: 'CompanyCard',
+  components: {
+    Avatar,
+    Button,
+  },
+  props: {
+    vendor: {
+      type: Object as PropType<Company>,
+      required: true,
+    },
+  },
+  methods: {
+    contactCompany() {
+      console.log('Contact company', this.vendor.name);
+    },
+  },
+});
 </script>
 
 
