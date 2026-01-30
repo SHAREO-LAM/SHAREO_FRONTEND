@@ -20,18 +20,18 @@
 
       <div class="flex gap-8">
         <aside class="hidden lg:block w-64 shrink-0">
-          <div class="bg-white rounded-lg p-6 shadow sticky top-24">
-            <h3 class="text-xl font-semibold mb-4">Filtres</h3>
+          <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 shadow sticky top-24">
+            <h3 class="text-xl font-semibold mb-4 dark:text-gray-100">Filtres</h3>
 
             <div class="space-y-6">
               <template v-for="f in filterConfig" :key="filterKey(f)">
                 <div v-if="f.kind === 'text'">
-                  <h4 class="font-medium mb-3">{{ f.label }}</h4>
+                  <h4 class="font-medium mb-3 dark:text-white">{{ f.label }}</h4>
                   <InputText v-model="filtersTextDraft[f.stateKey]" :placeholder="f.placeholder" class="w-full" />
                 </div>
 
                 <div v-else>
-                  <h4 class="font-medium mb-3">{{ f.label }}</h4>
+                  <h4 class="font-medium mb-3 dark:text-white">{{ f.label }}</h4>
                   <div class="grid grid-cols-2 gap-2">
                     <InputNumber v-model="filtersNumberDraft[f.minKey]" :placeholder="f.minPlaceholder ?? 'Min'"
                       class="w-full" inputClass="w-full" :min="f.minValue" />

@@ -1,49 +1,67 @@
 <template>
-  <header class="header">
-    <div class="container">
-      <div class="content">
+  <header class="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-200">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between py-4">
 
         <!-- Header Logo -->
-        <Button text class="logo" icon="pi pi-calendar" label="VenueBook" @click="navigate('home')" />
+        <Button text class="!text-xl !font-bold text-primary hover:text-primary/80 transition-colors"
+          icon="pi pi-calendar" label="VenueBook" @click="navigate('home')" />
 
         <!-- Desktop navigation -->
-        <nav class="nav nav--desktop" aria-label="Main Navigation">
-          <Button v-for="item in navItems" :key="item.value" text class="nav-item bg-color-secondary"
-            :class="{ active: currentPage === item.value }" :label="item.label" @click="navigate(item.value)" />
+        <nav class="hidden md:flex items-center gap-2" aria-label="Main Navigation">
+          <Button v-for="item in navItems" :key="item.value" text
+            class="!text-gray-700 dark:!text-gray-200 hover:!text-primary dark:hover:!text-primary transition-colors"
+            :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
+            @click="navigate(item.value)" />
         </nav>
 
-        <div class="actions">
-          <Button v-if="userRole === 'vendor'" outlined class="hidden-sm" label="Vendor Dashboard"
-            @click="navigate('vendor')" />
+        <div class="flex items-center gap-2">
+          <Button v-if="userRole === 'vendor'" outlined severity="secondary" class="hidden md:flex !text-sm"
+            label="Vendor Dashboard" @click="navigate('vendor')" />
 
-          <Button v-if="userRole === 'admin'" outlined class="hidden-sm" label="Admin Panel"
-            @click="navigate('admin')" />
+          <Button v-if="userRole === 'admin'" outlined severity="secondary" class="hidden md:flex !text-sm"
+            label="Admin Panel" @click="navigate('admin')" />
 
-          <Button text class="icon-button" :icon="themeStore.theme === 'light' ? 'pi pi-moon' : 'pi pi-sun'"
-            @click="themeStore.toggleTheme()"
+          <Button text rounded class="!text-gray-700 dark:!text-gray-200 hover:!bg-gray-100 dark:hover:!bg-gray-800"
+            :icon="themeStore.theme === 'light' ? 'pi pi-moon' : 'pi pi-sun'" @click="themeStore.toggleTheme()"
             v-tooltip.bottom="themeStore.theme === 'light' ? 'Mode sombre' : 'Mode clair'" />
 
-          <Button text class="icon-button" icon="pi pi-shopping-cart" @click="navigate('cart')"
-            :badge="String(cart.cartItems.length)" badge-severity="warn">
+          <Button text rounded
+            class="!text-gray-700 dark:!text-gray-200 hover:!bg-gray-100 dark:hover:!bg-gray-800 relative"
+            icon="pi pi-shopping-cart" @click="navigate('cart')" :badge="String(cart.cartItems.length)"
+            badge-severity="warn">
           </Button>
 
-          <Button text class="icon-button" icon="pi pi-user" @click="navigate('account')" />
+          <Button text rounded class="!text-gray-700 dark:!text-gray-200 hover:!bg-gray-100 dark:hover:!bg-gray-800"
+            icon="pi pi-user" @click="navigate('account')" />
 
           <!-- Mobile menu -->
-          <Button text class="icon-button mobile-only" icon="pi pi-bars" @click="mobileMenuVisible = true" />
+          <Button text rounded class="md:hidden !text-gray-700 dark:!text-gray-200" icon="pi pi-bars"
+            @click="mobileMenuVisible = true" />
         </div>
       </div>
     </div>
 
     <!-- Mobile Drawer -->
-    <Drawer v-model:visible="mobileMenuVisible" position="right">
-      <nav class="nav nav--mobile">
-        <Button v-for="item in navItems" :key="item.value" text class="nav__item" :label="item.label"
+    <Drawer v-model:visible="mobileMenuVisible" position="right" class="w-72">
+      <template #header>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Menu</h3>
+      </template>
+      <nav class="flex flex-col gap-2 pt-4">
+        <Button v-for="item in navItems" :key="item.value" text
+          class="!justify-start !text-gray-700 dark:!text-gray-200 hover:!bg-gray-100 dark:hover:!bg-gray-800"
+          :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
           @click="navigate(item.value)" />
 
-        <Button v-if="userRole === 'vendor'" outlined label="Vendor Dashboard" @click="navigate('vendor')" />
+        <div v-if="userRole === 'vendor' || userRole === 'admin'"
+          class="border-t border-gray-200 dark:border-gray-700 my-2">
+        </div>
 
-        <Button v-if="userRole === 'admin'" outlined label="Admin Panel" @click="navigate('admin')" />
+        <Button v-if="userRole === 'vendor'" outlined severity="secondary" class="!justify-start"
+          label="Vendor Dashboard" @click="navigate('vendor')" />
+
+        <Button v-if="userRole === 'admin'" outlined severity="secondary" class="!justify-start" label="Admin Panel"
+          @click="navigate('admin')" />
       </nav>
     </Drawer>
 
