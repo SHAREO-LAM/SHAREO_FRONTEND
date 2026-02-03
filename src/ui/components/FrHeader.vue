@@ -96,6 +96,7 @@ export default defineComponent({
     return {
       mobileMenuVisible: false,
       navItems: [
+        { label: 'Accueil', value: '' },
         { label: 'Lieux', value: 'domains' },
         { label: 'Équipements', value: 'equipments' },
       ] as NavItem[],

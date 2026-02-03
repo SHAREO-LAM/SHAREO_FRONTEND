@@ -1,214 +1,231 @@
 <template>
-  <div class="min-h-screen">
-    <div class="flex flex-col gap-16">
-
-      <!-- Hero Section -->
-      <section class="bg-(--primary-color) text-(--primary-color-text) py-20 px-4 text-center">
-        <div class="max-w-3xl mx-auto flex flex-col gap-6">
-          <h1 class="text-4xl font-bold">Book the Perfect Venue or Equipment</h1>
-          <p class="text-lg">Easily find and reserve venues and event equipment for any occasion</p>
-
-          <div class="flex flex-col gap-4 md:flex-row md:justify-center">
-            <InputText v-model:modelValue="searchQuery" placeholder="Search venues or equipment..."
-              class="w-full md:w-md" />
-            <Button label="Search" @click="onSearch" />
-          </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-20">
+      <div class="container mx-auto px-4 text-center">
+        <div class="max-w-4xl mx-auto mb-12">
+          <h1 class="text-4xl md:text-5xl mb-4">Trouvez le lieu parfait pour votre événement</h1>
+          <p class="text-xl text-blue-100">
+            Réservez facilement des lieux et équipements pour toutes vos occasions
+          </p>
         </div>
-      </section>
 
-      <!-- Featured Venues -->
-      <section class="py-16 px-4">
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-center text-3xl font-semibold mb-8">Featured Venues</h2>
+        <!-- Search Bar -->
+        <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="lg:col-span-2">
+              <label class="block text-sm text-gray-700 mb-2">Recherche</label>
+              <InputText v-model="searchQuery" placeholder="Nom du lieu ou équipement..." class="w-full" />
+            </div>
 
-          <div class="flex flex-wrap justify-center gap-6">
-            <Card v-for="venue in featuredVenues" :key="venue.id" class="w-72 shrink-0 overflow-hidden">
-              <template #header>
-                <img :src="venue.image" :alt="venue.name" class="w-full h-48 object-cover" />
-              </template>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Localisation</label>
+              <InputText v-model="location" placeholder="Ville, État" class="w-full" />
+            </div>
 
-              <div class="p-4 flex flex-col gap-1">
-                <h3 class="text-lg font-medium">{{ venue.name }}</h3>
-                <p class="text-(--muted-color)">{{ venue.location }}</p>
-                <div class="mt-2">
-                  <Badge :value="`$${venue.price}/day`" />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Type d'événement</label>
+              <MultiSelect v-model="eventType" :options="eventTypes" optionLabel="label" optionValue="value"
+                placeholder="Type d'événement" class="w-full" />
+            </div>
 
-      <!-- Featured Equipment -->
-      <section class="py-16 px-4">
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-center text-3xl font-semibold mb-8">Featured Equipment</h2>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Capacité</label>
+              <Select v-model="capacity" :options="capacities" optionLabel="label" optionValue="value"
+                placeholder="Capacité" filter showClear class="w-full" />
 
-          <div class="flex flex-wrap justify-center gap-6">
-            <Card v-for="equipment in featuredEquipment" :key="equipment.id" class="w-72 shrink-0 overflow-hidden">
-              <template #header>
-                <img :src="equipment.image" :alt="equipment.name" class="w-full h-48 object-cover" />
-              </template>
-
-              <div class="p-4 flex flex-col gap-1">
-                <h3 class="text-lg font-medium">{{ equipment.name }}</h3>
-                <p class="text-(--muted-color)">{{ equipment.type }}</p>
-                <div class="mt-2">
-                  <Badge :value="`$${equipment.price}/day`" />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl mb-2">Pourquoi choisir VenueBook ?</h2>
-            <p class="text-gray-600">
-              La manière la plus simple de réserver des lieux et des équipements
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div v-for="(benefit, index) in benefits" :key="index" class="text-center">
-              <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-4">
-                <i :class="['pi', benefit.icon, 'text-2xl text-blue-600']"></i>
-              </div>
-
-              <h3 class="mb-2 font-semibold">
-                {{ benefit.title }}
-              </h3>
-
-              <p class="text-gray-600">
-                {{ benefit.description }}
-              </p>
             </div>
           </div>
+
+          <Button label="Rechercher"
+            class="w-full md:w-auto mt-6 bg-orange-500 hover:bg-orange-600 text-white border-none" size="large"
+            @click="handleSearch" />
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Section Appel à l’action -->
-      <section class="py-16 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-        <div class="container mx-auto px-4 text-center">
-          <h2 class="text-3xl md:text-4xl mb-4">
-            Prêt à inscrire votre établissement ?
-          </h2>
-
-          <p class="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-            Donnez de la visibilité à vos lieux et équipements et attirez de nouveaux clients dès maintenant.
-          </p>
-
-          <Button size="large" class="bg-white text-orange-600 hover:bg-gray-100 border-none" @click="goToVendorDashboard">
-            Devenir vendeur
-          </Button>
+    <!-- Popular Listings -->
+    <section class="py-16 container mx-auto px-4">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-3xl mb-2">Lieux et équipements populaires</h2>
+          <p class="text-gray-600">Découvrez nos lieux et équipements les plus réservés</p>
         </div>
-      </section>
+      </div>
 
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card v-for="listing in popularListings" :key="listing.id"
+          class="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" @click="goToListing(listing.id)">
+          <img :src="listing.image" :alt="listing.name" class="w-full h-48 object-cover" />
+          <div class="p-4 flex flex-col gap-2">
+            <h3 class="mb-1">{{ listing.name }}</h3>
+            <p class="text-gray-600 text-sm">{{ listing.location }}</p>
+            <Badge :value="listing.type" class="bg-blue-100 text-blue-800" />
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-gray-900 font-medium">${{ listing.price }}</span>
+              <span class="text-sm text-yellow-500">★ {{ listing.rating }}</span>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </section>
 
-    </div>
+    <!-- Benefits Section -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl mb-2">Pourquoi choisir VenueBook ?</h2>
+          <p class="text-gray-600">La manière la plus simple de réserver des lieux et équipements</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div v-for="(benefit, index) in benefits" :key="index" class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-4">
+              <i :class="['pi', benefit.icon, 'text-2xl text-blue-600']"></i>
+            </div>
+            <h3 class="mb-2 font-semibold">{{ benefit.title }}</h3>
+            <p class="text-gray-600">{{ benefit.description }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl mb-4">Prêt à inscrire votre établissement ?</h2>
+        <p class="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+          Donnez de la visibilité à vos lieux et équipements et attirez de nouveaux clients dès maintenant.
+        </p>
+        <Button label="Devenir vendeur" size="large" class="bg-white text-orange-600 hover:bg-gray-100 border-none"
+          @click="goToVendorDashboard" />
+      </div>
+    </section>
   </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { ROUTES } from '../../constants/const';
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Badge from 'primevue/badge';
+import Dropdown from 'primevue/dropdown';
+import { ROUTES } from '@/constants/const';
 
-interface Venue {
-  id: number;
-  name: string;
-  location: string;
-  price: number;
-  image: string;
-}
-
-interface Equipment {
+interface Listing {
   id: number;
   name: string;
   type: string;
+  location: string;
   price: number;
   image: string;
+  rating: number;
 }
 
 export default defineComponent({
   name: 'HomePage',
-  components: {
-    InputText,
-    Card,
-    Badge,
-  },
-  data() {
-    return {
-      searchQuery: '',
-      featuredVenues: [
-        {
-          id: 1,
-          name: 'Grand Ballroom',
-          location: 'New York',
-          price: 2500,
-          image: 'https://images.unsplash.com/photo-1759519238029-689e99c6d19e?w=400',
+  setup() {
+    const router = useRouter();
+    const searchQuery = ref('');
+    const location = ref('');
+    const eventType = ref<string[]>([])
+    const capacity = ref<string | null>(null)
+    const eventTypes = [
+      { label: 'Mariage', value: 'wedding' },
+      { label: 'Corporate', value: 'corporate' },
+      { label: 'Conférence', value: 'conference' },
+      { label: 'Fête', value: 'party' },
+      { label: 'Autre', value: 'other' },
+    ];
+
+    const capacities = [
+      { label: '0-50 invités', value: '0-50' },
+      { label: '50-100 invités', value: '50-100' },
+      { label: '100-200 invités', value: '100-200' },
+      { label: '200-500 invités', value: '200-500' },
+      { label: '500+ invités', value: '500+' },
+    ];
+
+
+
+    const popularListings = ref<Listing[]>([
+      {
+        id: 1,
+        name: 'Grand Ballroom Downtown',
+        type: 'Lieu',
+        image: 'https://images.unsplash.com/photo-1519167758481-83f29da8c68d?w=800',
+        price: 2500,
+        location: 'New York, NY',
+        rating: 4.9,
+      },
+      {
+        id: 2,
+        name: 'Modern Conference Hall',
+        type: 'Lieu',
+        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800',
+        price: 1200,
+        location: 'San Francisco, CA',
+        rating: 4.8,
+      },
+      {
+        id: 3,
+        name: 'Professional Audio System',
+        type: 'Équipement',
+        image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800',
+        price: 350,
+        location: 'Los Angeles, CA',
+        rating: 4.7,
+      },
+    ]);
+
+    const benefits = [
+      { icon: 'pi-search', title: 'Découverte facile', description: 'Trouvez facilement le lieu ou équipement parfait' },
+      { icon: 'pi-shield', title: 'Réservation sécurisée', description: 'Réservez en toute confiance avec notre système sécurisé' },
+      { icon: 'pi-clock', title: 'Disponibilité instantanée', description: 'Vérifiez les disponibilités et réservez en quelques minutes' },
+      { icon: 'pi-trending-up', title: 'Meilleurs prix', description: 'Tarifs compétitifs auprès de prestataires vérifiés' },
+    ];
+
+    const handleSearch = () => {
+      router.push({
+        name: ROUTES.COMMON.SEARCH.name,
+        query: {
+          q: searchQuery.value || '',
+          location: location.value || '',
+          eventType: eventType.value.length === 0
+            ? 'any'
+            : eventType.value.join(','),
+          capacity: capacity.value ?? 'any',
         },
-        {
-          id: 2,
-          name: 'Conference Hall',
-          location: 'Los Angeles',
-          price: 1800,
-          image: 'https://images.unsplash.com/photo-1603430416744-a47cee46b0ae?w=400',
-        },
-        {
-          id: 3,
-          name: 'Garden Event Space',
-          location: 'Chicago',
-          price: 2000,
-          image: 'https://images.unsplash.com/photo-1760972594010-e217e2f2845c?w=400',
-        },
-      ] as Venue[],
-      featuredEquipment: [
-        {
-          id: 1,
-          name: 'Professional Audio System',
-          type: 'Audio',
-          price: 350,
-          image: 'https://images.unsplash.com/photo-1745848413083-cfea604edb6a?w=400',
-        },
-        {
-          id: 2,
-          name: 'Lighting Package',
-          type: 'Lighting',
-          price: 200,
-          image: 'https://images.unsplash.com/photo-1582719478250-93f1b20a0372?w=400',
-        },
-        {
-          id: 3,
-          name: 'Projector & Screen',
-          type: 'AV',
-          price: 150,
-          image: 'https://images.unsplash.com/photo-1582719478806-d1b4a4d5e734?w=400',
-        },
-      ] as Equipment[],
-      benefits: [
-        { title: 'Easy Booking', description: 'Quickly reserve venues', icon: 'pi pi-check' },
-        { title: 'Trusted Vendors', description: 'Verified suppliers', icon: 'pi pi-users' },
-        { title: 'Secure Payments', description: 'Safe and reliable', icon: 'pi pi-lock' },
-        { title: '24/7 Support', description: 'Always here to help', icon: 'pi pi-headset' },
-      ],
-    };
-  },
-  methods: {
-    onSearch() {
-      this.$router.push({
-        path: ROUTES.COMMON.SEARCH.path,
-        query: { q: this.searchQuery },
       });
-    },
-    goToVendorDashboard() {
-      this.$router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
-    }
+    };
+
+    const goToVendorDashboard = () => {
+      router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
+    };
+
+    const goToListing = (id: number) => {
+      router.push({ name: ROUTES.COMMON.SEARCH.name, query: { listingId: id } });
+    };
+
+    return {
+      searchQuery,
+      location,
+      eventType,
+      capacity,
+      eventTypes,
+      capacities,
+      popularListings,
+      benefits,
+      handleSearch,
+      goToVendorDashboard,
+      goToListing,
+    };
   },
 });
 </script>
+
+<style scoped>
+/* Ajustements optionnels pour PrimeVue */
+</style>
