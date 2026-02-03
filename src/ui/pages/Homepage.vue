@@ -61,6 +61,52 @@
           </div>
         </div>
       </section>
+
+      <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl mb-2">Pourquoi choisir VenueBook ?</h2>
+            <p class="text-gray-600">
+              La manière la plus simple de réserver des lieux et des équipements
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div v-for="(benefit, index) in benefits" :key="index" class="text-center">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mb-4">
+                <i :class="['pi', benefit.icon, 'text-2xl text-blue-600']"></i>
+              </div>
+
+              <h3 class="mb-2 font-semibold">
+                {{ benefit.title }}
+              </h3>
+
+              <p class="text-gray-600">
+                {{ benefit.description }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Appel à l’action -->
+      <section class="py-16 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+          <h2 class="text-3xl md:text-4xl mb-4">
+            Prêt à inscrire votre établissement ?
+          </h2>
+
+          <p class="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+            Donnez de la visibilité à vos lieux et équipements et attirez de nouveaux clients dès maintenant.
+          </p>
+
+          <Button size="large" class="bg-white text-orange-600 hover:bg-gray-100 border-none" @click="goToVendorDashboard">
+            Devenir vendeur
+          </Button>
+        </div>
+      </section>
+
+
     </div>
   </div>
 </template>
@@ -98,7 +144,6 @@ export default defineComponent({
   },
   data() {
     return {
-      ROUTES,
       searchQuery: '',
       featuredVenues: [
         {
@@ -161,6 +206,9 @@ export default defineComponent({
         query: { q: this.searchQuery },
       });
     },
+    goToVendorDashboard() {
+      this.$router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
+    }
   },
 });
 </script>
