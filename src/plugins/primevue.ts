@@ -1,6 +1,6 @@
 // Composants de base
 import Aura from '@primevue/themes/aura'
-import { DatePicker, Drawer } from 'primevue'
+import { DatePicker, Drawer, Listbox, MultiSelect, Select, SelectButton } from 'primevue'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
@@ -51,5 +51,7 @@ export default {
     app.component('ProgressBar', ProgressBar)
     app.component('Badge', Badge)
     app.component('Drawer', Drawer)
+    app.component('MultiSelect', MultiSelect)
+    app.component('Select', Select)
   },
 }

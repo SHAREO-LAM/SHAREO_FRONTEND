@@ -1,14 +1,20 @@
-import HomePage from '@/ui/pages/HomePage.vue'
+import HomePage from '@/ui/pages/Homepage.vue'
 import DomainsCatalogPage from '@/ui/pages/DomainsCatalogPage.vue'
 import EquipmentsCatalogPage from '@/ui/pages/EquipmentsCatalogPage.vue'
 import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import VendorDashBoardPage from '@/ui/pages/VendorDashBoardPage.vue'
 
 const routes = [
   { path: '/', component: HomePage },
   { path: '/domains', component: DomainsCatalogPage },
   { path: '/equipments', component: EquipmentsCatalogPage },
   { path: '/productDetails/:id', component: ProductDetailsPage },
+  { 
+    path: '/vendor/dashboard',
+    name: 'vendor-dashboard',
+    component: VendorDashBoardPage,
+  },
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
   // { path: '/cart', component: CartBooking },
