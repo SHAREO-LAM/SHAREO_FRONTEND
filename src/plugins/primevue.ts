@@ -1,5 +1,5 @@
 // Composants de base
-import Aura from '@primevue/themes/aura'
+import Lara from '@primevue/themes/lara'
 import { DatePicker, Drawer } from 'primevue'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
@@ -26,7 +26,7 @@ export default {
   install(app: App) {
     app.use(PrimeVue, {
       theme: {
-        preset: Aura,
+        preset: Lara,
       },
     })
     app.use(ToastService) // service global pour Toast
