@@ -4,18 +4,23 @@ import EquipmentsCatalogPage from '@/ui/pages/EquipmentsCatalogPage.vue'
 import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import VendorDashBoardPage from '@/ui/pages/VendorDashBoardPage.vue'
+import { ROUTES } from '@/constants/const'
 
 const routes = [
   { path: '/', component: HomePage },
   { path: '/domains', component: DomainsCatalogPage },
   { path: '/equipments', component: EquipmentsCatalogPage },
   { path: '/productDetails/:id', component: ProductDetailsPage },
-  { 
-    path: '/vendor/dashboard',
-    name: 'vendor-dashboard',
+  {
+    path: ROUTES.VENDOR.DASHBOARD.path,
+    name: ROUTES.VENDOR.DASHBOARD.name,
     component: VendorDashBoardPage,
   },
-  // { path: '/search', component: SearchResults },
+  {
+    path: ROUTES.COMMON.SEARCH.path,
+    name: ROUTES.COMMON.SEARCH.name,
+    component: DomainsCatalogPage
+  },
   // { path: '/listing/:id', component: ListingDetail },
   // { path: '/cart', component: CartBooking },
   // { path: '/account', component: UserAccount, meta: { requiresAuth: true } },
