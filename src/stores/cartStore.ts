@@ -12,14 +12,36 @@ export const useCartStore = defineStore('cart', {
       localStorage.setItem(CART_KEY, JSON.stringify(this.cartItems));
     },
     addItem(cartItem: CartItem) {
-      this.cartItems.push(cartItem);
+      cartItem.cartItemId = crypto.randomUUID();
+      const itemAlreadyInCart = this.cartItems.find(item => item.productId === cartItem.productId && item.companyId === cartItem.companyId);
+      if (cartItem.type === 'equipment' && itemAlreadyInCart) {
+        this.increaseQuantity(itemAlreadyInCart.cartItemId!);
+      } else {
+        this.cartItems.push(cartItem);
+        this.save();
+      }
+    },
+    removeItem(cartItemId: string) {
+      this.cartItems = this.cartItems.filter(
+        item => item.cartItemId !== cartItemId
+      );
       this.save();
     },
-    removeItem(productId: string) {
-      this.cartItems = this.cartItems.filter(
-        item => item.productId !== productId
-      )
-      this.save();
+    increaseQuantity(cartItemId: string) {
+      const item = this.cartItems.find(item => item.cartItemId === cartItemId);
+      if (item) {
+        item.quantity = ((Number(item.quantity) || 1) + 1).toString();
+        this.save();
+      }
+    },
+    decreaseQuantity(cartItemId: string) {
+      const item = this.cartItems.find(item => item.cartItemId === cartItemId);
+      if (item && item.quantity && Number(item.quantity) > 1) {
+        item.quantity = (Number(item.quantity) - 1).toString();
+        this.save();
+      }else if (item && item.quantity === '1') {
+        this.removeItem(cartItemId);
+      }
     },
     clear() {
       this.cartItems = [];

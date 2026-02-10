@@ -52,13 +52,13 @@
               </template>
 
               <!-- Equipment badges -->
-              <template v-else-if="type === 'equipment' && equipement">
+              <template v-else-if="productType === 'equipment' && equipement">
                 <Badge severity="info" class="mr-2">
                   <i class="pi pi-box" style="margin-right: 6px;"></i>
                   {{ equipement.equipementType?.name }}
                 </Badge>
 
-                <Badge severity="warning">
+                <Badge severity="success">
                   <i class="pi pi-tags" style="margin-right: 6px;"></i>
                   {{ equipement.equipementType?.equipementCategory?.name }}
                 </Badge>
@@ -173,10 +173,12 @@ import CompanyCard from '@/ui/components/CompanyCard.vue';
 import type { Company } from '@/types/company';
 import { getCompany } from '@/services/company';
 import { useCartStore } from '@/stores/cartStore';
+import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
   name: 'ProductDetailsPage',
   components: {
+    // eslint-disable-next-line vue/no-reserved-component-names
     Button,
     DatePicker,
     Badge,
@@ -271,16 +273,32 @@ export default defineComponent({
       return `${year}-${month}-${day}`;
     },
     handleBookNow() {
+      if (!this.company) return
+
       this.cart.addItem({
+        type: this.productType,
         productId: this.id,
-        companyId: this.company?.companyId,
-        unitPrice: this.totalPrice,
+        companyId: this.company.companyId,
+        company: this.company,
+        product: this.productType === 'equipment'
+          ? this.equipement!
+          : this.domain!,
         startDate: this.formatDateLocal(this.startDate),
         endDate: this.formatDateLocal(this.endDate),
-        quantity: this.productType === 'equipment' ? this.quantity.toString() : undefined,
-        type: this.productType,
+        quantity: this.productType === 'equipment'
+          ? this.quantity.toString()
+          : undefined,
+        unitPrice: this.totalPrice
+      })
+      console.log(this.cart.cartItems);
+
+      this.$toast.add({
+        severity: 'success',
+        summary: 'Ajouté au panier',
+        detail: `${this.productTitle} a bien été ajouté au panier.`,
+        life: 5000
       });
-    },
+    }
   },
 });
 </script>
