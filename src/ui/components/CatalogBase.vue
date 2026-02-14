@@ -39,8 +39,18 @@
                       class="w-full" inputClass="w-full" :min="f.minValue" />
                   </div>
                 </div>
+
               </template>
 
+              <h4 class="font-medium mb-3">Disponibilité</h4>
+              <div>
+
+                <div class="space-y-2">
+                  <InputText v-model="startDate" type="date" class="w-full" />
+
+                  <InputText v-model="endDate" type="date" class="w-full" />
+                </div>
+              </div>
               <Button label="Valider" class="w-full" @click="applyFilters" />
 
               <Button label="Réinitialiser les filtres" severity="secondary" outlined class="w-full"
@@ -179,6 +189,8 @@ export default defineComponent({
       filtersNumberDraft: { ...defaults.number } as NumberFilters,
       sortBy: 'name' as 'name' | 'price',
       sortOrder: 'asc' as 'asc' | 'desc',
+      startDate: '' as string,
+      endDate: '' as string,
     }
   },
   computed: {
@@ -212,11 +224,43 @@ export default defineComponent({
           items = items.filter((item) => typeof item[cfg.itemKey] === 'number' && (item[cfg.itemKey] as number) <= max)
         }
       }
+      if (this.startDate && this.endDate) {
+        const start = new Date(this.startDate)
+        const end = new Date(this.endDate)
+
+        items = items.filter((item) => {
+          if (!item.availableFrom || !item.availableTo) return true
+
+          const from = new Date(item.availableFrom)
+          const to = new Date(item.availableTo)
+
+          return from <= start && to >= end
+        })
+      }
+
 
       return this.sortItems(items)
     },
   },
   mounted() {
+    const query = this.$route.query
+
+    if (typeof query.q === "string") {
+      this.searchQuery = query.q
+    }
+
+    if (typeof query.location === "string") {
+      this.filtersTextDraft["city"] = query.location
+      this.filtersText["city"] = query.location
+    }
+
+    if (typeof query.startDate === "string") {
+      this.startDate = query.startDate
+    }
+
+    if (typeof query.endDate === "string") {
+      this.endDate = query.endDate
+    }
     this.loadData()
   },
   methods: {
