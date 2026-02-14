@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8">
+      <!-- Header et bouton créer annonce -->
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl mb-2">Tableau de bord prestataire</h1>
@@ -15,6 +16,7 @@
         />
       </div>
 
+      <!-- Dialog créer annonce -->
       <Dialog
         v-model:visible="showCreateDialog"
         modal
@@ -77,7 +79,6 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block mb-2 font-medium">Prix par jour (€)</label>
-
               <InputNumber
                 v-model="form.price"
                 class="w-full"
@@ -88,7 +89,7 @@
 
             <div>
               <label class="block mb-2 font-medium">Stock disponible</label>
-              <InputText v-model="form.stock" placeholder="10" />
+              <InputText v-model="form.stock" placeholder="10" class="w-full" />
             </div>
           </div>
 
@@ -113,6 +114,7 @@
         </form>
       </Dialog>
 
+      <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card v-for="(stat, i) in stats" :key="i">
           <template #content>
@@ -126,6 +128,25 @@
         </Card>
       </div>
 
+      <!-- Tableau équipements / annonces -->
+      <Card class="mt-8">
+        <template #title>Mes annonces</template>
+        <template #content>
+          <DataTable
+            :value="equipmentsWithTypeName"
+            responsiveLayout="scroll"
+            class="w-full"
+          >
+            <Column field="displayName" header="Nom de l’annonce" />
+            <Column field="pricePerDay" header="Prix (€)" />
+            <Column field="stock" header="Stock" />
+            <Column field="description" header="Description" />
+            <Column field="typeName" header="Type" />
+          </DataTable>
+        </template>
+      </Card>
+
+      <!-- Réservations à venir -->
       <Card class="mt-8">
         <template #title>Réservations à venir</template>
         <template #content>
@@ -138,11 +159,9 @@
               <template #body="{ data }">
                 <Badge
                   :value="data.status"
-                  :class="
-                    data.status === 'confirmée'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  "
+                  :class="data.status === 'confirmée'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'"
                 />
               </template>
             </Column>
@@ -154,7 +173,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
@@ -167,16 +186,19 @@ import Badge from 'primevue/badge'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
-import { createEquipementCompany } from '@/services/equipementCompany'
+import { createEquipementCompany, getEquipementsCompany } from '@/services/equipementCompany'
 import { fetchEquipementTypes } from '@/services/equipement'
 import type { EquipementType } from '@/types/equipementType'
+import type { EquipementCompany } from '@/types/equipementCompany'
 
 export default defineComponent({
   name: 'VendorDashBoardPage',
-
   setup() {
     const showCreateDialog = ref(false)
+    const isSubmitting = ref(false)
+    const submitError = ref<string | null>(null)
 
+    // Formulaire création
     const form = ref({
       type: null as string | null,
       companyId: '',
@@ -193,9 +215,17 @@ export default defineComponent({
     ]
 
     const equipementTypes = ref<EquipementType[]>([])
-    const isSubmitting = ref(false)
-    const submitError = ref<string | null>(null)
-
+    const equipments = ref<EquipementCompany[]>([])
+    
+    const equipmentsWithTypeName = computed(() => {
+      return equipments.value.map((e) => {
+        const type = equipementTypes.value.find(t => t.equipementTypeId === e.equipementTypeId)
+        return {
+          ...e,
+          typeName: type ? type.name : 'Inconnu'
+        }
+      })
+    })
     const stats = [
       { label: 'Annonces actives', value: 12, change: '+2', icon: 'pi-home' },
       { label: 'Réservations', value: 34, change: '+5', icon: 'pi-calendar' },
@@ -213,10 +243,10 @@ export default defineComponent({
       }
     ]
 
+    // Charger les types d'équipement
     const loadEquipementTypes = async () => {
       try {
         const data = await fetchEquipementTypes()
-
         equipementTypes.value = data.map((t) => ({
           ...t,
           equipementTypeId: String(t.equipementTypeId)
@@ -226,6 +256,16 @@ export default defineComponent({
       }
     }
 
+    // Charger les équipements existants
+    const loadEquipments = async () => {
+      try {
+        equipments.value = await getEquipementsCompany()
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    // Créer un nouvel équipement
     const handleCreateEquipement = async () => {
       submitError.value = null
 
@@ -247,7 +287,7 @@ export default defineComponent({
       isSubmitting.value = true
 
       try {
-        await createEquipementCompany({
+        const newEquipement = await createEquipementCompany({
           displayName: form.value.name,
           description: form.value.description || undefined,
           pricePerDay: form.value.price,
@@ -256,6 +296,8 @@ export default defineComponent({
           equipementTypeId: form.value.equipementTypeId
         })
 
+        // Ajouter immédiatement le nouvel équipement à la liste
+        equipments.value.push(newEquipement)
         showCreateDialog.value = false
       } catch (error) {
         submitError.value = 'Erreur lors de la création.'
@@ -264,13 +306,18 @@ export default defineComponent({
       }
     }
 
-    onMounted(loadEquipementTypes)
+    onMounted(async () => {
+      await loadEquipementTypes()
+      await loadEquipments()
+    })
 
     return {
       showCreateDialog,
       form,
       listingTypes,
       equipementTypes,
+      equipments,
+      equipmentsWithTypeName,
       isSubmitting,
       submitError,
       handleCreateEquipement,
