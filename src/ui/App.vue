@@ -7,7 +7,7 @@
             class="pi pi-check text-green-500 text-xl mt-1"
           ></i>
 
-          <div class="flex-1 text-gray-100">
+          <div class="flex-1">
             <p class="font-semibold">
               {{ slotProps.message.summary }}
             </p>

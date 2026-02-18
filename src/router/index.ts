@@ -8,6 +8,7 @@ import AccountPage from '@/ui/pages/AccountPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import CartPageVue from '@/ui/pages/CartPage.vue'
+import CheckoutPage from '@/ui/pages/CheckoutPage.vue'
 
 const routes = [
   { path: '/', component: HomePage, name: 'home' },
@@ -20,6 +21,7 @@ const routes = [
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
   { path: '/cart', component: CartPageVue },
+  { path: '/checkout', component: CheckoutPage },
   // { path: '/account', component: UserAccount, meta: { requiresAuth: true } },
   // { path: '/vendor', component: VendorDashboard, meta: { requiresRole: 'vendor' } },
   // { path: '/admin', component: AdminDashboard, meta: { requiresRole: 'admin' } },

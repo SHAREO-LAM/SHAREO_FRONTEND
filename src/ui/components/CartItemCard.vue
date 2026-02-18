@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl shadow-md p-4 flex gap-4">
+  <div :class="['flex gap-4', { 'p-4 bg-white rounded-xl shadow-md': !props.small }]">
     <!-- IMAGE À GAUCHE + QUANTITÉ / SUPPRIMER -->
     <div class="flex flex-col w-32 flex-shrink-0">
       <div class="w-full h-24 rounded-lg overflow-hidden">
@@ -12,7 +12,7 @@
 
       <!-- Quantité + Supprimer sous l'image -->
       <div>
-        <div v-if="item.type === 'equipment'" class="mt-2 flex justify-between items-center text-sm">
+        <div v-if="item.type === 'equipment' && !props.small" class="mt-2 flex justify-between items-center text-sm">
           <Button
             icon="pi pi-minus"
             severity="secondary"
@@ -29,7 +29,7 @@
             @click="cart.increaseQuantity(item.cartItemId!)"
           />
         </div>
-        <div v-if="item.type === 'domain'" class="mt-2 flex justify-center items-center text-sm">
+        <div v-if="item.type === 'domain' && !props.small" class="mt-2 flex justify-center items-center text-sm">
           <Button
             icon="pi pi-trash"
             severity="danger"
@@ -46,7 +46,10 @@
       <!-- HEADER PRIX EN HAUT À DROITE -->
       <div class="flex justify-between items-start">
         <div>
-          <h3 class="text-lg font-semibold">
+          <div   :class="['block font-semibold mb-1', { 'sm:hidden text-lg': !props.small }]">
+            {{ totalPrice }} €
+          </div>
+          <h3 :class="['text-md font-semibold', { 'sm:text-lg': !props.small }]">
             <RouterLink
               :to="{
                 path: `/productDetails/${item.productId}`,
@@ -54,13 +57,15 @@
               }"
               class="cursor-pointer hover:underline"
             >
-              {{ item.type === 'equipment'
-                ? item.product.displayName
-                : item.product.name }}
+              {{
+                item.type === 'equipment'
+                  ? `${item.product.displayName}${props.small ? ` (x${item.quantity})` : ''}`
+                  : item.product.name
+              }}
             </RouterLink>
           </h3>
           <!-- BADGES -->
-          <div class="flex gap-2 mt-1">
+          <div class="hidden sm:flex gap-2 mt-1" v-if ="!props.small">
             <template v-if="item.type === 'domain'">
               <Badge severity="info">
                 <i class="pi pi-users mr-1" />
@@ -88,22 +93,24 @@
 
           <!-- DATES -->
           <div class="text-sm text-gray-600 mt-2 flex items-center gap-1.5">
-            <i class="pi pi-calendar" />
+            <i class="pi pi-calendar" v-if="!props.small" />
             {{ formatDate(item.startDate) }} - {{ formatDate(item.endDate) }}
           </div>
 
-          <div class="text-sm text-gray-600 mt-2 flex items-center gap-1.5">
+          <div class="text-sm text-gray-600 mt-2 flex items-center gap-1.5" v-if="!props.small">
             <i class="pi pi-building" />
-            Proposé par <p class="font-bold">{{ item.company.name }}</p>
+            <span class="hidden sm:block"> Proposé par </span> <p class="font-bold">{{ item.company.name }}</p>
           </div>
         </div>
 
         <!-- PRIX EN HAUT À DROITE -->
-        <div class="text-lg font-semibold">{{ totalPrice }} €</div>
+        <div class="hidden sm:block text-lg font-semibold" v-if="!props.small">
+          {{ totalPrice }} €
+        </div>
       </div>
 
       <!-- FOOTER : EN SAVOIR PLUS À GAUCHE -->
-      <div class="mt-2">
+      <div class="mt-2 font" v-if="!props.small">
         <Button
           :label="expanded ? 'Réduire' : 'En savoir plus'"
           :icon="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
@@ -118,13 +125,13 @@
       <!-- DETAILS EXPAND -->
       <div v-if="expanded" class="mt-2 text-sm space-y-2 border-t pt-2">
         <div class="flex items-center gap-1.5" v-if="item.type === 'domain'">
-          <i class="pi pi-map-marker" style="color: slateblue;"/><p class="font-bold"> Adresse : </p>
+          <i class="pi pi-map-marker" style="color: slateblue;"/><p class="hidden sm:font-bold"> Adresse : </p>
           {{ item.product.houseNumber }} {{ item.product.streetName }},
           {{ item.product.postcode }} {{ item.product.city }}
         </div>
 
         <div class="flex items-center gap-1.5" v-else-if="item.type === 'equipment'">
-          <i class="pi pi-map-marker" style="color: slateblue;"/><p class="font-bold"> Adresse de retrait : </p>
+          <i class="pi pi-map-marker" style="color: slateblue;"/><p class="hidden sm:font-bold"> Adresse de retrait : </p>
           {{ item.company.houseNumber }} {{ item.company.streetName }},
           {{ item.company.postcode }} {{ item.company.city }}
         </div>
@@ -148,7 +155,7 @@ import type { EquipementCompanyRead } from '@/types/equipementCompany'
 import { useCartStore } from '@/stores/cartStore'
 
 const cart = useCartStore()
-const props = defineProps<{ item: CartItem }>()
+const props = defineProps<{ item: CartItem, small?: boolean }>()
 defineEmits(['remove'])
 
 const domain = ref<Domain | null>(null)
@@ -173,7 +180,6 @@ const totalPrice = computed(() => {
 const image = computed(() => {
   return 'https://placehold.co/400x300'
 })
-
 function formatDate(date?: string) {
   if (!date) return ''
 

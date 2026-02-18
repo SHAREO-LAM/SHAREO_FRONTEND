@@ -1,9 +1,8 @@
 .product-details-page {
   min-height: 100vh;
+  margin: auto;
 
   .product-details {
-    margin: 0 auto;
-    padding: 3rem 3rem;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -127,6 +126,7 @@
   .amenities,
   .included,
   .vendor,
+  .address,
   .reviews {
     h2 {
       font-size: 20px;

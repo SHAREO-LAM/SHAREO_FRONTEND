@@ -1,6 +1,6 @@
 <template>
   <div class="product-details-page">
-    <main class="product-details"
+    <div class="container mx-auto px-4 py-8 product-details"
       v-if="(productType === 'domain' && domain) || (productType === 'equipment' && equipement)">
       <!-- IMAGE GALLERY -->
       <section class="gallery">
@@ -151,7 +151,7 @@
           <Button label="Réserver" severity="warn" :disabled="!startDate || !endDate" @click="handleBookNow" />
         </aside>
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
@@ -173,7 +173,6 @@ import CompanyCard from '@/ui/components/CompanyCard.vue';
 import type { Company } from '@/types/company';
 import { getCompany } from '@/services/company';
 import { useCartStore } from '@/stores/cartStore';
-import { useToast } from 'primevue/usetoast';
 
 export default defineComponent({
   name: 'ProductDetailsPage',

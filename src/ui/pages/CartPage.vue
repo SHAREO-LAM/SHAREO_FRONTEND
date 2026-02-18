@@ -1,13 +1,33 @@
 <template>
-  <div class="container p-[3rem] py-8">
+  <div class="container mx-auto px-4 py-8">
     <!-- HEADER -->
     <header class="mb-6">
       <h1 class="text-2xl font-bold">Votre panier</h1>
     </header>
 
     <div v-if="cart.cartItems.length" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:hidden">
+        <Button
+          :label="isCartOpen ? 'Masquer le panier' : 'Voir le panier'"
+          :icon="isCartOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+          severity="success"
+          class="w-full"
+          @click="isCartOpen = !isCartOpen"
+        />
+      </div>
       <!-- LEFT -->
-      <section class="lg:col-span-2 space-y-4">
+      <section
+        class="
+          lg:col-span-2
+          space-y-4
+          overflow-hidden
+          transition-all duration-300
+        "
+        :class="{
+          'max-h-0 opacity-0 lg:max-h-none lg:opacity-100': !isCartOpen,
+          'max-h-750 opacity-100': isCartOpen,
+        }"
+      >
         <!-- ITEMS -->
         <CartItemCard
           v-for="item in cart.cartItems"
@@ -23,28 +43,10 @@
             Récapitulatif
           </h1>
 
-          <div class="flex justify-between items-center">
-            <span>Commission SHAREO (1%)</span>
-            <span>
-              {{ (cartTotal * 0.01).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) }} €
-            </span>
-          </div>
-          <div>
-            <Divider />
-            <div class="flex justify-between items-center">
-              <span>Total</span>
-              <span>
-                {{ (cartTotal * 1.01).toLocaleString('fr-FR', { minimumFractionDigits: 1 }) }} €
-              </span>
-            </div>
-            <Divider />
 
-            <Button
-              label="Paiement"
-              severity="warn"
-              class="w-full h-11 text-base font-medium"
-            />
-          </div>
+          <CartSummary
+            @pay="$router.push('/checkout')"
+          />
 
         </div>
       </aside>
@@ -59,41 +61,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import CartItemCard from '@/ui/components/CartItemCard.vue'
 import { useCartStore } from '@/stores/cartStore'
+import CartSummary from '@/ui/components/CartSummary.vue'
 
 import Card from 'primevue/card'
 import Button from 'primevue/button'
-import Divider from 'primevue/divider'
 
 const cart = useCartStore()
+const isCartOpen = ref(false)
 console.log(cart.cartItems[0])
-
-const groupedByCompany = computed(() => {
-  const map = new Map()
-
-  cart.cartItems.forEach(item => {
-    if (!map.has(item.companyId)) {
-      map.set(item.companyId, {
-        companyId: item.companyId,
-        companyName: "Test",
-        items: [],
-        total: 0
-      })
-    }
-
-    const group = map.get(item.companyId)
-    group.items.push(item)
-    group.total += item.type === 'equipment'
-      ? item.unitPrice * ((item.quantity as unknown as number) || 1)
-      : item.unitPrice
-  })
-
-  return Array.from(map.values())
-})
-
-const cartTotal = computed(() =>
-  groupedByCompany.value.reduce((sum, g) => sum + g.total, 0)
-)
 </script>
