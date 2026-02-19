@@ -1,11 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <Toast position="top-right">
+    <Toast position="top-right" group="cart">
       <template #message="slotProps">
         <div class="flex items-start gap-3">
-          <i
-            class="pi pi-check text-green-500 text-xl mt-1"
-          ></i>
+          <i class="pi pi-check text-green-500 text-xl mt-1"></i>
 
           <div class="flex-1">
             <p class="font-semibold">
@@ -26,6 +24,7 @@
         </div>
       </template>
     </Toast>
+    <Toast position="top-right" />
     <FrHeader :current-page="currentPage" user-role="guest" :cart-item-count="cartItemCount"
       @navigate="handleNavigate" />
 

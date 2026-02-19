@@ -12,9 +12,10 @@
           :icon="isCartOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
           severity="success"
           class="w-full"
-          @click="isCartOpen = !isCartOpen"
+          @click="toggleCart"
         />
       </div>
+
       <!-- LEFT -->
       <section
         class="
@@ -28,7 +29,6 @@
           'max-h-750 opacity-100': isCartOpen,
         }"
       >
-        <!-- ITEMS -->
         <CartItemCard
           v-for="item in cart.cartItems"
           :key="item.productId"
@@ -43,11 +43,9 @@
             Récapitulatif
           </h1>
 
-
           <CartSummary
-            @pay="$router.push('/checkout')"
+            @pay="goToCheckout"
           />
-
         </div>
       </aside>
     </div>
@@ -60,16 +58,44 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
 import CartItemCard from '@/ui/components/CartItemCard.vue'
-import { useCartStore } from '@/stores/cartStore'
 import CartSummary from '@/ui/components/CartSummary.vue'
+import { useCartStore } from '@/stores/cartStore'
 
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 
-const cart = useCartStore()
-const isCartOpen = ref(false)
-console.log(cart.cartItems[0])
+export default defineComponent({
+  name: 'CartPage',
+
+  components: {
+    CartItemCard,
+    CartSummary,
+    Card,
+    // eslint-disable-next-line vue/no-reserved-component-names
+    Button
+  },
+
+  data() {
+    return {
+      isCartOpen: false,
+      cart: useCartStore()
+    }
+  },
+
+  mounted() {
+    console.log(this.cart.cartItems[0])
+  },
+
+  methods: {
+    toggleCart() {
+      this.isCartOpen = !this.isCartOpen
+    },
+    goToCheckout() {
+      this.$router.push('/checkout')
+    }
+  }
+})
 </script>

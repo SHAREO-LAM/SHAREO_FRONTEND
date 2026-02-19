@@ -293,8 +293,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive } from 'vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useCartStore } from '@/stores/cartStore'
 
 import Button from 'primevue/button'
@@ -303,16 +303,10 @@ import InputMask from 'primevue/inputmask'
 import Tag from 'primevue/tag'
 import Divider from 'primevue/divider'
 import CartSummary from '@/ui/components/CartSummary.vue'
+
 import { createCheckoutSession } from '@/services/checkout'
+import { confirmPayment } from '@/services/payment'
 
-const cart = useCartStore()
-
-/* ================= ÉTATS ================= */
-const billingAccepted = ref(false)
-const editBilling = ref(false)
-const isProcessingPayment = ref(false)
-
-/* ================= TYPES ================= */
 type BillingForm = {
   firstName: string
   lastName: string
@@ -323,182 +317,210 @@ type BillingForm = {
   city: string
 }
 
-type PaymentForm = {
-  cardNumber: string
-  expiry: string
-  cvc: string
-}
+export default defineComponent({
+  name: 'CheckoutPage',
 
-/* ================= FACTURATION ================= */
-const billingValues = ref<BillingForm | null>(null)
+  components: {
+    // eslint-disable-next-line vue/no-reserved-component-names
+    Button,
+    InputText,
+    InputMask,
+    Tag,
+    Divider,
+    CartSummary
+  },
 
-const billingForm = reactive<BillingForm>({
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  address: '',
-  postcode: '',
-  city: ''
-})
+  data() {
+    return {
+      cart: useCartStore(),
 
-const billingErrors = reactive<Record<string, string>>({})
+      /* ÉTATS */
+      billingAccepted: false,
+      editBilling: false,
+      isProcessingPayment: false,
 
-function clearError(field: string) {
-  delete billingErrors[field]
-}
+      /* FACTURATION */
 
-function validateBillingForm(): boolean {
-  // Réinitialiser les erreurs
-  Object.keys(billingErrors).forEach(key => delete billingErrors[key])
+      billingForm: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        postcode: '',
+        city: ''
+      } as BillingForm,
 
-  let isValid = true
+      billingValues: null as BillingForm | null,
+      billingErrors: {} as Record<string, string>,
 
-  if (!billingForm.firstName || billingForm.firstName.trim().length < 2) {
-    billingErrors.firstName = 'Le prénom doit contenir au moins 2 caractères'
-    isValid = false
-  }
-
-  if (!billingForm.lastName || billingForm.lastName.trim().length < 2) {
-    billingErrors.lastName = 'Le nom doit contenir au moins 2 caractères'
-    isValid = false
-  }
-
-  if (!billingForm.email || billingForm.email.trim().length === 0) {
-    billingErrors.email = 'Adresse email invalide'
-    isValid = false
-  }
-
-  const phoneDigits = billingForm.phone.replace(/\s/g, '')
-  if (!phoneDigits || phoneDigits.length !== 10) {
-    billingErrors.phone = 'Le numéro doit contenir 10 chiffres'
-    isValid = false
-  }
-
-  if (!billingForm.address || billingForm.address.trim().length < 5) {
-    billingErrors.address = 'Adresse invalide'
-    isValid = false
-  }
-
-  if (!billingForm.postcode || billingForm.postcode.length !== 5) {
-    billingErrors.postcode = 'Code postal invalide (5 chiffres)'
-    isValid = false
-  }
-
-  if (!billingForm.city || billingForm.city.trim().length < 2) {
-    billingErrors.city = 'Ville invalide'
-    isValid = false
-  }
-
-  return isValid
-}
-
-function handleBillingSubmit() {
-  if (!validateBillingForm()) return
-
-  // Sauvegarder les valeurs
-  billingValues.value = { ...billingForm }
-  billingAccepted.value = true
-  editBilling.value = false
-}
-
-/* ================= PAIEMENT ================= */
-const paymentForm = reactive<PaymentForm>({
-  cardNumber: '',
-  expiry: '',
-  cvc: ''
-})
-
-const paymentErrors = reactive<Record<string, string>>({})
-
-function clearPaymentError(field: string) {
-  delete paymentErrors[field]
-}
-
-function validatePaymentForm(): boolean {
-  // Réinitialiser les erreurs
-  Object.keys(paymentErrors).forEach(key => delete paymentErrors[key])
-
-  let isValid = true
-
-  const cardDigits = paymentForm.cardNumber.replace(/\s/g, '')
-  if (!cardDigits || cardDigits.length !== 16) {
-    paymentErrors.cardNumber = 'Numéro de carte invalide (16 chiffres)'
-    isValid = false
-  }
-
-  if (!paymentForm.expiry || paymentForm.expiry.length !== 5) {
-    paymentErrors.expiry = 'Date d\'expiration invalide (MM/AA)'
-    isValid = false
-  } else {
-    // Validation supplémentaire de la date
-    const [month] = paymentForm.expiry.split('/')
-    const monthNum = parseInt(month || '0')
-    if (monthNum < 1 || monthNum > 12) {
-      paymentErrors.expiry = 'Mois invalide (01-12)'
-      isValid = false
-    }
-  }
-
-  if (!paymentForm.cvc || paymentForm.cvc.length !== 3) {
-    paymentErrors.cvc = 'CVC invalide (3 chiffres)'
-    isValid = false
-  }
-
-  return isValid
-}
-
-async function handlePaymentSubmit() {
-  if (!validatePaymentForm()) return
-  if (!billingValues.value) return
-
-  isProcessingPayment.value = true
-
-  try {
-
-    /*
-    const orderData = {
-      billing: billingValues.value,
-      payment: {
-        cardNumber: paymentForm.cardNumber,
-        expiry: paymentForm.expiry,
-        cvc: paymentForm.cvc
+      /* PAIEMENT */
+      paymentForm: {
+        cardNumber: '',
+        expiry: '',
+        cvc: ''
       },
-      cartItems: cart.cartItems,
-      total: cart.totalWithCommission
+
+      paymentErrors: {} as Record<string, string>
     }
-    */
-    const checkoutPayload = {
-      items: cart.cartItems.map(item => ({
-        type: item.type,
-        productId: item.productId,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        quantity: item.quantity ?? '1',
-        unitPrice: item.unitPrice
-      })),
-      cartTotal: cart.totalWithCommission
+  },
+
+  methods: {
+    /* FACTURATION */
+
+    clearError(field: string) {
+      delete this.billingErrors[field]
+    },
+
+    validateBillingForm(): boolean {
+      this.billingErrors = {}
+      let isValid = true
+
+      if (!this.billingForm.firstName || this.billingForm.firstName.trim().length < 2) {
+        this.billingErrors.firstName = 'Le prénom doit contenir au moins 2 caractères'
+        isValid = false
+      }
+
+      if (!this.billingForm.lastName || this.billingForm.lastName.trim().length < 2) {
+        this.billingErrors.lastName = 'Le nom doit contenir au moins 2 caractères'
+        isValid = false
+      }
+
+      if (!this.billingForm.email) {
+        this.billingErrors.email = 'Adresse email invalide'
+        isValid = false
+      }
+
+      const phoneDigits = this.billingForm.phone.replace(/\s/g, '')
+      if (!phoneDigits || phoneDigits.length !== 10) {
+        this.billingErrors.phone = 'Le numéro doit contenir 10 chiffres'
+        isValid = false
+      }
+
+      if (!this.billingForm.address || this.billingForm.address.trim().length < 5) {
+        this.billingErrors.address = 'Adresse invalide'
+        isValid = false
+      }
+
+      if (!this.billingForm.postcode || this.billingForm.postcode.length !== 5) {
+        this.billingErrors.postcode = 'Code postal invalide (5 chiffres)'
+        isValid = false
+      }
+
+      if (!this.billingForm.city || this.billingForm.city.trim().length < 2) {
+        this.billingErrors.city = 'Ville invalide'
+        isValid = false
+      }
+
+      return isValid
+    },
+
+    handleBillingSubmit() {
+      if (!this.validateBillingForm()) return
+
+      this.billingValues = { ...this.billingForm }
+      this.billingAccepted = true
+      this.editBilling = false
+    },
+
+    /* PAIEMENT */
+
+    clearPaymentError(field: string) {
+      delete this.paymentErrors[field]
+    },
+
+    validatePaymentForm(): boolean {
+      this.paymentErrors = {}
+      let isValid = true
+
+      const cardDigits = this.paymentForm.cardNumber.replace(/\s/g, '')
+      if (!cardDigits || cardDigits.length !== 16) {
+        this.paymentErrors.cardNumber = 'Numéro invalide (16 chiffres)'
+        isValid = false
+      }
+
+      if (!this.paymentForm.expiry || this.paymentForm.expiry.length !== 5) {
+        this.paymentErrors.expiry = 'Expiration invalide (MM/AA)'
+        isValid = false
+      } else {
+        const [month] = this.paymentForm.expiry.split('/')
+        const monthNum = parseInt(month || '0')
+        if (monthNum < 1 || monthNum > 12) {
+          this.paymentErrors.expiry = 'Mois invalide (01-12)'
+          isValid = false
+        }
+      }
+
+      if (!this.paymentForm.cvc || this.paymentForm.cvc.length !== 3) {
+        this.paymentErrors.cvc = 'CVC invalide (3 chiffres)'
+        isValid = false
+      }
+
+      return isValid
+    },
+
+    async handlePaymentSubmit() {
+      if (!this.validatePaymentForm()) return
+      if (!this.billingValues) return
+
+      this.isProcessingPayment = true
+
+      try {
+        const checkoutPayload = {
+          items: this.cart.cartItems.map(item => ({
+            type: item.type,
+            productId: item.productId,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            quantity: item.quantity ?? '1',
+            unitPrice: item.unitPrice
+          })),
+          cartTotal: this.cart.totalWithCommission
+        }
+
+        const checkoutResponse = await createCheckoutSession(checkoutPayload)
+        console.log('Checkout session créée :', checkoutResponse)
+        console.log(checkoutResponse.data.total.toString())
+        const paymentId = checkoutResponse.data.paymentId
+
+        await confirmPayment(paymentId)
+
+        this.cart.clear()
+
+        this.$toast?.add({
+          severity: 'success',
+          summary: 'Paiement réussi',
+          detail: 'Votre commande a été confirmée.',
+          life: 5000
+        })
+
+        this.$router.push({
+          name: 'order-confirmed',
+          query: {
+            totalAmount: parseFloat(checkoutResponse.data.total)
+          }
+        })
+
+      } catch (error) {
+        console.error(error)
+
+        this.$toast?.add({
+          severity: 'error',
+          summary: 'Erreur de paiement',
+          detail: 'Une erreur est survenue.',
+          life: 5000
+        })
+      } finally {
+        this.isProcessingPayment = false
+      }
+    },
+
+    formatPrice(value: number, digits = 2) {
+      return value.toLocaleString('fr-FR', {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      })
     }
-
-    console.log('Payload de checkout:', checkoutPayload);
-
-    const response = await createCheckoutSession(checkoutPayload)
-    const paymentId = response.data.paymentId
-    //await confirmPayment(paymentId)
-    console.log('Session de paiement créée:', response.data)
-
-  } catch (error) {
-    console.error('Erreur de paiement:', error)
-    alert('Erreur lors du paiement.')
-  } finally {
-    isProcessingPayment.value = false
   }
-}
-
-function formatPrice(value: number, digits = 2) {
-  return value.toLocaleString('fr-FR', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits
-  })
-}
+})
 </script>

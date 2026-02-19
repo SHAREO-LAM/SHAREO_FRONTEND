@@ -23,7 +23,6 @@
     </div>
 
     <!-- Total général -->
-
     <div>
       <Divider />
       <div class="flex justify-between items-center">
@@ -36,19 +35,20 @@
     </div>
 
     <Button
-      v-if="!props.small"
+      v-if="!small"
       label="Paiement"
       severity="warn"
       class="w-full h-11"
       @click="$emit('pay')"
     />
+
     <Button
-      v-if="props.small"
+      v-if="small"
       :label="showCartItems ? 'Masquer le panier' : 'Voir le panier'"
       :icon="showCartItems ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
       severity="warn"
       class="w-full h-11 mb-3"
-      @click="showCartItems = !showCartItems"
+      @click="toggleCartItems"
     />
 
     <!-- Items -->
@@ -57,33 +57,56 @@
         v-for="item in cart.cartItems"
         :key="item.productId"
         :item="item"
-        :small="props.small"
+        :small="small"
       />
     </div>
-
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue'
 import Divider from 'primevue/divider'
 import Button from 'primevue/button'
 import { useCartStore } from '@/stores/cartStore'
 import CartItemCard from '@/ui/components/CartItemCard.vue'
-import { ref } from 'vue'
 
+export default defineComponent({
+  name: 'CartSummary',
 
-const cart = useCartStore()
+  components: {
+    Divider,
+    // eslint-disable-next-line vue/no-reserved-component-names
+    Button,
+    CartItemCard
+  },
 
-defineEmits<{
-  (e: 'pay'): void
-}>()
-const props = defineProps<{small?: boolean }>()
-const showCartItems = ref(false)
+  props: {
+    small: {
+      type: Boolean,
+      default: false
+    }
+  },
 
-function formatPrice(value: number, digits = 2) {
-  return value.toLocaleString('fr-FR', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits
-  })
-}
+  emits: ['pay'],
+
+  data() {
+    return {
+      showCartItems: false,
+      cart: useCartStore()
+    }
+  },
+
+  methods: {
+    toggleCartItems() {
+      this.showCartItems = !this.showCartItems
+    },
+
+    formatPrice(value: number, digits = 2): string {
+      return value.toLocaleString('fr-FR', {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      })
+    }
+  }
+})
 </script>

@@ -292,6 +292,7 @@ export default defineComponent({
       console.log(this.cart.cartItems);
 
       this.$toast.add({
+        group: 'cart',
         severity: 'success',
         summary: 'Ajouté au panier',
         detail: `${this.productTitle} a bien été ajouté au panier.`,
