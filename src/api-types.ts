@@ -985,6 +985,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description Id de l’équipement */
+            id?: string;
             equipementType?: components["schemas"]["EquipementTypeReadDto"];
         };
         UpdateEquipementCompanyDto: {
@@ -1008,6 +1010,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description Id de l’équipement */
+            id: string;
         };
         CreateOrderStatusDto: {
             /** @description Code du statut */

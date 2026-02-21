@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8">
-      <!-- Header et bouton créer annonce -->
+      <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl mb-2">Tableau de bord prestataire</h1>
@@ -35,7 +35,6 @@
               class="w-full"
             />
           </div>
-
           <div>
             <label class="block mb-2 font-medium">Société (ID)</label>
             <InputText
@@ -44,7 +43,6 @@
               class="w-full"
             />
           </div>
-
           <div>
             <label class="block mb-2 font-medium">Type d’équipement</label>
             <Select
@@ -56,16 +54,10 @@
               class="w-full"
             />
           </div>
-
           <div>
             <label class="block mb-2 font-medium">Nom de l’annonce</label>
-            <InputText
-              v-model="form.name"
-              placeholder="Ex : Projecteur HD"
-              class="w-full"
-            />
+            <InputText v-model="form.name" placeholder="Ex : Projecteur HD" class="w-full" />
           </div>
-
           <div>
             <label class="block mb-2 font-medium">Description</label>
             <Textarea
@@ -75,27 +67,19 @@
               class="w-full"
             />
           </div>
-
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block mb-2 font-medium">Prix par jour (€)</label>
-              <InputNumber
-                v-model="form.price"
-                class="w-full"
-                placeholder="250"
-                :min="0"
-              />
+              <InputNumber v-model="form.price" class="w-full" placeholder="250" :min="0" />
             </div>
-
             <div>
               <label class="block mb-2 font-medium">Stock disponible</label>
               <InputText v-model="form.stock" placeholder="10" class="w-full" />
             </div>
           </div>
-
           <div class="flex gap-4">
             <Button
-              label="Créer l’annonce"
+              label="Enregistrer"
               class="flex-1 bg-blue-600 border-none"
               type="submit"
               :loading="isSubmitting"
@@ -107,10 +91,7 @@
               @click="showCreateDialog = false"
             />
           </div>
-
-          <p v-if="submitError" class="text-sm text-red-600">
-            {{ submitError }}
-          </p>
+          <p v-if="submitError" class="text-sm text-red-600">{{ submitError }}</p>
         </form>
       </Dialog>
 
@@ -128,7 +109,7 @@
         </Card>
       </div>
 
-      <!-- Tableau équipements / annonces -->
+      <!-- Tableau annonces avec actions -->
       <Card class="mt-8">
         <template #title>Mes annonces</template>
         <template #content>
@@ -142,26 +123,17 @@
             <Column field="stock" header="Stock" />
             <Column field="description" header="Description" />
             <Column field="typeName" header="Type" />
-          </DataTable>
-        </template>
-      </Card>
-
-      <!-- Réservations à venir -->
-      <Card class="mt-8">
-        <template #title>Réservations à venir</template>
-        <template #content>
-          <DataTable :value="upcomingBookings" responsiveLayout="scroll">
-            <Column field="listing" header="Annonce" />
-            <Column field="customer" header="Client" />
-            <Column field="date" header="Date" />
-            <Column field="amount" header="Montant (€)" />
-            <Column header="Statut">
+            <Column header="Actions">
               <template #body="{ data }">
-                <Badge
-                  :value="data.status"
-                  :class="data.status === 'confirmée'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'"
+                <Button
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-text p-button-info mr-2"
+                  @click="editEquipement(data)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  @click="deleteEquipement(data)"
                 />
               </template>
             </Column>
@@ -169,24 +141,65 @@
         </template>
       </Card>
     </div>
+
+    <!-- Dialog modifier annonce -->
+    <Dialog
+      v-model:visible="showEditDialog"
+      modal
+      header="Modifier l’annonce"
+      class="w-full max-w-2xl"
+    >
+      <form class="space-y-6 mt-4" @submit.prevent="handleUpdateEquipement">
+        <div>
+          <label class="block mb-2 font-medium">Nom de l’annonce</label>
+          <InputText v-model="editForm.name" class="w-full" />
+        </div>
+        <div>
+          <label class="block mb-2 font-medium">Description</label>
+          <Textarea v-model="editForm.description" rows="4" class="w-full" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 font-medium">Prix par jour (€)</label>
+            <InputNumber v-model="editForm.price" class="w-full" :min="0" />
+          </div>
+          <div>
+            <label class="block mb-2 font-medium">Stock disponible</label>
+            <InputText v-model="editForm.stock" class="w-full" />
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <Button
+            label="Enregistrer"
+            class="flex-1 bg-blue-600 border-none"
+            type="submit"
+            :loading="isSubmitting"
+          />
+          <Button
+            label="Annuler"
+            severity="secondary"
+            outlined
+            @click="showEditDialog = false"
+          />
+        </div>
+      </form>
+    </Dialog>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue'
-
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
-import Card from 'primevue/card'
-import Badge from 'primevue/badge'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import Card from 'primevue/card'
+import Badge from 'primevue/badge'
 
-import { createEquipementCompany, getEquipementsCompany } from '@/services/equipementCompany'
+import { getEquipementsCompany, createEquipementCompany, updateEquipementCompany, deleteEquipementCompany } from '@/services/equipementCompany'
 import { fetchEquipementTypes } from '@/services/equipement'
 import type { EquipementType } from '@/types/equipementType'
 import type { EquipementCompany } from '@/types/equipementCompany'
@@ -195,10 +208,41 @@ export default defineComponent({
   name: 'VendorDashBoardPage',
   setup() {
     const showCreateDialog = ref(false)
+    const showEditDialog = ref(false)
     const isSubmitting = ref(false)
     const submitError = ref<string | null>(null)
 
-    // Formulaire création
+    const equipments = ref<EquipementCompany[]>([])
+    const equipementTypes = ref<EquipementType[]>([])
+
+
+    const stats = ref([
+  {
+    label: 'Annonces actives',
+    value: 12,
+    change: '+2',
+    icon: 'pi-briefcase'
+  },
+  {
+    label: 'Réservations',
+    value: 8,
+    change: '+1',
+    icon: 'pi-calendar'
+  },
+  {
+    label: 'Revenus du mois',
+    value: '2 450€',
+    change: '+12%',
+    icon: 'pi-euro'
+  },
+  {
+    label: 'Taux de remplissage',
+    value: '78%',
+    change: '+5%',
+    icon: 'pi-chart-line'
+  }
+])
+
     const form = ref({
       type: null as string | null,
       companyId: '',
@@ -209,120 +253,119 @@ export default defineComponent({
       stock: ''
     })
 
+    const editForm = ref<any>({})
+    let editingId: string | null = null
+
     const listingTypes = [
       { label: 'Lieu', value: 'venue' },
       { label: 'Équipement', value: 'equipment' }
     ]
 
-    const equipementTypes = ref<EquipementType[]>([])
-    const equipments = ref<EquipementCompany[]>([])
-    
-    const equipmentsWithTypeName = computed(() => {
-      return equipments.value.map((e) => {
+    const equipmentsWithTypeName = computed(() =>
+      equipments.value.map(e => {
         const type = equipementTypes.value.find(t => t.equipementTypeId === e.equipementTypeId)
-        return {
-          ...e,
-          typeName: type ? type.name : 'Inconnu'
-        }
+        return { ...e, typeName: type ? type.name : 'Inconnu' }
       })
-    })
-    const stats = [
-      { label: 'Annonces actives', value: 12, change: '+2', icon: 'pi-home' },
-      { label: 'Réservations', value: 34, change: '+5', icon: 'pi-calendar' },
-      { label: 'Vues', value: 1280, change: '+12%', icon: 'pi-eye' },
-      { label: 'Revenus', value: '18 500 €', change: '+8%', icon: 'pi-euro' }
-    ]
+    )
 
-    const upcomingBookings = [
-      {
-        listing: 'Projecteur HD',
-        customer: 'Startup XYZ',
-        date: '18/03/2026',
-        amount: 450,
-        status: 'confirmée'
+    const loadEquipements = async () => {
+      try {
+        equipments.value = await getEquipementsCompany()
+      } catch (err) {
+        console.error(err)
       }
-    ]
+    }
 
-    // Charger les types d'équipement
     const loadEquipementTypes = async () => {
       try {
         const data = await fetchEquipementTypes()
-        equipementTypes.value = data.map((t) => ({
-          ...t,
-          equipementTypeId: String(t.equipementTypeId)
-        }))
-      } catch (error) {
-        console.error(error)
+        equipementTypes.value = data.map(t => ({ ...t, equipementTypeId: String(t.equipementTypeId) }))
+      } catch (err) {
+        console.error(err)
       }
     }
 
-    // Charger les équipements existants
-    const loadEquipments = async () => {
-      try {
-        equipments.value = await getEquipementsCompany()
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    // Créer un nouvel équipement
     const handleCreateEquipement = async () => {
       submitError.value = null
-
-      if (form.value.type !== 'equipment') {
-        submitError.value = 'Veuillez sélectionner "Équipement".'
-        return
-      }
-
-      if (!form.value.companyId || !form.value.equipementTypeId) {
-        submitError.value = 'Société et type requis.'
-        return
-      }
-
-      if (!form.value.name || form.value.price === null) {
-        submitError.value = 'Nom et prix obligatoires.'
+      if (!form.value.name || form.value.price === null || !form.value.equipementTypeId) {
+        submitError.value = 'Nom, prix et type requis.'
         return
       }
 
       isSubmitting.value = true
-
       try {
-        const newEquipement = await createEquipementCompany({
+        const newEquip = await createEquipementCompany({
           displayName: form.value.name,
-          description: form.value.description || undefined,
+          description: form.value.description,
           pricePerDay: form.value.price,
           stock: form.value.stock,
           companyId: form.value.companyId,
           equipementTypeId: form.value.equipementTypeId
         })
-
-        // Ajouter immédiatement le nouvel équipement à la liste
-        equipments.value.push(newEquipement)
+        equipments.value.push(newEquip)
         showCreateDialog.value = false
-      } catch (error) {
+      } catch {
         submitError.value = 'Erreur lors de la création.'
       } finally {
         isSubmitting.value = false
       }
     }
 
+    const editEquipement = (equip: EquipementCompany) => {
+      editingId = equip.id
+      editForm.value = { ...equip, price: equip.pricePerDay }
+      showEditDialog.value = true
+    }
+
+    const handleUpdateEquipement = async () => {
+      if (!editingId) return
+      isSubmitting.value = true
+      try {
+        const updated = await updateEquipementCompany(editingId, {
+          ...editForm.value,
+          pricePerDay: editForm.value.price
+        })
+        const index = equipments.value.findIndex(e => e.id === editingId)
+        if (index !== -1) equipments.value[index] = updated
+        showEditDialog.value = false
+      } catch {
+        submitError.value = 'Erreur lors de la modification.'
+      } finally {
+        isSubmitting.value = false
+      }
+    }
+
+    const deleteEquipement = async (equip: EquipementCompany) => {
+      if (!confirm(`Supprimer ${equip.displayName} ?`)) return
+      try {
+        await deleteEquipementCompany(equip.id)
+        equipments.value = equipments.value.filter(e => e.id !== equip.id)
+      } catch {
+        alert('Erreur lors de la suppression.')
+      }
+    }
+
     onMounted(async () => {
       await loadEquipementTypes()
-      await loadEquipments()
+      await loadEquipements()
     })
 
     return {
       showCreateDialog,
+      showEditDialog,
+      isSubmitting,
+      submitError,
       form,
+      editForm,
       listingTypes,
       equipementTypes,
       equipments,
       equipmentsWithTypeName,
-      isSubmitting,
-      submitError,
       handleCreateEquipement,
-      stats,
-      upcomingBookings
+      editEquipement,
+      handleUpdateEquipement,
+      deleteEquipement,
+      stats
     }
   }
 })
