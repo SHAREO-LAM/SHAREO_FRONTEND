@@ -29,3 +29,23 @@ export const updateDomain = async (id: string, payload: Domain): Promise<Domain>
 export const deleteDomain = async (id: string): Promise<void> => {
   await apiClient.delete(`/api/domain/${id}`)
 }
+
+export const getUnavailableDates = async (id: string): Promise<{ disabledDates: string[] }> => {
+  const { data } = await apiClient.get<{ disabledDates: string[] }>(`/domain/${id}/unavailable-dates`);
+  return data;
+}
+
+export const checkDomainAvailability = async (
+  id: string,
+  startDate: string,
+  endDate: string
+): Promise<boolean> => {
+  const { data } = await apiClient.get<{ available: boolean }>(
+    `/domain/${id}/check-availability`,
+    {
+      params: { startDate, endDate },
+    }
+  );
+
+  return data.available;
+};

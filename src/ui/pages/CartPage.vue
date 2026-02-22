@@ -66,6 +66,8 @@ import { useCartStore } from '@/stores/cartStore'
 
 import Card from 'primevue/card'
 import Button from 'primevue/button'
+import { checkDomainAvailability } from '@/services/domain'
+import { checkEquipmentAvailability } from '@/services/equipementCompany'
 
 export default defineComponent({
   name: 'CartPage',
@@ -85,16 +87,51 @@ export default defineComponent({
     }
   },
 
-  mounted() {
-    console.log(this.cart.cartItems[0])
-  },
-
   methods: {
     toggleCart() {
       this.isCartOpen = !this.isCartOpen
     },
-    goToCheckout() {
-      this.$router.push('/checkout')
+    async goToCheckout() {
+      let hasUnavailableItem = false;
+
+      for (const item of this.cart.cartItems) {
+        if (item.type === 'domain') {
+          const isAvailable = await checkDomainAvailability(
+            item.productId,
+            item.startDate!,
+            item.endDate!
+          );
+          if (!isAvailable) {
+            this.$toast.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: `Le domaine ${item.product.name} n'est plus disponible pour ces dates.`,
+              life: 3000
+            });
+            hasUnavailableItem = true;
+          }
+        }else{
+          const isAvailable = await checkEquipmentAvailability(
+            item.productId,
+            item.startDate!,
+            item.endDate!,
+            Number(item.quantity!)
+          );
+          if (!isAvailable) {
+            this.$toast.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: `L'équipement ${item.product.displayName} n'est plus disponible pour ces dates et cette quantité.`,
+              life: 3000
+            });
+            hasUnavailableItem = true;
+          }
+        }
+      }
+
+      if (!hasUnavailableItem) {
+        this.$router.push('/checkout');
+      }
     }
   }
 })

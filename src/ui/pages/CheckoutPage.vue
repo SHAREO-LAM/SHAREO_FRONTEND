@@ -306,6 +306,8 @@ import CartSummary from '@/ui/components/CartSummary.vue'
 
 import { createCheckoutSession } from '@/services/checkout'
 import { confirmPayment } from '@/services/payment'
+import { checkDomainAvailability } from '@/services/domain'
+import { checkEquipmentAvailability } from '@/services/equipementCompany'
 
 type BillingForm = {
   firstName: string
@@ -466,6 +468,13 @@ export default defineComponent({
       this.isProcessingPayment = true
 
       try {
+
+        const isAvailable = await this.checkProductAvailability();
+        if (!isAvailable) {
+          this.isProcessingPayment = false;
+          return;
+        }
+
         const checkoutPayload = {
           items: this.cart.cartItems.map(item => ({
             type: item.type,
@@ -520,7 +529,46 @@ export default defineComponent({
         minimumFractionDigits: digits,
         maximumFractionDigits: digits
       })
-    }
+    },
+
+    async checkProductAvailability() {
+      let hasUnavailableItem = false;
+      for (const item of this.cart.cartItems) {
+        if (item.type === 'domain') {
+          const isAvailable = await checkDomainAvailability(
+            item.productId,
+            item.startDate!,
+            item.endDate!
+          );
+          if (!isAvailable) {
+            this.$toast.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: `Le domaine ${item.product.name} n'est plus disponible pour ces dates.`,
+              life: 3000
+            });
+            hasUnavailableItem = true;
+          }
+        }else{
+          const isAvailable = await checkEquipmentAvailability(
+            item.productId,
+            item.startDate!,
+            item.endDate!,
+            Number(item.quantity!)
+          );
+          if (!isAvailable) {
+            this.$toast.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: `L'équipement ${item.product.displayName} n'est plus disponible pour ces dates et cette quantité.`,
+              life: 3000
+            });
+            hasUnavailableItem = true;
+          }
+        }
+      }
+      return !hasUnavailableItem;
+    },
   }
 })
 </script>

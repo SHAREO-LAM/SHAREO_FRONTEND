@@ -121,15 +121,49 @@
           <div class="date-fields">
             <div class="date-field">
               <label>Début</label>
-              <DatePicker v-model="startDate" showIcon fluid :min-date="minDate" date-format="dd/mm/yy"
-                placeholder="Choisir une date" />
+                <DatePicker
+                  v-model="startDate"
+                  showIcon
+                  fluid
+                  :min-date="minDate"
+                  :disabled-dates="disabledDatesObjects"
+                  date-format="dd/mm/yy"
+                  placeholder="Choisir une date"
+                >
+                  <template #date="slotProps">
+                    <span v-if="isUnavailable(slotProps.date)" style="text-decoration: line-through;">
+                      {{ slotProps.date.day }}
+                    </span>
+                    <template v-else>{{ slotProps.date.day }}</template>
+                  </template>
+                </DatePicker>
             </div>
 
             <div class="date-field">
               <label>Fin</label>
-              <DatePicker v-model="endDate" showIcon fluid :min-date="startDate || minDate" date-format="dd/mm/yy"
-                placeholder="Choisir une date" :disabled="!startDate" />
+              <DatePicker
+                v-model="endDate"
+                showIcon
+                fluid
+                :min-date="startDate || minDate"
+                :disabled-dates="disabledDatesObjects"
+                date-format="dd/mm/yy"
+                placeholder="Choisir une date"
+                :disabled="!startDate"
+              >
+                <template #date="slotProps">
+                  <span v-if="isUnavailable(slotProps.date)" style="text-decoration: line-through;">
+                    {{ slotProps.date.day }}
+                  </span>
+                  <template v-else>{{ slotProps.date.day }}</template>
+                </template>
+              </DatePicker>
             </div>
+          </div>
+          <div>
+            <p class="text-center" v-if="hasUnavailableDateInRange" style="color: red;">
+              Cette période contient des dates indisponibles.
+            </p>
           </div>
 
           <!-- Résumé -->
@@ -148,7 +182,12 @@
             </div>
           </div>
 
-          <Button label="Réserver" severity="warn" :disabled="!startDate || !endDate" @click="handleBookNow" />
+          <Button
+            label="Réserver"
+            severity="warn"
+            :disabled="!startDate || !endDate || hasUnavailableDateInRange"
+            @click="handleBookNow"
+          />
         </aside>
       </div>
     </div>
@@ -160,13 +199,13 @@ import 'primeicons/primeicons.css';
 
 import { defineComponent } from 'vue';
 import Button from 'primevue/button';
-import DatePicker from 'primevue/datepicker';
+import DatePicker, { type DatePickerDateSlotOptions } from 'primevue/datepicker';
 import Badge from 'primevue/badge';
 import Galleria from 'primevue/galleria';
 import InputNumber from 'primevue/inputnumber';
 
-import { getDomain } from '@/services/domain';
-import { getEquipementCompany } from '@/services/equipementCompany';
+import { getDomain, getUnavailableDates } from '@/services/domain';
+import { getEquipementCompany, getUnavailableDatesEquipement } from '@/services/equipementCompany';
 import type { Domain } from '@/types/domain';
 import type { EquipementCompanyRead } from '@/types/equipementCompany';
 import CompanyCard from '@/ui/components/CompanyCard.vue';
@@ -196,6 +235,8 @@ export default defineComponent({
       domain: null as Domain | null,
       equipement: null as EquipementCompanyRead | null,
       company: undefined as Company | undefined,
+      unavailableDates: [] as string[],
+      hasUnavailableDateInRange: false,
       displayGallery: false,
       activeIndex: 0,
       images: [
@@ -244,6 +285,9 @@ export default defineComponent({
     totalPrice(): number {
       return this.numberOfDays * this.productPrice;
     },
+    disabledDatesObjects(): Date[] {
+      return this.unavailableDates.map(d => new Date(d));
+    },
   },
   mounted() {
     this.loadData();
@@ -257,10 +301,23 @@ export default defineComponent({
       if (this.productType === 'domain') {
         this.domain = await getDomain(this.id);
         this.company = await getCompany(this.domain.companyId!);
+        const res = await getUnavailableDates(this.id);
+        this.unavailableDates = res.disabledDates ?? [];
       } else if (this.productType === 'equipment') {
         this.equipement = await getEquipementCompany(this.id);
         this.company = await getCompany(this.equipement.companyId!);
+        const res = await getUnavailableDatesEquipement(this.id);
+        this.unavailableDates = res.disabledDates ?? [];
       }
+    },
+    isUnavailable(slotDate: DatePickerDateSlotOptions): boolean {
+      const date = new Date(slotDate.year, slotDate.month, slotDate.day);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (date < today) return true;
+
+      const dateStr = this.formatDateLocal(date);
+      return this.unavailableDates.includes(dateStr!);
     },
     formatDateLocal(date?: Date | null): string | undefined {
       if (!date) return undefined;
@@ -289,7 +346,6 @@ export default defineComponent({
           : undefined,
         unitPrice: this.totalPrice
       })
-      console.log(this.cart.cartItems);
 
       this.$toast.add({
         group: 'cart',
@@ -298,7 +354,34 @@ export default defineComponent({
         detail: `${this.productTitle} a bien été ajouté au panier.`,
         life: 5000
       });
-    }
+    },
+    checkRangeAvailability() {
+      this.hasUnavailableDateInRange = false;
+      if (!this.startDate || !this.endDate) return;
+
+      const current = new Date(this.startDate);
+      current.setHours(0, 0, 0, 0);
+      const end = new Date(this.endDate);
+      end.setHours(0, 0, 0, 0);
+
+      while (current <= end) {
+        const dateStr = this.formatDateLocal(current);
+        if (this.unavailableDates.includes(dateStr!)) {
+          this.hasUnavailableDateInRange = true;
+          return;
+        }
+        current.setDate(current.getDate() + 1);
+      }
+    },
+  },
+  watch: {
+    endDate() {
+      this.checkRangeAvailability();
+    },
+    startDate() {
+      this.endDate = null;
+      this.hasUnavailableDateInRange = false;
+    },
   },
 });
 </script>
