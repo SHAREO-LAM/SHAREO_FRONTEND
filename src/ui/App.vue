@@ -3,8 +3,6 @@
     <Toast position="top-right" group="cart">
       <template #message="slotProps">
         <div class="flex items-start gap-3">
-          <i class="pi pi-check text-green-500 text-xl mt-1"></i>
-
           <div class="flex-1">
             <p class="font-semibold">
               {{ slotProps.message.summary }}

@@ -49,18 +49,8 @@ export const useCartStore = defineStore('cart', {
     addItem(cartItem: CartItem) {
       cartItem.cartItemId = crypto.randomUUID()
 
-      const itemAlreadyInCart = this.cartItems.find(
-        (item) =>
-          item.productId === cartItem.productId &&
-          item.companyId === cartItem.companyId
-      )
-
-      if (cartItem.type === 'equipment' && itemAlreadyInCart) {
-        this.increaseQuantity(itemAlreadyInCart.cartItemId!)
-      } else {
-        this.cartItems.push(cartItem)
-        this.save()
-      }
+      this.cartItems.push(cartItem)
+      this.save()
 
       this.sortByCompany()
     },

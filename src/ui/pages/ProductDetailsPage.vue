@@ -145,7 +145,7 @@
                 v-model="endDate"
                 showIcon
                 fluid
-                :min-date="startDate || minDate"
+                :min-date="startDate ? new Date(startDate.getTime() + 24 * 60 * 60 * 1000) : minDate"
                 :disabled-dates="disabledDatesObjects"
                 date-format="dd/mm/yy"
                 placeholder="Choisir une date"
@@ -212,6 +212,7 @@ import CompanyCard from '@/ui/components/CompanyCard.vue';
 import type { Company } from '@/types/company';
 import { getCompany } from '@/services/company';
 import { useCartStore } from '@/stores/cartStore';
+import type { CartItem } from '@/types/cartItem';
 
 export default defineComponent({
   name: 'ProductDetailsPage',
@@ -331,7 +332,7 @@ export default defineComponent({
     handleBookNow() {
       if (!this.company) return
 
-      this.cart.addItem({
+      const newCartItem: CartItem = {
         type: this.productType,
         productId: this.id,
         companyId: this.company.companyId,
@@ -345,15 +346,26 @@ export default defineComponent({
           ? this.quantity.toString()
           : undefined,
         unitPrice: this.totalPrice
-      })
+      };
 
-      this.$toast.add({
-        group: 'cart',
-        severity: 'success',
-        summary: 'Ajouté au panier',
-        detail: `${this.productTitle} a bien été ajouté au panier.`,
-        life: 5000
-      });
+      if (this.checkItemAlreadyInCart(newCartItem)) {
+        this.$toast.add({
+          group: 'cart',
+          severity: 'info',
+          summary: 'Déjà dans le panier',
+          detail: `${this.productTitle} est déjà dans le panier pour des dates similaires.`,
+          life: 5000
+        });
+      } else{
+        this.cart.addItem(newCartItem)
+        this.$toast.add({
+          group: 'cart',
+          severity: 'success',
+          summary: 'Ajouté au panier',
+          detail: `${this.productTitle} a bien été ajouté au panier.`,
+          life: 5000
+        });
+      }
     },
     checkRangeAvailability() {
       this.hasUnavailableDateInRange = false;
@@ -373,6 +385,29 @@ export default defineComponent({
         current.setDate(current.getDate() + 1);
       }
     },
+    checkItemAlreadyInCart(cartItem: CartItem) {
+      const cartStore = useCartStore()
+
+      const newStart = new Date(cartItem.startDate!)
+      const newEnd = new Date(cartItem.endDate!)
+
+      const itemAlreadyInCart = cartStore.cartItems.find((item) => {
+        if (
+          item.productId !== cartItem.productId ||
+          item.companyId !== cartItem.companyId
+        ) {
+          return false
+        }
+
+        const existingStart = new Date(item.startDate!)
+        const existingEnd = new Date(item.endDate!)
+
+        // Vérifie si les périodes se chevauchent (inclusif)
+        return newStart <= existingEnd && newEnd >= existingStart
+      })
+
+      return !!itemAlreadyInCart
+    }
   },
   watch: {
     endDate() {
