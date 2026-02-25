@@ -30,3 +30,5 @@ jobs:
           push: true
           platforms: linux/arm64
           tags: zastial/shareo-frontend-prod:latest
+          build-args: |
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
