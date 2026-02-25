@@ -1,5 +1,28 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <Toast position="top-right" group="cart">
+      <template #message="slotProps">
+        <div class="flex items-start gap-3">
+          <div class="flex-1">
+            <p class="font-semibold">
+              {{ slotProps.message.summary }}
+            </p>
+            <p class="text-sm opacity-80">
+              {{ slotProps.message.detail }}
+            </p>
+
+            <Button
+              label="Aller au panier"
+              size="small"
+              severity="secondary"
+              class="mt-2"
+              @click="handleNavigate('cart')"
+            />
+          </div>
+        </div>
+      </template>
+    </Toast>
+    <Toast position="top-right" />
     <FrHeader :current-page="currentPage" user-role="guest" :cart-item-count="cartItemCount"
       @navigate="handleNavigate" />
 
@@ -16,6 +39,7 @@ import { defineComponent } from 'vue';
 import { useCartStore } from '@/stores/cartStore';
 import FrHeader from './components/FrHeader.vue';
 import FrFooter from './components/FrFooter.vue';
+import Toast from 'primevue/toast';
 import { ROUTES } from '@/constants/const';
 
 export default defineComponent({
@@ -23,6 +47,7 @@ export default defineComponent({
   components: {
     FrHeader,
     FrFooter,
+    Toast,
   },
   data() {
     return {

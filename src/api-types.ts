@@ -559,6 +559,23 @@ export interface paths {
         patch: operations["CompanyPayoutController_update"];
         trace?: never;
     };
+    "/api/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new checkout order */
+        post: operations["CheckoutController_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1239,6 +1256,19 @@ export interface components {
             orderItemId?: string;
             /** @description ID du statut du paiement */
             payoutStatusId?: string;
+        };
+        CheckoutItemDto: {
+            /** @enum {string} */
+            type: "domain" | "equipment";
+            productId: string;
+            startDate?: string;
+            endDate?: string;
+            quantity?: string;
+            unitPrice: number;
+        };
+        CreateCheckoutDto: {
+            items: components["schemas"]["CheckoutItemDto"][];
+            cartTotal: number;
         };
     };
     responses: never;
@@ -2971,6 +3001,28 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CompanyPayout"];
                 };
+            };
+        };
+    };
+    CheckoutController_checkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCheckoutDto"];
+            };
+        };
+        responses: {
+            /** @description Order created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

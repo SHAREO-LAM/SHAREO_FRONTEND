@@ -18,6 +18,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@primevue/forms": "^4.5.4",
     "@primevue/themes": "^4.5.4",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
