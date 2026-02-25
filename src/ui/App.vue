@@ -26,7 +26,7 @@
     <FrHeader :current-page="currentPage" user-role="guest" :cart-item-count="cartItemCount"
       @navigate="handleNavigate" />
 
-    <main class="flex-1">
+    <main class="flex-1 pt-20">
       <router-view />
     </main>
 
