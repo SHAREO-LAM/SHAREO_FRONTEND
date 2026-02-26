@@ -93,27 +93,23 @@
           </div>
 
           <!-- Submit Button -->
-          <button
+          <Button
             type="submit"
+            :label="isLoading ? 'Inscription en cours...' : 'Créer mon compte'"
+            :loading="isLoading"
             :disabled="isLoading || passwordMismatch"
-            class="submit-button"
-          >
-            <span v-if="!isLoading">Créer mon compte</span>
-            <span v-else class="loading">
-              <svg class="spinner" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Inscription en cours...
-            </span>
-          </button>
+            severity="success"
+          />
         </form>
 
         <!-- Footer -->
-        <div class="footer">
-          <p>
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
             Vous avez déjà un compte ?
-            <router-link to="/login">
+            <router-link
+              :to="route.query.redirect ? `/login?redirect=${route.query.redirect}` : '/login'"
+              class="text-indigo-600 font-medium no-underline hover:text-indigo-700"
+            >
               Se connecter
             </router-link>
           </p>
@@ -125,10 +121,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import type { RegisterCredentials } from '@/services/auth'
 
+const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -169,7 +166,8 @@ const handleSignup = async () => {
 
     // Redirection vers la page d'accueil après inscription réussie
     setTimeout(() => {
-      router.push('/')
+      const redirect = route.query.redirect as string || '/'
+      router.push(redirect)
     }, 1500)
   } catch (err: unknown) {
     const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -282,74 +280,6 @@ const handleSignup = async () => {
   }
 }
 
-.submit-button {
-  width: 100%;
-  background-color: #4f46e5;
-  color: white;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background-color: #4338ca;
-  }
-
-  &:focus {
-    outline: none;
-    ring: 2px;
-    ring-color: #6366f1;
-    ring-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .spinner {
-      animation: spin 1s linear infinite;
-      height: 1.25rem;
-      width: 1.25rem;
-      margin-right: 0.5rem;
-
-      circle {
-        opacity: 0.25;
-      }
-
-      path {
-        opacity: 0.75;
-      }
-    }
-  }
-}
-
-.footer {
-  margin-top: 1.5rem;
-  text-align: center;
-
-  p {
-    font-size: 0.875rem;
-    color: #4b5563;
-
-    a {
-      color: #4f46e5;
-      font-weight: 500;
-      text-decoration: none;
-
-      &:hover {
-        color: #4338ca;
-      }
-    }
-  }
-}
 
 @keyframes spin {
   from {

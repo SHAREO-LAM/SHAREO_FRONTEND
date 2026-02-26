@@ -4,6 +4,54 @@
  */
 
 export interface paths {
+    "/api/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuthController_getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user": {
         parameters: {
             query?: never;
@@ -189,6 +237,40 @@ export interface paths {
         patch: operations["DomainController_update"];
         trace?: never;
     };
+    "/api/domain/{id}/unavailable-dates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer toutes les dates non disponibles pour un domaine */
+        get: operations["DomainController_getUnavailableDates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/domain/{id}/check-availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vérifier la disponibilité d’un domaine sur une période donnée */
+        get: operations["DomainController_checkAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/equipement-category": {
         parameters: {
             query?: never;
@@ -298,6 +380,40 @@ export interface paths {
         head?: never;
         /** Mettre à jour un équipement */
         patch: operations["EquipementCompanyController_update"];
+        trace?: never;
+    };
+    "/api/equipement-company/{id}/unavailable-dates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer toutes les dates non disponibles pour un équipement */
+        get: operations["EquipementCompanyController_getUnavailableDates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equipement-company/{id}/check-availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vérifier la disponibilité d’un équipement sur une période et une quantité données */
+        get: operations["EquipementCompanyController_checkAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/order-status": {
@@ -485,41 +601,24 @@ export interface paths {
         patch: operations["PaymentController_update"];
         trace?: never;
     };
-    "/api/payout-status": {
+    "/api/payment/{id}/confirm": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Récupérer tous les statuts de paiement à verser */
-        get: operations["PayoutStatusController_findAll"];
+        get?: never;
         put?: never;
-        /** Créer un statut de paiement à verser */
-        post: operations["PayoutStatusController_create"];
+        /**
+         * Confirmer un paiement
+         * @description Confirme le paiement, met à jour la commande associée et déclenche la création des payouts.
+         */
+        post: operations["PaymentController_confirmPayment"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/api/payout-status/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Récupérer un statut par ID */
-        get: operations["PayoutStatusController_findOne"];
-        put?: never;
-        post?: never;
-        /** Supprimer un statut par ID */
-        delete: operations["PayoutStatusController_remove"];
-        options?: never;
-        head?: never;
-        /** Mettre à jour un statut par ID */
-        patch: operations["PayoutStatusController_update"];
         trace?: never;
     };
     "/api/company-payout": {
@@ -559,6 +658,43 @@ export interface paths {
         patch: operations["CompanyPayoutController_update"];
         trace?: never;
     };
+    "/api/payout-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer tous les statuts de paiement à verser */
+        get: operations["PayoutStatusController_findAll"];
+        put?: never;
+        /** Créer un statut de paiement à verser */
+        post: operations["PayoutStatusController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payout-status/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer un statut par ID */
+        get: operations["PayoutStatusController_findOne"];
+        put?: never;
+        post?: never;
+        /** Supprimer un statut par ID */
+        delete: operations["PayoutStatusController_remove"];
+        options?: never;
+        head?: never;
+        /** Mettre à jour un statut par ID */
+        patch: operations["PayoutStatusController_update"];
+        trace?: never;
+    };
     "/api/checkout": {
         parameters: {
             query?: never;
@@ -580,6 +716,8 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        RegisterDto: Record<string, never>;
+        LoginDto: Record<string, never>;
         CreateUserDto: {
             /** @description Login de l’utilisateur */
             login: string;
@@ -1207,27 +1345,6 @@ export interface components {
             /** @description ID du statut de paiement */
             paymentStatusId?: string;
         };
-        CreatePayoutStatusDto: {
-            /** @description Code du statut */
-            code: string;
-            /** @description Nom du statut */
-            name: string;
-            /** @description ID de l’utilisateur créateur */
-            userCreateId?: string;
-            /** @description ID de l’utilisateur modificateur */
-            userUpdateId?: string;
-        };
-        PayoutStatus: Record<string, never>;
-        UpdatePayoutStatusDto: {
-            /** @description Code du statut */
-            code?: string;
-            /** @description Nom du statut */
-            name?: string;
-            /** @description ID de l’utilisateur créateur */
-            userCreateId?: string;
-            /** @description ID de l’utilisateur modificateur */
-            userUpdateId?: string;
-        };
         CreateCompanyPayoutDto: {
             /** @description Montant du paiement */
             amount: number;
@@ -1257,6 +1374,27 @@ export interface components {
             /** @description ID du statut du paiement */
             payoutStatusId?: string;
         };
+        CreatePayoutStatusDto: {
+            /** @description Code du statut */
+            code: string;
+            /** @description Nom du statut */
+            name: string;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string;
+            /** @description ID de l’utilisateur modificateur */
+            userUpdateId?: string;
+        };
+        PayoutStatus: Record<string, never>;
+        UpdatePayoutStatusDto: {
+            /** @description Code du statut */
+            code?: string;
+            /** @description Nom du statut */
+            name?: string;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string;
+            /** @description ID de l’utilisateur modificateur */
+            userUpdateId?: string;
+        };
         CheckoutItemDto: {
             /** @enum {string} */
             type: "domain" | "equipment";
@@ -1266,9 +1404,20 @@ export interface components {
             quantity?: string;
             unitPrice: number;
         };
+        CheckoutAddressDto: {
+            name?: string;
+            lastName?: string;
+            streetName?: string;
+            houseNumber?: string;
+            postcode?: string;
+            city?: string;
+            country?: string;
+            phone?: string;
+        };
         CreateCheckoutDto: {
             items: components["schemas"]["CheckoutItemDto"][];
             cartTotal: number;
+            address: components["schemas"]["CheckoutAddressDto"];
         };
     };
     responses: never;
@@ -1279,6 +1428,65 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    AuthController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_getProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     UserController_findAll: {
         parameters: {
             query?: never;
@@ -1854,6 +2062,69 @@ export interface operations {
             };
         };
     };
+    DomainController_getUnavailableDates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du domaine */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des dates non disponibles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Domaine non trouvé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DomainController_checkAvailability: {
+        parameters: {
+            query: {
+                /** @description Date de début (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Date de fin (YYYY-MM-DD) */
+                endDate: string;
+            };
+            header?: never;
+            path: {
+                /** @description ID du domaine */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disponibilité vérifiée */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Domaine non trouvé ou paramètres invalides */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     EquipementCategoryController_findAll: {
         parameters: {
             query?: never;
@@ -2196,6 +2467,69 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["EquipementCompany"];
                 };
+            };
+        };
+    };
+    EquipementCompanyController_getUnavailableDates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de l’équipement */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des dates non disponibles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Équipement non trouvé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    EquipementCompanyController_checkAvailability: {
+        parameters: {
+            query: {
+                /** @description Date de début (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Date de fin (YYYY-MM-DD) */
+                endDate: string;
+                /** @description Quantité demandée */
+                quantity: number;
+            };
+            header?: never;
+            path: {
+                /** @description ID de l’équipement */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disponibilité vérifiée avec succès */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Paramètres invalides ou indisponibilité */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2774,118 +3108,33 @@ export interface operations {
             };
         };
     };
-    PayoutStatusController_findAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Liste des statuts renvoyée */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PayoutStatus"][];
-                };
-            };
-        };
-    };
-    PayoutStatusController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePayoutStatusDto"];
-            };
-        };
-        responses: {
-            /** @description Statut créé avec succès */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PayoutStatus"];
-                };
-            };
-        };
-    };
-    PayoutStatusController_findOne: {
+    PaymentController_confirmPayment: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @description ID du statut à récupérer */
+                /** @description ID du paiement à confirmer */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Statut trouvé */
+            /** @description Paiement confirmé et payouts créés */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PayoutStatus"];
+                    "application/json": unknown;
                 };
             };
-        };
-    };
-    PayoutStatusController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID du statut à supprimer */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Statut supprimé avec succès */
-            200: {
+            /** @description Paiement introuvable ou déjà confirmé */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    PayoutStatusController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID du statut à mettre à jour */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePayoutStatusDto"];
-            };
-        };
-        responses: {
-            /** @description Statut mis à jour avec succès */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PayoutStatus"];
-                };
             };
         };
     };
@@ -3000,6 +3249,121 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CompanyPayout"];
+                };
+            };
+        };
+    };
+    PayoutStatusController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des statuts renvoyée */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutStatus"][];
+                };
+            };
+        };
+    };
+    PayoutStatusController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePayoutStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Statut créé avec succès */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutStatus"];
+                };
+            };
+        };
+    };
+    PayoutStatusController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du statut à récupérer */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Statut trouvé */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutStatus"];
+                };
+            };
+        };
+    };
+    PayoutStatusController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du statut à supprimer */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Statut supprimé avec succès */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PayoutStatusController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du statut à mettre à jour */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePayoutStatusDto"];
+            };
+        };
+        responses: {
+            /** @description Statut mis à jour avec succès */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayoutStatus"];
                 };
             };
         };
