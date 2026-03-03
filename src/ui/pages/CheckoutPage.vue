@@ -128,14 +128,28 @@
               </div>
 
               <!-- Adresse -->
-              <div class="flex flex-col gap-2 md:col-span-2">
+              <!-- Adresse -->
+              <div class="flex flex-col gap-2">
+                <label for="houseNumber" :class="['font-medium', billingErrors.houseNumber ? 'text-red-500' : '']">
+                  N° *
+                </label>
+                <InputText
+                  id="houseNumber"
+                  v-model="billingForm.houseNumber"
+                  placeholder="12"
+                  :invalid="!!billingErrors.houseNumber"
+                  @input="clearError('houseNumber')"
+                />
+              </div>
+
+              <div class="flex flex-col gap-2">
                 <label for="address" :class="['font-medium', billingErrors.address ? 'text-red-500' : '']">
                   Adresse *
                 </label>
                 <InputText
                   id="address"
                   v-model="billingForm.address"
-                  placeholder="Numéro et nom de rue"
+                  placeholder="Nom de rue"
                   :invalid="!!billingErrors.address"
                   @input="clearError('address')"
                 />
@@ -308,12 +322,14 @@ import { createCheckoutSession } from '@/services/checkout'
 import { confirmPayment } from '@/services/payment'
 import { checkDomainAvailability } from '@/services/domain'
 import { checkEquipmentAvailability } from '@/services/equipementCompany'
+import { useAuthStore } from '@/stores/authStore'
 
 type BillingForm = {
   firstName: string
   lastName: string
   email: string
   phone: string
+  houseNumber: string
   address: string
   postcode: string
   city: string
@@ -333,8 +349,10 @@ export default defineComponent({
   },
 
   data() {
+    const auth = useAuthStore()
     return {
       cart: useCartStore(),
+      auth: auth,
 
       /* ÉTATS */
       billingAccepted: false,
@@ -346,8 +364,9 @@ export default defineComponent({
       billingForm: {
         firstName: '',
         lastName: '',
-        email: '',
+        email: auth.user?.email || '',
         phone: '',
+        houseNumber: '',
         address: '',
         postcode: '',
         city: ''
@@ -401,6 +420,11 @@ export default defineComponent({
 
       if (!this.billingForm.address || this.billingForm.address.trim().length < 5) {
         this.billingErrors.address = 'Adresse invalide'
+        isValid = false
+      }
+
+      if (!this.billingForm.houseNumber || this.billingForm.houseNumber.trim().length < 1) {
+        this.billingErrors.houseNumber = 'Numéro invalide'
         isValid = false
       }
 
@@ -484,12 +508,20 @@ export default defineComponent({
             quantity: item.quantity ?? '1',
             unitPrice: item.unitPrice
           })),
-          cartTotal: this.cart.totalWithCommission
+          cartTotal: this.cart.totalWithCommission,
+          address: {
+            name: this.billingValues?.firstName || undefined,
+            lastName: this.billingValues?.lastName || undefined,
+            streetName: this.billingValues?.address || undefined,
+            houseNumber: this.billingValues?.houseNumber || undefined,
+            postcode: this.billingValues?.postcode || undefined,
+            city: this.billingValues?.city || undefined,
+            country: "France",
+            phone: this.billingValues?.phone || undefined
+          }
         }
 
         const checkoutResponse = await createCheckoutSession(checkoutPayload)
-        console.log('Checkout session créée :', checkoutResponse)
-        console.log(checkoutResponse.data.total.toString())
         const paymentId = checkoutResponse.data.paymentId
 
         await confirmPayment(paymentId)

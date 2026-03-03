@@ -128,6 +128,12 @@ export default defineComponent({
     },
     handleLogout() {
       this.authStore.logout();
+      this.$toast.add({
+        severity: 'success',
+        summary: 'Déconnexion réussie',
+        detail: `Vous êtes maintenant déconnecté.`,
+        life: 3000
+      });
       this.mobileMenuVisible = false;
       this.$router.push('/');
     },

@@ -46,33 +46,26 @@
           </div>
 
           <!-- Submit Button -->
-          <button
+          <Button
             type="submit"
+            :label="isLoading ? 'Connexion en cours...' : 'Se connecter'"
+            :loading="isLoading"
             :disabled="isLoading"
-            class="submit-button"
-          >
-            <span v-if="!isLoading">Se connecter</span>
-            <span v-else class="loading">
-              <ProgressSpinner
-                style="width: 20px; height: 20px"
-                strokeWidth="4"
-                fill="transparent"
-                animationDuration="1s"
-              />
-              Connexion en cours...
-            </span>
-          </button>
+          />
         </form>
 
         <!-- Footer -->
-        <div class="footer">
-          <p>
-            Vous n'avez pas de compte ?
-            <router-link to="/signup">
-              Créer un compte
-            </router-link>
-          </p>
-        </div>
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          Vous n'avez pas de compte ?
+          <router-link
+            :to="route.query.redirect ? `/signup?redirect=${route.query.redirect}` : '/signup'"
+            class="text-indigo-600 font-medium no-underline hover:text-indigo-700"
+          >
+            Créer un compte
+          </router-link>
+        </p>
+      </div>
       </div>
     </div>
   </div>
@@ -80,12 +73,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/authStore'
 import type { LoginCredentials } from '@/services/auth'
 
+const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToast()
 
 const formData = ref<LoginCredentials>({
   email: '',
@@ -101,7 +97,14 @@ const handleLogin = async () => {
 
   try {
     await authStore.login(formData.value)
-    router.push('/')
+    toast.add({
+      severity: 'success',
+      summary: 'Connexion réussie',
+      detail: `Vous êtes maintenant connecté en tant que ${authStore.user?.login}.`,
+      life: 3000
+    });
+    const redirect = route.query.redirect as string || '/'
+    router.push(redirect)
   } catch (err: unknown) {
     const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
     error.value = errorMessage || 'Email ou mot de passe incorrect'
@@ -188,61 +191,6 @@ const handleLogin = async () => {
       ring: 2px;
       ring-color: #6366f1;
       border-color: transparent;
-    }
-  }
-}
-
-.submit-button {
-  width: 100%;
-  background-color: #4f46e5;
-  color: white;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background-color: #4338ca;
-  }
-
-  &:focus {
-    outline: none;
-    ring: 2px;
-    ring-color: #6366f1;
-    ring-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-}
-
-.footer {
-  margin-top: 1.5rem;
-  text-align: center;
-
-  p {
-    font-size: 0.875rem;
-    color: #4b5563;
-
-    a {
-      color: #4f46e5;
-      font-weight: 500;
-      text-decoration: none;
-
-      &:hover {
-        color: #4338ca;
-      }
     }
   }
 }

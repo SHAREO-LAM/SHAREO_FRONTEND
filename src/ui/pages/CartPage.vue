@@ -68,6 +68,7 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import { checkDomainAvailability } from '@/services/domain'
 import { checkEquipmentAvailability } from '@/services/equipementCompany'
+import { useAuthStore } from '@/stores/authStore'
 
 export default defineComponent({
   name: 'CartPage',
@@ -83,7 +84,8 @@ export default defineComponent({
   data() {
     return {
       isCartOpen: false,
-      cart: useCartStore()
+      cart: useCartStore(),
+      auth: useAuthStore()
     }
   },
 
@@ -130,6 +132,16 @@ export default defineComponent({
       }
 
       if (!hasUnavailableItem) {
+        if (!this.auth.isLoggedIn) {
+          this.$toast.add({
+            severity: 'warn',
+            summary: 'Connexion requise',
+            detail: 'Veuillez vous connecter ou vous inscrire pour procéder au paiement.',
+            life: 3000
+          });
+          this.$router.push('/login?redirect=/checkout');
+          return;
+        }
         this.$router.push('/checkout');
       }
     }
