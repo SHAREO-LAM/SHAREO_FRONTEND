@@ -31,4 +31,4 @@ jobs:
           platforms: linux/arm64
           tags: zastial/shareo-frontend-sandbox:latest
           build-args: |
-            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL_SANDBOX }}
