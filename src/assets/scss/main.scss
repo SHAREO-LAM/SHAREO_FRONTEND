@@ -14,8 +14,12 @@ body {
     color 0.3s ease;
 }
 
-/* Dark mode */
-.dark body {
-  background-color: #111827;
-  color: #f9fafb;
+/* PrimeVue inputs spécifiques */
+.p-inputtext,
+.p-inputnumber,
+.p-inputtextarea,
+.p-dropdown,
+.p-datepicker {
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }
