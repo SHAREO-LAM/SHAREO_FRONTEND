@@ -6,6 +6,8 @@ export type CatalogBaseItem = {
   description?: string
   image?: string
   pricePerDay?: number
+  availableFrom?: string
+  availableTo?: string
   // extra fields are allowed for filtering / display (city, capacity, stock, etc.)
   [key: string]: unknown
 }
