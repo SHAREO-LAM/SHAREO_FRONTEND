@@ -1,166 +1,242 @@
 <template>
-  <div class="min-h-screen">
-    <div class="flex flex-col gap-16">
+  <div class="min-h-screen bg-gray-50">
+    <section class="bg-linear-to-br from-blue-600 to-blue-700 text-white py-20">
+      <div class="container mx-auto px-4 text-center">
+        <div class="max-w-4xl mx-auto mb-12">
+          <h1 class="text-4xl md:text-5xl mb-4">
+            Trouvez le lieu parfait pour votre événement
+          </h1>
+          <p class="text-xl text-blue-100">
+            Réservez facilement des lieux et équipements pour toutes vos occasions
+          </p>
+        </div>
 
-      <!-- Hero Section -->
-      <section class="bg-(--primary-color) text-(--primary-color-text) py-20 px-4 text-center">
-        <div class="max-w-3xl mx-auto flex flex-col gap-6">
-          <h1 class="text-4xl font-bold">Book the Perfect Venue or Equipment</h1>
-          <p class="text-lg">Easily find and reserve venues and event equipment for any occasion</p>
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-6 text-gray-900">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="block text-sm text-gray-700 mb-2">Recherche</p>
+              <InputText
+                v-model="searchQuery"
+                placeholder="Nom du lieu ou équipement..."
+                class="w-full"
+              />
+            </div>
 
-          <div class="flex flex-col gap-4 md:flex-row md:justify-center">
-            <InputText v-model:modelValue="searchQuery" placeholder="Search venues or equipment..."
-              class="w-full md:w-md" />
-            <Button label="Search" @click="onSearch" />
+            <div>
+              <p class="block text-sm text-gray-700 mb-2">Localisation</p>
+              <InputText
+                v-model="location"
+                placeholder="Ville, Pays"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div class="flex w-full justify-around md:flex-row gap-4 mb-6">
+            <div>
+              <p class=" text-sm text-gray-700 mb-2">Date de début</p>
+              <DatePicker
+                v-model="startDate"
+                placeholder="Début"
+                class="w-full"
+                dateFormat="dd/mm/yy"
+              />
+            </div>
+
+            <div>
+              <p class=" text-sm text-gray-700 mb-2">Date de fin</p>
+              <DatePicker
+                v-model="endDate"
+                placeholder="Fin"
+                class="w-full"
+                dateFormat="dd/mm/yy"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-between gap-4">
+            <Button
+              label="Équipements"
+              icon="pi pi-cog"
+              class="flex-1"
+              :outlined="selectedCategory !== 'equipment'"
+              @click="selectedCategory = 'equipment'"
+            />
+
+            <Button
+              label="Salle"
+              icon="pi pi-building"
+              class="flex-1"
+              :outlined="selectedCategory !== 'venue'"
+              @click="selectedCategory = 'venue'"
+            />
+
+            <Button
+              label="Rechercher"
+              icon="pi pi-search"
+              class="flex-1 bg-orange-500 border-none text-white"
+              @click="handleSearch"
+            />
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Featured Venues -->
-      <section class="py-16 px-4">
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-center text-3xl font-semibold mb-8">Featured Venues</h2>
+    <section class="py-16 container mx-auto px-4">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-3xl mb-2">Lieux et équipements populaires</h2>
+        <p class="text-gray-600">Découvrez nos lieux et équipements les plus réservés</p>
+      </div>
 
-          <div class="flex flex-wrap justify-center gap-6">
-            <Card v-for="venue in featuredVenues" :key="venue.id" class="w-72 shrink-0 overflow-hidden">
-              <template #header>
-                <img :src="venue.image" :alt="venue.name" class="w-full h-48 object-cover" />
-              </template>
-
-              <div class="p-4 flex flex-col gap-1">
-                <h3 class="text-lg font-medium">{{ venue.name }}</h3>
-                <p class="text-(--muted-color)">{{ venue.location }}</p>
-                <div class="mt-2">
-                  <Badge :value="`$${venue.price}/day`" />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <!-- Featured Equipment -->
-      <section class="py-16 px-4">
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-center text-3xl font-semibold mb-8">Featured Equipment</h2>
-
-          <div class="flex flex-wrap justify-center gap-6">
-            <Card v-for="equipment in featuredEquipment" :key="equipment.id" class="w-72 shrink-0 overflow-hidden">
-              <template #header>
-                <img :src="equipment.image" :alt="equipment.name" class="w-full h-48 object-cover" />
-              </template>
-
-              <div class="p-4 flex flex-col gap-1">
-                <h3 class="text-lg font-medium">{{ equipment.name }}</h3>
-                <p class="text-(--muted-color)">{{ equipment.type }}</p>
-                <div class="mt-2">
-                  <Badge :value="`$${equipment.price}/day`" />
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
+      <Button
+        label="Voir tout"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 border-none"
+        @click="goToDomains"
+      />
     </div>
+
+    <div class="overflow-x-auto flex gap-4 pb-4">
+      <ListingCard
+        v-for="listing in popularListings"
+        :key="listing.id"
+        :listing="listing"
+        viewMode="grid"
+        :onNavigate="() => goToDetails(listing)"
+        class="shrink-0 w-64"
+      />
+    </div>
+  </section>
+
+    <section class="py-16 bg-linear-to-br from-orange-500 to-orange-600 text-white">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl mb-4">
+          Prêt à inscrire votre établissement ?
+        </h2>
+        <p class="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+          Donnez de la visibilité à vos lieux et équipements et attirez de nouveaux clients dès maintenant.
+        </p>
+
+        <Button
+          label="Devenir vendeur"
+          size="large"
+          class="bg-white text-orange-600 hover:bg-gray-100 border-none"
+          @click="goToVendorDashboard"
+        />
+      </div>
+    </section>
   </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { ROUTES } from '../../constants/const';
-import InputText from 'primevue/inputtext';
-import Card from 'primevue/card';
-import Badge from 'primevue/badge';
+import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 
-interface Venue {
-  id: number;
-  name: string;
-  location: string;
-  price: number;
-  image: string;
-}
+import InputText from "primevue/inputtext";
+import Button from "primevue/button";
+import DatePicker from "primevue/datepicker";
 
-interface Equipment {
+import { ROUTES } from "@/constants/const";
+import ListingCard from "../components/ListingCard.vue";
+import { getDomains } from "@/services/domain";
+import type { Domain } from "@/types/domain";
+
+interface PopularListing {
   id: number;
   name: string;
   type: string;
-  price: number;
   image: string;
+  price: number;
+  location: string;
+  capacity?: number;
+  rating?: number;
 }
 
 export default defineComponent({
-  name: 'HomePage',
+  name: "HomePage",
   components: {
-    InputText,
-    Card,
-    Badge,
+    ListingCard, 
   },
-  data() {
+  setup() {
+    const router = useRouter();
+
+    const searchQuery = ref("");
+    const location = ref("");
+
+    const startDate = ref<Date | null>(null);
+    const endDate = ref<Date | null>(null);
+
+    const selectedCategory = ref<"equipment" | "venue">("equipment");
+    
+    const popularListings = ref<PopularListing[]>([]);
+
+    const fetchPopularDomains = async () => {
+      const domains = await getDomains();
+      popularListings.value = domains.map((d: Domain, index: number) => ({
+        id: 1,
+        name: d.name ?? 'Nom indisponible',
+        type: 'Domaine',
+        image: d.imageUrl ?? 'https://via.placeholder.com/400x300?text=No+Image',
+        price: d.pricePerDay ?? 0,
+        location: d.city ?? '',
+        capacity: typeof d.capacity === 'number' ? d.capacity : undefined,
+        rating: Math.round(Math.random() * 5 * 10) / 10 || 4.5, // note aléatoire pour exemple
+      }));
+    };
+
+
+    const handleSearch = () => {
+      const targetRoute =
+        selectedCategory.value === "venue"
+          ? ROUTES.COMMON.DOMAINS.name
+          : ROUTES.COMMON.EQUIPMENTS.name;
+
+      router.push({
+        name: targetRoute,
+        query: {
+          q: searchQuery.value || "",
+          location: location.value || "",
+          startDate: startDate.value?.toISOString() ?? "",
+          endDate: endDate.value?.toISOString() ?? "",
+        },
+      });
+    };
+
+
+    const goToVendorDashboard = () => {
+      router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
+    };
+
+
+    const goToDomains = () => {
+      router.push({ name: ROUTES.COMMON.DOMAINS.name });
+    };
+
+    const goToDetails = (listing: PopularListing) => {
+      router.push({
+        name: ROUTES.COMMON.DOMAINS.name,
+        query: { listingId: listing.id },
+      });
+    };
+
     return {
-      ROUTES,
-      searchQuery: '',
-      featuredVenues: [
-        {
-          id: 1,
-          name: 'Grand Ballroom',
-          location: 'New York',
-          price: 2500,
-          image: 'https://images.unsplash.com/photo-1759519238029-689e99c6d19e?w=400',
-        },
-        {
-          id: 2,
-          name: 'Conference Hall',
-          location: 'Los Angeles',
-          price: 1800,
-          image: 'https://images.unsplash.com/photo-1603430416744-a47cee46b0ae?w=400',
-        },
-        {
-          id: 3,
-          name: 'Garden Event Space',
-          location: 'Chicago',
-          price: 2000,
-          image: 'https://images.unsplash.com/photo-1760972594010-e217e2f2845c?w=400',
-        },
-      ] as Venue[],
-      featuredEquipment: [
-        {
-          id: 1,
-          name: 'Professional Audio System',
-          type: 'Audio',
-          price: 350,
-          image: 'https://images.unsplash.com/photo-1745848413083-cfea604edb6a?w=400',
-        },
-        {
-          id: 2,
-          name: 'Lighting Package',
-          type: 'Lighting',
-          price: 200,
-          image: 'https://images.unsplash.com/photo-1582719478250-93f1b20a0372?w=400',
-        },
-        {
-          id: 3,
-          name: 'Projector & Screen',
-          type: 'AV',
-          price: 150,
-          image: 'https://images.unsplash.com/photo-1582719478806-d1b4a4d5e734?w=400',
-        },
-      ] as Equipment[],
-      benefits: [
-        { title: 'Easy Booking', description: 'Quickly reserve venues', icon: 'pi pi-check' },
-        { title: 'Trusted Vendors', description: 'Verified suppliers', icon: 'pi pi-users' },
-        { title: 'Secure Payments', description: 'Safe and reliable', icon: 'pi pi-lock' },
-        { title: '24/7 Support', description: 'Always here to help', icon: 'pi pi-headset' },
-      ],
+      searchQuery,
+      location,
+      startDate,
+      endDate,
+      selectedCategory,
+      popularListings,
+      handleSearch,
+      goToVendorDashboard,
+      goToDomains,
+      goToDetails,
+      fetchPopularDomains,
     };
   },
-  methods: {
-    onSearch() {
-      this.$router.push({
-        path: ROUTES.COMMON.SEARCH.path,
-        query: { q: this.searchQuery },
-      });
-    },
+  mounted() {
+    this.fetchPopularDomains();
   },
 });
 </script>
+
+<style scoped></style>
