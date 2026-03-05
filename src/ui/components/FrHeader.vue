@@ -22,6 +22,16 @@
           <Button v-if="userRole === 'admin' || userRole === 'superadmin'" outlined severity="secondary"
             class="hidden md:flex !text-sm" label="Admin Panel" @click="navigate('admin')" />
 
+          <Button
+            v-if="userRole !== 'vendor'"
+            outlined
+            severity="primary"
+            class="hidden md:flex !text-sm"
+            icon="pi pi-shop"
+            label="Devenir vendeur"
+            @click="openBecomeSeller"
+          />
+
           <Button text rounded class="!text-gray-700 hover:!bg-gray-100 relative" icon="pi pi-shopping-cart"
             @click="navigate('cart')" :badge="String(cart.cartItems.length)" badge-severity="warn">
           </Button>
@@ -56,8 +66,17 @@
           :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
           @click="navigate(item.value)" />
 
-        <div v-if="userRole === 'vendor' || userRole === 'admin'" class="border-t border-gray-200 my-2">
+        <div v-if="userRole !== 'vendor'" class="border-t border-gray-200 my-2">
         </div>
+
+        <Button
+          v-if="userRole !== 'vendor'"
+          text
+          class="!justify-start !text-gray-700 hover:!bg-gray-100"
+          icon="pi pi-shop"
+          label="Devenir vendeur"
+          @click="openBecomeSeller"
+        />
 
         <Button v-if="userRole === 'vendor' || userRole === 'admin'" outlined severity="secondary"
           class="!justify-start" label="Vendor Dashboard" @click="navigate('vendor')" />
@@ -137,6 +156,14 @@ export default defineComponent({
       });
       this.mobileMenuVisible = false;
       this.$router.push('/');
+    },
+    openBecomeSeller() {
+      if (!this.authStore.isLoggedIn) {
+        this.$router.push('/login');
+        return;
+      }
+      this.$router.push('/become-seller');
+      this.mobileMenuVisible = false;
     },
     updateViewport() {
       this.isMobile = window.innerWidth < 768;

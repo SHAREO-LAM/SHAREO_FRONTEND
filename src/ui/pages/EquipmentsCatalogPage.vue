@@ -42,7 +42,7 @@ export default defineComponent({
           maxKey: 'stockMax',
           minValue: 0,
         },
-        {
+         {
           kind: "text",
           label: "Localisation",
           placeholder: "Ex: Paris",

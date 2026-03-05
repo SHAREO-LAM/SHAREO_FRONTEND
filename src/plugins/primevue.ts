@@ -27,6 +27,9 @@ export default {
     app.use(PrimeVue, {
       theme: {
         preset: Lara,
+        options: {
+          darkModeSelector: false,
+        }
       },
     })
     app.use(ToastService) // service global pour Toast

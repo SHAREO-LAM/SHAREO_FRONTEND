@@ -28,6 +28,7 @@ export const ROUTES = {
   COMMON: {
     HOME: { name: 'home', path: '/' },
     CATALOG: { name: 'catalog', path: '/catalog' },
+    SEARCH: { name: 'search', path: '/search' },
     DOMAINS : { name: 'domains', path: '/domains' },
     EQUIPMENTS : { name: 'equipments', path: '/equipments' },
     LOGIN: { name: 'login', path: '/login' },

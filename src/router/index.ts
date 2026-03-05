@@ -5,6 +5,7 @@ import ProductDetailsPage from '@/ui/pages/ProductDetailsPage.vue'
 import LoginPage from '@/ui/pages/LoginPage.vue'
 import SignupPage from '@/ui/pages/SignupPage.vue'
 import AccountPage from '@/ui/pages/AccountPage.vue'
+import BecomeSellerPage from '@/ui/pages/BecomeSellerPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import CartPageVue from '@/ui/pages/CartPage.vue'
@@ -21,6 +22,7 @@ const routes = [
   { path: '/login', component: LoginPage, name: 'login', meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, name: 'signup', meta: { requiresGuest: true } },
   { path: '/account', component: AccountPage, name: 'account', meta: { requiresAuth: true } },
+  { path: '/become-seller', component: BecomeSellerPage, name: 'become-seller', meta: { requiresAuth: true } },
   {
     path: ROUTES.VENDOR.DASHBOARD.path,
     name: ROUTES.VENDOR.DASHBOARD.name,

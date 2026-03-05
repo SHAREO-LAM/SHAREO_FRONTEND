@@ -1,5 +1,6 @@
 import apiClient from './api'
 import type { Company, CreateCompany } from '@/types/company'
+import type { CreateUserCompany } from '@/types/userCompany'
 
 // Lister tous les companies
 export const getCompanies = async (): Promise<Company[]> => {
@@ -28,4 +29,10 @@ export const updateCompany = async (id: string, payload: Company): Promise<Compa
 // Supprimer un company
 export const deleteCompany = async (id: string): Promise<void> => {
   await apiClient.delete(`/api/company/${id}`)
+}
+
+// Associer un utilisateur à une compagnie
+export const createUserCompany = async (payload: CreateUserCompany): Promise<any> => {
+  const { data } = await apiClient.post('/user-company', payload)
+  return data
 }
