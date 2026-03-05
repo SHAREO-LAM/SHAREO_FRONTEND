@@ -5,8 +5,6 @@
 @use './layout/header.scss';
 @use './layout/footer.scss';
 
-@use './layout/typography.scss';
-
 /* Light mode par défaut */
 body {
   background-color: #f0f0f0;
@@ -16,8 +14,12 @@ body {
     color 0.3s ease;
 }
 
-/* Dark mode */
-.dark body {
-  background-color: #111827;
-  color: #f9fafb;
+/* PrimeVue inputs spécifiques */
+.p-inputtext,
+.p-inputnumber,
+.p-inputtextarea,
+.p-dropdown,
+.p-datepicker {
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }

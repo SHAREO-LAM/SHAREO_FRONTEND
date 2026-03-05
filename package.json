@@ -19,6 +19,7 @@
     "generate:api": "openapi-typescript http://localhost:3000/api-json -o src/api-types.ts"
   },
   "dependencies": {
+    "@primevue/forms": "^4.5.4",
     "@primevue/themes": "^4.5.4",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
