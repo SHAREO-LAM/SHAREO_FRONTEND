@@ -227,7 +227,7 @@
               </fieldset>
 
               <!-- Actions -->
-              <div class="flex items-center gap-3 pt-6 border-t border-gray-200">
+              <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
                 <Button
                   type="button"
                   label="Annuler"
