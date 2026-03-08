@@ -855,6 +855,11 @@ export interface components {
             website?: string;
             /** @description Logo URL */
             logoUrl?: string;
+            /**
+             * @description Statut de l’entreprise
+             * @enum {string}
+             */
+            status?: "PENDING_VALIDATION" | "VALIDATED";
             /** @description Date de création */
             datetimeCreate?: string;
             /** @description Date de mise à jour */
@@ -900,6 +905,11 @@ export interface components {
             website?: string;
             /** @description Logo URL */
             logoUrl?: string;
+            /**
+             * @description Statut de l’entreprise
+             * @enum {string}
+             */
+            status?: "PENDING_VALIDATION" | "VALIDATED";
             /** @description Date de création */
             datetimeCreate?: string;
             /** @description Date de mise à jour */
@@ -1045,6 +1055,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID de la catégorie */
+            id: string;
         };
         CreateEquipementTypeDto: {
             /** @description Nom du type d’équipement */
@@ -1101,7 +1113,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        EquipementCompany: Record<string, never>;
         EquipementTypeReadDto: {
             /** @description Nom du type d’équipement */
             name?: string;
@@ -1117,6 +1128,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID du type d’équipement */
+            id: string;
             equipementCategory?: components["schemas"]["UpdateEquipementCategoryDto"];
         };
         EquipementCompanyReadDto: {
@@ -1140,8 +1153,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
-            /** @description Id de l’équipement */
-            id?: string;
+            /** @description ID de l'équipement */
+            equipementCompanyId: string;
             equipementType?: components["schemas"]["EquipementTypeReadDto"];
         };
         UpdateEquipementCompanyDto: {
@@ -1165,8 +1178,6 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
-            /** @description Id de l’équipement */
-            id: string;
         };
         CreateOrderStatusDto: {
             /** @description Code du statut */
@@ -2374,7 +2385,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"][];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"][];
                 };
             };
         };
@@ -2398,7 +2409,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"];
                 };
             };
         };
@@ -2469,7 +2480,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"];
                 };
             };
         };

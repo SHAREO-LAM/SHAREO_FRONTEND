@@ -1,40 +1,48 @@
 // src/services/equipementCompany.ts
 import apiClient from './api'
-import type { EquipementCompany, CreateEquipementCompany, EquipementCompanyReadDto } from '@/types/equipementCompany'
+import type { CreateEquipementCompany, EquipementCompanyReadDto } from '@/types/equipement-company'
 
+// Récupérer tous les équipements
 export const getEquipementsCompany = async (): Promise<EquipementCompanyReadDto[]> => {
   const { data } = await apiClient.get<EquipementCompanyReadDto[]>('equipement-company')
   return data
 }
 
+// Récupérer un équipement par ID
 export const getEquipementCompany = async (id: string): Promise<EquipementCompanyReadDto> => {
   const { data } = await apiClient.get<EquipementCompanyReadDto>(`equipement-company/${id}`)
   return data
 }
 
-export const createEquipementCompany = async (payload: CreateEquipementCompany): Promise<EquipementCompany> => {
-  const { data } = await apiClient.post<EquipementCompany>('equipement-company', payload)
+// Créer un équipement
+export const createEquipementCompany = async (payload: CreateEquipementCompany): Promise<EquipementCompanyReadDto> => {
+  const { data } = await apiClient.post<EquipementCompanyReadDto>('equipement-company', payload)
   return data
 }
 
+// Mettre à jour un équipement
 export const updateEquipementCompany = async (
   id: string,
   payload: Partial<CreateEquipementCompany>
-): Promise<EquipementCompany> => {
-  const { data } = await apiClient.patch<EquipementCompany>(`equipement-company/${id}`, payload)
+): Promise<EquipementCompanyReadDto> => {
+  console.log('TEST  TEST TEST Updating equipement with ID:', id, 'and payload:', payload) 
+  const { data } = await apiClient.patch<EquipementCompanyReadDto>(`equipement-company/${id}`, payload)
+  console.log('Received updated equipement data:', data)
   return data
 }
 
+// Supprimer un équipement
 export const deleteEquipementCompany = async (id: string): Promise<void> => {
   await apiClient.delete(`equipement-company/${id}`)
 }
 
+// Récupérer les dates indisponibles pour un équipement
 export const getUnavailableDatesEquipement = async (id: string): Promise<{ disabledDates: string[] }> => {
   const { data } = await apiClient.get<{ disabledDates: string[] }>(`/equipement-company/${id}/unavailable-dates`);
   return data;
 }
 
-
+// Vérifier la disponibilité d’un équipement
 export const checkEquipmentAvailability = async (
   id: string,
   startDate: string,

@@ -211,7 +211,7 @@ export default defineComponent({
     })
 
     const editForm = ref<EquipementCompanyReadDto>({
-      id: '',
+      equipementCompanyId: '',
       displayName: '',
       description: '',
       pricePerDay: 0,
@@ -232,7 +232,7 @@ export default defineComponent({
     const loadEquipements = async () => {
       try {
         const raw: EquipementCompanyReadDto[] = await getEquipementsCompany()
-        console.log('Equipements chargés:', raw)
+        console.log('Raw equipements data:', raw) 
         equipments.value = raw
       } catch (err) {
         console.error('Erreur chargement équipements:', err)
@@ -285,20 +285,20 @@ export default defineComponent({
 
 
     const handleUpdateEquipement = async () => {
-      //console.log('Updating equipement with data:', editForm.value)
-      if (!editForm.value.id) return
+      console.log('Updating equipement with data:', editForm.value.equipementCompanyId)
+      if (!editForm.value.equipementCompanyId) return
 
       isSubmitting.value = true
 
       try {
-        //console.log('Sending update request for equipement ID:', editForm.value.id)
+        console.log('Sending update request for equipement ID:', editForm.value.equipementCompanyId)
         const updated = await updateEquipementCompany(
-          editForm.value.id,
+          editForm.value.equipementCompanyId,
           editForm.value
         )
 
         const index = equipments.value.findIndex(
-          e => e.id === updated.id
+          e => e.equipementCompanyId === updated.equipementCompanyId
         )
 
         if (index !== -1) {
@@ -332,7 +332,7 @@ export default defineComponent({
         await deleteEquipementCompany(equipToDelete.value.equipementTypeId)
 
         equipments.value = equipments.value.filter(
-          e => e.id !== equipToDelete.value!.id
+          e => e.equipementCompanyId !== equipToDelete.value!.equipementCompanyId
         )
 
       } catch {
