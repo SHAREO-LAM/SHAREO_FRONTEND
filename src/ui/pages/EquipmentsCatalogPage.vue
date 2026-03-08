@@ -16,7 +16,7 @@ import { defineComponent } from 'vue'
 import CatalogBase from '@/ui/components/CatalogBase.vue'
 import type { CatalogBaseItem, FilterConfig } from '@/ui/components/catalogTypes'
 import { getEquipementsCompany } from '@/services/equipementCompany'
-import type { EquipementCompany } from '@/types/equipementCompany'
+import type { EquipementCompanyReadDto } from '@/types/equipementCompany'
 
 export default defineComponent({
   name: 'EquipmentsCatalogPage',
@@ -56,13 +56,7 @@ export default defineComponent({
     async fetchItems(): Promise<CatalogBaseItem[]> {
       const equipements = await getEquipementsCompany()
 
-      type EquipementCompanyLike = EquipementCompany & {
-        equipementCompanyId?: string
-        displayName?: string
-        description?: string | null
-        pricePerDay?: number | null
-        stock?: string | number | null
-      }
+      type EquipementCompanyLike = EquipementCompanyReadDto
 
       return (equipements as EquipementCompanyLike[]).map((equipement) => {
         let stockNumber: number | undefined

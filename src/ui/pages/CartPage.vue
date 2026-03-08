@@ -139,6 +139,7 @@ export default defineComponent({
             detail: 'Veuillez vous connecter ou vous inscrire pour procéder au paiement.',
             life: 3000
           });
+          console.log('TESSSSSSSSSSSSSSSS TTTTTTTTTTTT  User not logged in, redirecting to login page');
           this.$router.push('/login?redirect=/checkout');
           return;
         }

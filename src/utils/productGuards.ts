@@ -1,11 +1,11 @@
-import type { Domain } from '@/types/domain'
+import type { UpdateDomainDto } from '@/types/domain'
 import type { EquipementCategory } from '@/types/equipementCategory'
 
-export type Product = Domain | EquipementCategory
+export type Product = UpdateDomainDto | EquipementCategory
 
 export function isDomain(
   product: Product
-): product is Domain {
+): product is UpdateDomainDto {
   return 'streetName' in product || 'city' in product
 }
 

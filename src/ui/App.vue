@@ -73,6 +73,7 @@ export default defineComponent({
   },
   methods: {
     handleNavigate(page: string) {
+      console.log(`Navigating to ${page} page`);
       this.$router.push(`/${page}`);
     },
   },

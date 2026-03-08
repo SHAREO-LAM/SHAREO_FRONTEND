@@ -1,6 +1,6 @@
-import type { Domain } from '@/types/domain'
+import type { UpdateDomainDto } from '@/types/domain'
 import type { Company } from '@/types/company'
-import type { EquipementCompanyRead } from '@/types/equipementCompany'
+import type { EquipementCompanyReadDto } from '@/types/equipementCompany'
 
 type BaseCartItem = {
   cartItemId?: string
@@ -16,9 +16,9 @@ type BaseCartItem = {
 export type CartItem =
   | ({
       type: 'domain'
-      product: Domain
+      product: UpdateDomainDto
     } & BaseCartItem)
   | ({
       type: 'equipment'
-      product: EquipementCompanyRead
+      product: EquipementCompanyReadDto
     } & BaseCartItem)

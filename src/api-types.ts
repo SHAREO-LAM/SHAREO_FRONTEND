@@ -988,7 +988,55 @@ export interface components {
             /** @description ID de l’entreprise associée */
             companyId: string;
         };
-        Domain: Record<string, never>;
+        OrderItem: Record<string, never>;
+        Domain: {
+            /** @description ID du domaine */
+            domainId: string;
+            /** @description Nom du domaine */
+            name: string;
+            /** @description Description du domaine */
+            description?: Record<string, never>;
+            /** @description Nom de la rue */
+            streetName?: Record<string, never>;
+            /** @description Complément de rue */
+            streetNameAdd?: Record<string, never>;
+            /** @description Numéro de la maison */
+            houseNumber?: string;
+            /** @description Code postal */
+            postcode?: Record<string, never>;
+            /** @description Ville */
+            city?: Record<string, never>;
+            /** @description Pays */
+            country?: Record<string, never>;
+            /** @description Latitude */
+            latitude?: number;
+            /** @description Longitude */
+            longitude?: number;
+            /** @description Prix par jour */
+            pricePerDay?: number;
+            /** @description Capacité */
+            capacity?: string;
+            /** @description URL de l’image */
+            imageUrl?: Record<string, never>;
+            /**
+             * Format: date
+             * @description Date de création
+             */
+            datetimeCreate: string;
+            /**
+             * Format: date
+             * @description Date de mise à jour
+             */
+            datetimeUpdate?: string;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string;
+            /** @description ID de l’utilisateur mise à jour */
+            userUpdateId?: string;
+            /** @description ID de la société */
+            companyId?: string;
+            company?: components["schemas"]["Company"];
+            orderItems?: components["schemas"]["OrderItem"][];
+        };
         UpdateDomainDto: {
             /** @description Nom du domaine */
             name?: string;
@@ -1261,7 +1309,6 @@ export interface components {
             /** @description ID de l'utilisateur modificateur */
             userUpdateId?: string;
         };
-        OrderItem: Record<string, never>;
         UpdateOrderItemDto: {
             /** @description ID de la commande associée */
             orderId?: string;
