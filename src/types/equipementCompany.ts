@@ -5,7 +5,7 @@ import type { components } from '@/api-types';
 export type EquipementCompany = components['schemas']['UpdateEquipementCompanyDto'];
 
 // Pour la lecture --> Info sur le type récupés en plus
-export type EquipementCompanyRead = components['schemas']['EquipementCompanyReadDto'];
+export type EquipementCompanyReadDto = components['schemas']['EquipementCompanyReadDto'];
 
 // DTO création
 export type CreateEquipementCompany = components['schemas']['CreateEquipementCompanyDto'];

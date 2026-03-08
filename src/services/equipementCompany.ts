@@ -1,15 +1,14 @@
 // src/services/equipementCompany.ts
 import apiClient from './api'
-import type { EquipementCompany, CreateEquipementCompany, EquipementCompanyRead } from '@/types/equipementCompany'
+import type { EquipementCompany, CreateEquipementCompany, EquipementCompanyReadDto } from '@/types/equipementCompany'
 
-export const getEquipementsCompany = async (): Promise<EquipementCompany[]> => {
-  const { data } = await apiClient.get<EquipementCompany[]>('equipement-company')
-  console.log('EquipementsCompany:', data) 
+export const getEquipementsCompany = async (): Promise<EquipementCompanyReadDto[]> => {
+  const { data } = await apiClient.get<EquipementCompanyReadDto[]>('equipement-company')
   return data
 }
 
-export const getEquipementCompany = async (id: string): Promise<EquipementCompanyRead> => {
-  const { data } = await apiClient.get<EquipementCompanyRead>(`equipement-company/${id}`)
+export const getEquipementCompany = async (id: string): Promise<EquipementCompanyReadDto> => {
+  const { data } = await apiClient.get<EquipementCompanyReadDto>(`equipement-company/${id}`)
   return data
 }
 

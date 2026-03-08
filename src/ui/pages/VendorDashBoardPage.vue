@@ -62,7 +62,7 @@
 
       <!-- Stats et réservation en dur -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <!-- <Card v-for="(stat, i) in stats" :key="i">
+        <Card v-for="(stat, i) in stats" :key="i">
           <template #content>
             <div class="flex items-center justify-between mb-4">
               <i :class="['pi', stat.icon, 'text-2xl']"></i>
@@ -71,7 +71,7 @@
             <h3 class="text-2xl mb-1">{{ stat.value }}</h3>
             <p class="text-sm text-gray-600">{{ stat.label }}</p>
           </template>
-</Card> -->
+        </Card>
       </div>
 
       <!-- Tableau annonces avec actions -->
@@ -83,7 +83,7 @@
             <Column field="pricePerDay" header="Prix (€)" />
             <Column field="stock" header="Stock" />
             <Column field="description" header="Description" />
-            <Column field="typeName" header="Type" />
+            <Column field="equipementType.name" header="Type" />
             <Column header="Actions">
               <template #body="{ data }">
                 <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-secondary mr-2"
@@ -98,6 +98,7 @@
         </template>
       </Card>
     </div>
+
 
     <!-- Dialog modifier annonce -->
     <Dialog v-model:visible="showEditDialog" modal header="Modifier l’annonce" class="w-full max-w-2xl">
@@ -148,15 +149,12 @@ import {
 } from '@/services/equipementCompany'
 import { fetchEquipementTypes } from '@/services/equipement'
 import type {
-  EquipementCompany,
   CreateEquipementCompany,
-  EquipementCompanyRead
+  EquipementCompanyReadDto
 } from '@/types/equipementCompany'
 import type { EquipementType } from '@/types/equipementType'
 
-interface EquipementRow extends EquipementCompanyRead {
-  typeName?: string
-}
+
 
 export default defineComponent({
   name: 'VendorDashBoardPage',
@@ -168,35 +166,40 @@ export default defineComponent({
     const isSubmitting = ref(false)
     const submitError = ref<string | null>(null)
 
-    const equipments = ref<EquipementRow[]>([])
+    const equipments = ref<EquipementCompanyReadDto[]>([])
     const equipementTypes = ref<EquipementType[]>([])
-    const equipToDelete = ref<EquipementRow | null>(null)
-      const stats = ref([
-  {
-    label: 'Annonces actives',
-    value: 12,
-    change: '+2',
-    icon: 'pi-briefcase'
-  },
-  {
-    label: 'Réservations',
-    value: 8,
-    change: '+1',
-    icon: 'pi-calendar'
-  },
-  {
-    label: 'Revenus du mois',
-    value: '2 450€',
-    change: '+12%',
-    icon: 'pi-euro'
-  },
-  {
-    label: 'Taux de remplissage',
-    value: '78%',
-    change: '+5%',
-    icon: 'pi-chart-line'
-  }
-])
+    const equipToDelete = ref<EquipementCompanyReadDto | null>(null)
+    const stats = ref([
+      {
+        label: 'Annonces actives',
+        value: 12,
+        change: '+2',
+        icon: 'pi-briefcase'
+      },
+      {
+        label: 'Réservations',
+        value: 8,
+        change: '+1',
+        icon: 'pi-calendar'
+      },
+      {
+        label: 'Revenus du mois',
+        value: '2 450€',
+        change: '+12%',
+        icon: 'pi-euro'
+      },
+      {
+        label: 'Taux de remplissage',
+        value: '78%',
+        change: '+5%',
+        icon: 'pi-chart-line'
+      }
+    ])
+
+    const listingTypes = [
+      { label: 'Lieu', value: 'venue' },
+      { label: 'Équipement', value: 'equipment' }
+    ]
 
     const form = ref<Partial<CreateEquipementCompany>>({
       companyId: '',
@@ -204,10 +207,10 @@ export default defineComponent({
       displayName: '',
       description: '',
       pricePerDay: undefined,
-      stock: '1'
+      stock: '1',
     })
 
-    const editForm = ref<EquipementRow>({
+    const editForm = ref<EquipementCompanyReadDto>({
       id: '',
       displayName: '',
       description: '',
@@ -220,8 +223,7 @@ export default defineComponent({
 
     const loadEquipementTypes = async () => {
       try {
-        const data = await fetchEquipementTypes()
-        //equipementTypes.value = data.map(t => ({ ...t, equipementTypeId: String(t.equipementTypeId) }))
+        equipementTypes.value = await fetchEquipementTypes()
       } catch (err) {
         console.error(err)
       }
@@ -229,22 +231,14 @@ export default defineComponent({
 
     const loadEquipements = async () => {
       try {
-        const raw: EquipementCompany[] = await getEquipementsCompany()
-
-        // equipments.value = raw.map(e => ({
-        //   ...e,
-        //   typeName: equipementTypes.value.find(
-        //     t => t.eui === e.equipementTypeId
-        //   )?.name
-        // }))
+        const raw: EquipementCompanyReadDto[] = await getEquipementsCompany()
+        console.log('Equipements chargés:', raw)
+        equipments.value = raw
       } catch (err) {
         console.error('Erreur chargement équipements:', err)
       }
     }
 
-    /* ============================= */
-    /* CREATE */
-    /* ============================= */
 
     const handleCreateEquipement = async () => {
       submitError.value = null
@@ -263,9 +257,6 @@ export default defineComponent({
 
         equipments.value.push({
           ...newEquip,
-          // typeName: equipementTypes.value.find(
-          //   t => t.equipementTypeId === newEquip.equipementTypeId
-          // )?.name
         })
 
         showCreateDialog.value = false
@@ -287,20 +278,20 @@ export default defineComponent({
     }
 
 
-    const editEquipement = (rowData: EquipementRow) => {
+    const editEquipement = (rowData: EquipementCompanyReadDto) => {
       editForm.value = { ...rowData }
       showEditDialog.value = true
     }
 
 
     const handleUpdateEquipement = async () => {
-      console.log('Updating equipement with data:', editForm.value)
+      //console.log('Updating equipement with data:', editForm.value)
       if (!editForm.value.id) return
 
       isSubmitting.value = true
 
       try {
-        console.log('Sending update request for equipement ID:', editForm.value.id)
+        //console.log('Sending update request for equipement ID:', editForm.value.id)
         const updated = await updateEquipementCompany(
           editForm.value.id,
           editForm.value
@@ -313,9 +304,6 @@ export default defineComponent({
         if (index !== -1) {
           equipments.value[index] = {
             ...updated,
-            // typeName: equipementTypes.value.find(
-            //   t => t.equipementTypeId === updated.equipementTypeId
-            // )?.name
           }
         }
 
@@ -328,16 +316,20 @@ export default defineComponent({
 
 
 
-    const confirmDeleteEquipement = (rowData: EquipementRow) => {
+    const confirmDeleteEquipement = (rowData: EquipementCompanyReadDto) => {
+      console.log('Confirm delete for equipement:', rowData)
       equipToDelete.value = rowData
       showDeleteDialog.value = true
     }
 
     const deleteConfirmed = async () => {
-      if (!equipToDelete.value) return
+      if (!equipToDelete.value || !equipToDelete.value.equipementTypeId) {
+        alert("ID NULL") 
+        return
+      }
 
       try {
-        await deleteEquipementCompany(equipToDelete.value.id!)
+        await deleteEquipementCompany(equipToDelete.value.equipementTypeId)
 
         equipments.value = equipments.value.filter(
           e => e.id !== equipToDelete.value!.id
@@ -350,7 +342,7 @@ export default defineComponent({
       }
     }
 
-    const viewEquipement = (rowData: EquipementRow) => {
+    const viewEquipement = (rowData: EquipementCompanyReadDto) => {
       alert(
         `Nom: ${rowData.displayName}
         Prix: ${rowData.pricePerDay} €
@@ -375,12 +367,14 @@ export default defineComponent({
       editForm,
       equipments,
       equipementTypes,
+      stats,
+      listingTypes,
       handleCreateEquipement,
       editEquipement,
       handleUpdateEquipement,
       confirmDeleteEquipement,
       deleteConfirmed,
-      viewEquipement
+      viewEquipement,
     }
   }
 })
