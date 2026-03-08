@@ -59,12 +59,7 @@
           :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
           @click="navigate(item.value)" />
 
-<<<<<<< HEAD
-        <div v-if="userRole !== 'vendor'" class="border-t border-gray-200 my-2">
-        </div>
-=======
         <div v-if="userRole === 'vendor' || userRole === 'admin'" class="border-t border-gray-50 my-2" />
->>>>>>> f43d49e (ajoute page user order + modif)
 
         <Button
           v-if="userRole !== 'vendor'"
@@ -144,7 +139,6 @@ export default defineComponent({
       this.$emit('navigate', page);
       this.mobileMenuVisible = false;
     },
-<<<<<<< HEAD
     handleLogout() {
       this.authStore.logout();
       this.$toast.add({
@@ -164,18 +158,11 @@ export default defineComponent({
       this.$router.push('/become-seller');
       this.mobileMenuVisible = false;
     },
-=======
->>>>>>> f43d49e (ajoute page user order + modif)
     updateViewport() {
       this.isMobile = window.innerWidth < 768;
       if (!this.isMobile) {
         this.mobileMenuVisible = false;
       }
-    },
-    handleLogout() {
-      this.authStore.logout()
-      this.mobileMenuVisible = false
-      this.$router.push('/')
     },
   },
   mounted() {
