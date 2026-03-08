@@ -153,6 +153,7 @@ import type {
   EquipementCompanyReadDto
 } from '@/types/equipementCompany'
 import type { EquipementType } from '@/types/equipementType'
+import router from '@/router'
 
 
 
@@ -343,12 +344,7 @@ export default defineComponent({
     }
 
     const viewEquipement = (rowData: EquipementCompanyReadDto) => {
-      alert(
-        `Nom: ${rowData.displayName}
-        Prix: ${rowData.pricePerDay} €
-        Stock: ${rowData.stock}
-        Description: ${rowData.description}`
-      )
+      router.push(`/productDetails/${rowData.equipementCompanyId}`)
     }
 
 

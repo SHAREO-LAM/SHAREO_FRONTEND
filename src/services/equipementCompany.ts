@@ -1,6 +1,6 @@
 // src/services/equipementCompany.ts
+import type { CreateEquipementCompany, EquipementCompanyReadDto } from '@/types/equipementCompany'
 import apiClient from './api'
-import type { CreateEquipementCompany, EquipementCompanyReadDto } from '@/types/equipement-company'
 
 // Récupérer tous les équipements
 export const getEquipementsCompany = async (): Promise<EquipementCompanyReadDto[]> => {
