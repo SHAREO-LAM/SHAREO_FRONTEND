@@ -4,7 +4,7 @@
  */
 
 export const APP = {
-  NAME: import.meta.env.VITE_APP_NAME ?? 'Shareo',
+  NAME: import.meta.env.VITE_APP_NAME ?? 'SHAREO',
   VERSION: import.meta.env.VITE_APP_VERSION ?? '0.0.0',
   SUPPORT_EMAIL: import.meta.env.VITE_SUPPORT_EMAIL ?? 'support@shareo.app',
   DEFAULT_LOCALE: 'fr',

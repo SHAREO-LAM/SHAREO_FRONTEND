@@ -4,34 +4,28 @@
             <div class="footer-grid">
                 <!-- Brand -->
                 <div class="footer-column">
-                    <h3 class="footer-title">VenueBook</h3>
+                    <h3 class="footer-title">SHAREO</h3>
                     <p class="footer-description">
-                        The easiest way to book venues and equipment for your events.
+                        Le moyen le plus simple de réserver des salles et du matériel pour vos événements.
                     </p>
                 </div>
 
                 <!-- Customers -->
                 <div class="footer-column">
-                    <h4 class="footer-subtitle">For Customers</h4>
+                    <h4 class="footer-subtitle">Particuliers</h4>
                     <ul class="footer-list">
                         <li>
-                            <Button label="Browse Venues" link @click="navigate('search')" />
+                            <Button label="Parcourir les lieux" link @click="navigate('search')" />
                         </li>
                         <li>
-                            <Button label="Browse Equipment" link @click="navigate('search')" />
-                        </li>
-                        <li>
-                            <Button label="How It Works" link />
-                        </li>
-                        <li>
-                            <Button label="FAQ" link />
+                            <Button label="Parcourir le matériel" link @click="navigate('search')" />
                         </li>
                     </ul>
                 </div>
 
                 <!-- Vendors -->
                 <div class="footer-column">
-                    <h4 class="footer-subtitle">For Vendors</h4>
+                    <h4 class="footer-subtitle">Professionnels</h4>
                     <ul class="footer-list">
                         <li>
                             <Button label="List Your Venue" link @click="navigate('vendor')" />
@@ -49,7 +43,7 @@
                 </div>
 
                 <!-- Company -->
-                <div class="footer-column">
+                <div class="hidden">
                     <h4 class="footer-subtitle">Company</h4>
                     <ul class="footer-list">
                         <li>
@@ -69,7 +63,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>© 2025 VenueBook. All rights reserved.</p>
+                <p>© 2025 SHAREO. All rights reserved.</p>
             </div>
         </div>
     </footer>

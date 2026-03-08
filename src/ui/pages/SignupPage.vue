@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="header">
           <h1>Inscription</h1>
-          <p>Créez votre compte Shareo</p>
+          <p>Créez votre compte SHAREO</p>
         </div>
 
         <!-- Error message -->

@@ -3,14 +3,12 @@
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between py-4">
 
-        <!-- Header Logo -->
         <Button text class="!text-xl !font-bold text-primary hover:text-primary/80 transition-colors"
-          icon="pi pi-calendar" label="VenueBook" @click="navigate('home')" />
+          icon="pi pi-calendar" label="SHAREO" @click="navigate('home')" />
 
-        <!-- Desktop navigation -->
         <nav class="hidden md:flex items-center gap-2" aria-label="Main Navigation">
           <Button v-for="item in navItems" :key="item.value" text
-            class="!text-gray-700 hover:!text-primary transition-colors"
+            class="!text-black hover:!text-primary transition-colors"
             :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
             @click="navigate(item.value)" />
         </nav>
@@ -32,23 +30,18 @@
             @click="openBecomeSeller"
           />
 
-          <Button text rounded class="!text-gray-700 hover:!bg-gray-100 relative" icon="pi pi-shopping-cart"
-            @click="navigate('cart')" :badge="String(cart.cartItems.length)" badge-severity="warn">
-          </Button>
+          <Button text rounded class="!text-black hover:!bg-gray-100 relative" icon="pi pi-shopping-cart"
+            @click="navigate('cart')" :badge="String(cart.cartItems.length)" badge-severity="warn" />
 
           <div class="hidden md:flex">
             <UserMenu @navigate="navigate" />
           </div>
 
-          <Button v-if="authStore.isLoggedIn" outlined severity="danger" class="hidden md:flex !text-sm"
-            icon="pi pi-sign-out" label="Déconnexion" @click="handleLogout" />
-
-          <!-- Mobile menu -->
           <Button
             v-if="isMobile"
             text
             rounded
-            class="md:hidden !text-gray-700"
+            class="md:hidden !text-black"
             icon="pi pi-bars"
             @click="mobileMenuVisible = true"
           />
@@ -57,17 +50,21 @@
     </div>
 
     <!-- Mobile Drawer -->
-    <Drawer v-if="isMobile" v-model:visible="mobileMenuVisible" position="right" class="w-72">
+    <Drawer v-if="isMobile" v-model:visible="mobileMenuVisible" position="right" class="w-72 !bg-white !text-black">
       <template #header>
         <h3 class="text-xl font-bold text-gray-900">Menu</h3>
       </template>
-      <nav class="flex flex-col gap-2 pt-4">
-        <Button v-for="item in navItems" :key="item.value" text class="!justify-start !text-gray-700 hover:!bg-gray-100"
+      <nav class="flex flex-col gap-2">
+        <Button v-for="item in navItems" :key="item.value" text class="!justify-start !text-black hover:!bg-gray-50"
           :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
           @click="navigate(item.value)" />
 
+<<<<<<< HEAD
         <div v-if="userRole !== 'vendor'" class="border-t border-gray-200 my-2">
         </div>
+=======
+        <div v-if="userRole === 'vendor' || userRole === 'admin'" class="border-t border-gray-50 my-2" />
+>>>>>>> f43d49e (ajoute page user order + modif)
 
         <Button
           v-if="userRole !== 'vendor'"
@@ -84,16 +81,17 @@
         <Button v-if="userRole === 'admin' || userRole === 'superadmin'" outlined severity="secondary"
           class="!justify-start" label="Admin Panel" @click="navigate('admin')" />
 
-        <UserMenu @navigate="navigate" />
+        <UserMenu :mobile="true" @navigate="navigate" />
 
-        <Button v-if="authStore.isLoggedIn" outlined severity="danger" class="!justify-start" icon="pi pi-sign-out"
-          label="Déconnexion" @click="handleLogout" />
+        <div class="border-t border-gray-500 my-2" />
+        <Button v-if="authStore.isLoggedIn" text @click="handleLogout"
+            icon="pi pi-sign-out" label="Déconnexion"
+            class="!w-full !justify-start !text-red-600 !px-4 !py-2 !text-md !rounded-none hover:!bg-gray-50" />
       </nav>
     </Drawer>
 
   </header>
 </template>
-
 
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -146,6 +144,7 @@ export default defineComponent({
       this.$emit('navigate', page);
       this.mobileMenuVisible = false;
     },
+<<<<<<< HEAD
     handleLogout() {
       this.authStore.logout();
       this.$toast.add({
@@ -165,11 +164,18 @@ export default defineComponent({
       this.$router.push('/become-seller');
       this.mobileMenuVisible = false;
     },
+=======
+>>>>>>> f43d49e (ajoute page user order + modif)
     updateViewport() {
       this.isMobile = window.innerWidth < 768;
       if (!this.isMobile) {
         this.mobileMenuVisible = false;
       }
+    },
+    handleLogout() {
+      this.authStore.logout()
+      this.mobileMenuVisible = false
+      this.$router.push('/')
     },
   },
   mounted() {
