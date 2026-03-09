@@ -27,7 +27,7 @@
             class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
           <Button v-if="authStore.isAdmin && !authStore.isSuperAdmin" text @click="handleNavigate('vendor')"
-            icon="pi pi-building" label="Vendor Dashboard"
+            icon="pi pi-building" label="Espace entreprise"
             class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
           <Button text @click="handleNavigate('orders')"
@@ -52,24 +52,16 @@
         class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
       <Button v-if="authStore.isAdmin && !authStore.isSuperAdmin" text @click="handleNavigate('vendor')"
-        icon="pi pi-building" label="Vendor Dashboard"
-        class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
-
-      <Button text @click="handleNavigate('account')"
-        icon="pi pi-user" label="Mon compte"
+        icon="pi pi-building" label="Espace entreprise"
         class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
       <Button text @click="handleNavigate('orders')"
         icon="pi pi-list" label="Mes commandes"
         class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
+
+
     </template>
 
-  </div>
-
-  <!-- Guest -->
-  <div v-else class="flex items-center gap-2">
-    <Button outlined severity="secondary" class="!text-sm" label="Connexion" icon="pi pi-user"
-      @click="$emit('navigate', 'login')" />
   </div>
 </template>
 

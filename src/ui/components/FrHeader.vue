@@ -14,17 +14,11 @@
         </nav>
 
         <div class="flex items-center gap-2">
-          <Button v-if="userRole === 'vendor'" outlined severity="secondary" class="hidden md:flex !text-sm"
-            label="Vendor Dashboard" @click="navigate('vendor')" />
-
-          <Button v-if="userRole === 'admin' || userRole === 'superadmin'" outlined severity="secondary"
-            class="hidden md:flex !text-sm" label="Admin Panel" @click="navigate('admin')" />
-
           <Button
             v-if="userRole !== 'vendor'"
             outlined
             severity="primary"
-            class="hidden md:flex !text-sm"
+            class="!hidden md:!flex !text-sm"
             icon="pi pi-shop"
             label="Devenir vendeur"
             @click="openBecomeSeller"
@@ -32,6 +26,9 @@
 
           <Button text rounded class="!text-black hover:!bg-gray-100 relative" icon="pi pi-shopping-cart"
             @click="navigate('cart')" :badge="String(cart.cartItems.length)" badge-severity="warn" />
+
+          <Button v-if="!isMobile && !authStore.isLoggedIn" class="!text-md" label="Connexion" icon="pi pi-user"
+            @click="$emit('navigate', 'login')" />
 
           <div class="hidden md:flex">
             <UserMenu @navigate="navigate" />
@@ -56,32 +53,27 @@
       </template>
       <nav class="flex flex-col gap-2">
         <Button v-for="item in navItems" :key="item.value" text class="!justify-start !text-black hover:!bg-gray-50"
-          :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
+          :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label" :icon="item.icon"
           @click="navigate(item.value)" />
-
-        <div v-if="userRole === 'vendor' || userRole === 'admin'" class="border-t border-gray-50 my-2" />
 
         <Button
           v-if="userRole !== 'vendor'"
           text
-          class="!justify-start !text-gray-700 hover:!bg-gray-100"
+          class="!justify-start !text-black hover:!bg-gray-100"
           icon="pi pi-shop"
           label="Devenir vendeur"
           @click="openBecomeSeller"
         />
 
-        <Button v-if="userRole === 'vendor' || userRole === 'admin'" outlined severity="secondary"
-          class="!justify-start" label="Vendor Dashboard" @click="navigate('vendor')" />
-
-        <Button v-if="userRole === 'admin' || userRole === 'superadmin'" outlined severity="secondary"
-          class="!justify-start" label="Admin Panel" @click="navigate('admin')" />
-
         <UserMenu :mobile="true" @navigate="navigate" />
 
         <div class="border-t border-gray-500 my-2" />
         <Button v-if="authStore.isLoggedIn" text @click="handleLogout"
-            icon="pi pi-sign-out" label="Déconnexion"
-            class="!w-full !justify-start !text-red-600 !px-4 !py-2 !text-md !rounded-none hover:!bg-gray-50" />
+          icon="pi pi-sign-out" label="Déconnexion"
+          class="!w-full !justify-start !text-red-600 !px-4 !py-2 !text-md hover:!bg-gray-50" />
+
+        <Button v-else class="!w-full !justify-start !text-md" label="Connexion" icon="pi pi-user"
+          @click="$emit('navigate', 'login')" />
       </nav>
     </Drawer>
 
@@ -97,6 +89,7 @@ import UserMenu from './UserMenu.vue';
 interface NavItem {
   label: string;
   value: string;
+  icon: string;
 }
 
 export default defineComponent({
@@ -120,9 +113,9 @@ export default defineComponent({
       isMobile: false,
       mobileMenuVisible: false,
       navItems: [
-        { label: 'Accueil', value: '' },
-        { label: 'Lieux', value: 'domains' },
-        { label: 'Équipements', value: 'equipments' },
+        { label: 'Accueil', value: '', icon: 'pi pi-home' },
+        { label: 'Lieux', value: 'domains', icon: 'pi pi-map-marker' },
+        { label: 'Équipements', value: 'equipments', icon: 'pi pi-cog' },
       ] as NavItem[],
     };
   },

@@ -69,7 +69,7 @@
                     </p>
                     <p class="text-xs text-gray-400">
                       {{ item.domain ? 'Lieu' : 'Équipement' }}
-                      <span v-if="getCompanyName(item)"> · {{ getCompanyName(item) }}</span>
+                      <span v-if="getCompanyName(item)"> · Proposé par {{ getCompanyName(item) }}</span>
                     </p>
                   </div>
                 </div>
@@ -115,7 +115,7 @@
                     </p>
                     <p class="text-xs text-gray-400">
                       {{ item.domain ? 'Lieu' : 'Équipement' }}
-                      <span v-if="getCompanyName(item)"> · {{ getCompanyName(item) }}</span>
+                      <span v-if="getCompanyName(item)"> · Proposé par {{ getCompanyName(item) }}</span>
                     </p>
                   </div>
                 </div>

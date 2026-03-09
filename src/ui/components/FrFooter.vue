@@ -15,10 +15,10 @@
                     <h4 class="footer-subtitle">Particuliers</h4>
                     <ul class="footer-list">
                         <li>
-                            <Button label="Parcourir les lieux" link @click="navigate('search')" />
+                            <Button label="Parcourir les lieux" link @click="navigate('domains')" />
                         </li>
                         <li>
-                            <Button label="Parcourir le matériel" link @click="navigate('search')" />
+                            <Button label="Parcourir le matériel" link @click="navigate('equipments')" />
                         </li>
                     </ul>
                 </div>
@@ -28,16 +28,10 @@
                     <h4 class="footer-subtitle">Professionnels</h4>
                     <ul class="footer-list">
                         <li>
-                            <Button label="List Your Venue" link @click="navigate('vendor')" />
+                            <Button label="Proposer un equipement ou un lieu" link @click="navigate('become-seller')" />
                         </li>
                         <li>
-                            <Button label="Vendor Dashboard" link @click="navigate('vendor')" />
-                        </li>
-                        <li>
-                            <Button label="Pricing" link />
-                        </li>
-                        <li>
-                            <Button label="Resources" link />
+                            <Button label="Espace entreprise" link @click="navigate('become-seller')" />
                         </li>
                     </ul>
                 </div>
