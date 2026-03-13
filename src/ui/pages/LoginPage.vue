@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="header">
           <h1>Connexion</h1>
-          <p>Connectez-vous à votre compte Shareo</p>
+          <p>Connectez-vous à votre compte SHAREO</p>
         </div>
 
         <!-- Error message -->

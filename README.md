@@ -1,6 +1,6 @@
-# Shareo - Frontend
+# SHAREO - Frontend
 
-Frontend de l'application **Shareo**, développé en Vue 3 avec TypeScript.  
+Frontend de l'application **SHAREO**, développé en Vue 3 avec TypeScript.  
 Cette application utilise **SCSS**, **PrimeVue** pour l'UI, **Pinia** pour la gestion d'état, et **Axios** pour les appels API.  
 Les tests end-to-end sont réalisés avec **Playwright**.
 
