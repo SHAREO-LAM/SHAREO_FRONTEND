@@ -358,6 +358,9 @@ export default defineComponent({
       this.isLoading = true;
       try {
         const authStore = useAuthStore();
+        if (!authStore.user?.userId) {
+          throw new Error('Utilisateur non authentifié');
+        }
 
         // Créer la compagnie
         const companyData: CreateCompany = {
@@ -374,14 +377,16 @@ export default defineComponent({
           country: this.form.country,
           description: this.form.description,
           website: this.form.website,
+          userCreateId: String(authStore.user.userId),
         };
 
         const company = await createCompany(companyData);
 
         // Associer l'utilisateur à la compagnie
         const userCompanyData: CreateUserCompany = {
-          companyId: (company as any).companyId as string,
-          userId: String(authStore.user?.userId) as string,
+          companyId: (company as any).id as string,
+          userId: String(authStore.user.userId) as string,
+          userCreateId: String(authStore.user.userId),
         };
 
         await createUserCompany(userCompanyData);

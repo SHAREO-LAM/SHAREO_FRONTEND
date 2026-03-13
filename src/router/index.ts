@@ -6,12 +6,21 @@ import LoginPage from '@/ui/pages/LoginPage.vue'
 import SignupPage from '@/ui/pages/SignupPage.vue'
 import AccountPage from '@/ui/pages/AccountPage.vue'
 import BecomeSellerPage from '@/ui/pages/BecomeSellerPage.vue'
+import AdminDashboards from '@/ui/pages/AdminDashboards.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import CartPageVue from '@/ui/pages/CartPage.vue'
 import CheckoutPage from '@/ui/pages/CheckoutPage.vue'
 import OrderConfirmed from '@/ui/pages/OrderConfirmed.vue'
 import UserOrdersPage from '@/ui/pages/UserOrdersPage.vue'
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    requiresAuth?: boolean
+    requiresGuest?: boolean
+    requiresRole?: string[]
+  }
+}
 
 const routes = [
   { path: '/', component: HomePage, name: 'home' },
@@ -23,6 +32,7 @@ const routes = [
   { path: '/account', component: AccountPage, name: 'account', meta: { requiresAuth: true } },
   { path: '/become-seller', component: BecomeSellerPage, name: 'become-seller', meta: { requiresAuth: true } },
   { path: '/orders', component: UserOrdersPage, name: 'orders' },
+  { path: '/admin', component: AdminDashboards, name: 'admin', meta: { requiresAuth: true, requiresRole: ['admin', 'superadmin'] } },
   // { path: '/search', component: SearchResults },
   // { path: '/listing/:id', component: ListingDetail },
   { path: '/cart', component: CartPageVue },
@@ -43,8 +53,13 @@ const router = createRouter({
 })
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  // Ensure persisted auth state is hydrated before checking role-based routes.
+  if (authStore.isLoggedIn && !authStore.user) {
+    await authStore.initialize()
+  }
 
   if (to.meta.requiresGuest && authStore.isLoggedIn) {
     return next('/')
@@ -54,8 +69,14 @@ router.beforeEach((to, from, next) => {
     return next('/login')
   }
 
-  if (to.meta.requiresRole && authStore.userRole !== to.meta.requiresRole) {
-    return next('/')
+  if (to.meta.requiresRole) {
+    const requiredRoles = Array.isArray(to.meta.requiresRole) 
+      ? to.meta.requiresRole 
+      : [to.meta.requiresRole]
+    
+    if (!requiredRoles.includes(authStore.userRole)) {
+      return next('/')
+    }
   }
 
   next()

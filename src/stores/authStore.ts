@@ -9,12 +9,14 @@ import {
   type RegisterCredentials,
   type UserProfile,
 } from '@/services/auth'
+import { getUserCompanies } from '@/services/company'
 
 interface AuthState {
   user: UserProfile | null
   isLoggedIn: boolean
   isLoading: boolean
   error: string | null
+  isVendor: boolean
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -23,6 +25,7 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: isAuthenticated(),
     isLoading: false,
     error: null,
+    isVendor: false,
   }),
 
   getters: {
@@ -32,6 +35,7 @@ export const useAuthStore = defineStore('auth', {
       if (!state.user) return 'guest'
       if (state.user.isSuperAdmin) return 'superadmin'
       if (state.user.isAdmin) return 'admin'
+      if (state.isVendor) return 'vendor'
       return 'user'
     },
   },
@@ -92,6 +96,10 @@ export const useAuthStore = defineStore('auth', {
         const profile = await getProfile()
         this.user = profile
         this.isLoggedIn = true
+        
+        // Charger le statut de vendeur
+        await this.loadVendorStatus()
+        
         return profile
       } catch (error: any) {
         this.error = error.response?.data?.message || 'Erreur lors de la récupération du profil'
@@ -103,12 +111,26 @@ export const useAuthStore = defineStore('auth', {
     },
 
     /**
+     * Charger le statut de vendeur (vérifie si l'utilisateur a une compagnie)
+     */
+    async loadVendorStatus() {
+      try {
+        const companies = await getUserCompanies()
+        this.isVendor = companies && companies.length > 0
+      } catch (error) {
+        // Si erreur, considérer que l'utilisateur n'est pas vendeur
+        this.isVendor = false
+      }
+    },
+
+    /**
      * Déconnexion de l'utilisateur
      */
     logout() {
       apiLogout()
       this.user = null
       this.isLoggedIn = false
+      this.isVendor = false
       this.error = null
     },
 

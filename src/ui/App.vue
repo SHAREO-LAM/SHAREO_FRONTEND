@@ -23,7 +23,7 @@
       </template>
     </Toast>
     <Toast position="top-right" />
-    <FrHeader :current-page="currentPage" user-role="guest" :cart-item-count="cartItemCount"
+    <FrHeader :current-page="currentPage" :cart-item-count="cartItemCount"
       @navigate="handleNavigate" />
 
     <main class="flex-1 pt-20">
