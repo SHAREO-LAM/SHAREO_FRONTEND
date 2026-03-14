@@ -2,31 +2,76 @@
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8">
 
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl mb-2">Tableau de bord prestataire</h1>
-          <p class="text-gray-600">Gérez vos annonces et vos réservations</p>
-        </div>
-
-        <Button icon="pi pi-plus" label="Créer une annonce" class="bg-orange-500 hover:bg-orange-600 border-none"
-          @click="showCreateDialog = true" />
+      <!-- HEADER -->
+      <div class="mb-8">
+        <h1 class="text-3xl mb-2">Tableau de bord prestataire</h1>
+        <p class="text-gray-600">Gérez vos annonces et vos réservations</p>
       </div>
 
-      <!-- Stats -->
+      <!-- STATS -->
       <DashboardStats :stats="stats" />
 
-      <!-- TABLE EQUIPEMENTS -->
-      <EquipementsTable :equipments="equipments" @view="viewEquipement" @edit="editEquipement"
-        @delete="confirmDeleteEquipement" />
+      <!-- TABS -->
+      <TabView class="mt-8">
 
-      <!-- TABLE DOMAINS -->
-      <DomainsTable :domains="domains" @view="viewDomain" @edit="editDomain" @delete="confirmDeleteDomain" />
+        <!-- TAB EQUIPEMENTS -->
+        <TabPanel header="Équipements" value="equipements">
 
+          <div class="bg-white rounded-xl shadow p-6">
+
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-semibold">Mes équipements</h2>
+
+              <Button
+                icon="pi pi-plus"
+                label="Créer un équipement"
+                class="bg-orange-500 hover:bg-orange-600 border-none"
+                @click="showCreateDialog = true"
+              />
+            </div>
+
+            <EquipementsTable
+              :equipments="equipments"
+              @view="viewEquipement"
+              @edit="editEquipement"
+              @delete="confirmDeleteEquipement"
+            />
+
+          </div>
+
+        </TabPanel>
+
+        <!-- TAB DOMAINES -->
+        <TabPanel header="Domaines" value="domains">
+
+          <div class="bg-white rounded-xl shadow p-6">
+
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-semibold">Mes domaines</h2>
+
+              <Button
+                icon="pi pi-plus"
+                label="Créer un domaine"
+                class="bg-orange-500 hover:bg-orange-600 border-none"
+                @click="showCreateDomainDialog = true"
+              />
+            </div>
+
+            <DomainsTable
+              :domains="domains"
+              @view="viewDomain"
+              @edit="editDomain"
+              @delete="confirmDeleteDomain"
+            />
+
+          </div>
+
+        </TabPanel>
+
+      </TabView>
     </div>
 
-    <!-- CREATE DIALOG -->
-
+    <!-- CREATE EQUIPEMENT -->
     <Dialog v-model:visible="showCreateDialog" header="Créer un équipement" modal class="w-full max-w-2xl">
 
       <form class="space-y-4 mt-4" @submit.prevent="handleCreateEquipement(form)">
@@ -38,8 +83,14 @@
 
         <div>
           <label>Type équipement</label>
-          <Select v-model="form.equipementTypeId" :options="equipementTypes" optionLabel="name"
-            optionValue="equipementTypeId" placeholder="Choisir" class="w-full" />
+          <Select
+            v-model="form.equipementTypeId"
+            :options="equipementTypes"
+            optionLabel="name"
+            optionValue="equipementTypeId"
+            placeholder="Choisir"
+            class="w-full"
+          />
         </div>
 
         <div>
@@ -73,9 +124,56 @@
 
     </Dialog>
 
+    <!-- CREATE DOMAIN -->
+    <Dialog v-model:visible="showCreateDomainDialog" header="Créer un domaine" modal class="w-full max-w-2xl">
 
-    <!-- EDIT DIALOG -->
+      <form class="space-y-4 mt-4" @submit.prevent="handleCreateDomain(domainForm)">
 
+        <div>
+          <label>Société ID</label>
+          <InputText v-model="domainForm.companyId" class="w-full" />
+        </div>
+
+        <div>
+          <label>Nom du domaine</label>
+          <InputText v-model="domainForm.name" class="w-full" />
+        </div>
+
+        <div>
+          <label>Description</label>
+          <Textarea v-model="domainForm.description" rows="3" class="w-full" />
+        </div>
+
+        <div>
+          <label>Ville</label>
+          <InputText v-model="domainForm.city" class="w-full" />
+        </div>
+
+        <div>
+          <label>Pays</label>
+          <InputText v-model="domainForm.country" class="w-full" />
+        </div>
+
+        <div>
+          <label>Prix / jour</label>
+          <InputNumber v-model="domainForm.pricePerDay" class="w-full" />
+        </div>
+
+        <div>
+          <label>Capacité</label>
+          <InputText v-model="domainForm.capacity" class="w-full" />
+        </div>
+
+        <div class="flex gap-4 mt-4">
+          <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
+          <Button label="Annuler" severity="secondary" @click="showCreateDomainDialog = false" />
+        </div>
+
+      </form>
+
+    </Dialog>
+
+    <!-- EDIT EQUIPEMENT -->
     <Dialog v-model:visible="showEditDialog" header="Modifier un équipement" modal class="w-full max-w-2xl">
 
       <form class="space-y-4 mt-4" @submit.prevent="handleUpdateEquipement(editForm)">
@@ -109,15 +207,60 @@
 
     </Dialog>
 
+    <!-- EDIT DOMAIN -->
+    <Dialog v-model:visible="showEditDomainDialog" header="Modifier un domaine" modal class="w-full max-w-2xl">
 
-    <!-- DELETE DIALOG -->
+      <form class="space-y-4 mt-4" @submit.prevent="handleUpdateDomain(editDomainForm)">
 
-    <DeleteConfirmDialog :visible="showDeleteDialog" message="Supprimer cette annonce ?" :onConfirm="deleteConfirmed"
-      :onCancel="() => showDeleteDialog = false" />
+        <div>
+          <label>Nom du domaine</label>
+          <InputText v-model="editDomainForm.name" class="w-full" />
+        </div>
+
+        <div>
+          <label>Description</label>
+          <Textarea v-model="editDomainForm.description" rows="3" class="w-full" />
+        </div>
+
+        <div>
+          <label>Ville</label>
+          <InputText v-model="editDomainForm.city" class="w-full" />
+        </div>
+
+        <div>
+          <label>Pays</label>
+          <InputText v-model="editDomainForm.country" class="w-full" />
+        </div>
+
+        <div>
+          <label>Prix / jour</label>
+          <InputNumber v-model="editDomainForm.pricePerDay" class="w-full" />
+        </div>
+
+        <div>
+          <label>Capacité</label>
+          <InputText v-model="editDomainForm.capacity" class="w-full" />
+        </div>
+
+        <div class="flex gap-4 mt-4">
+          <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
+          <Button label="Annuler" severity="secondary" @click="showEditDomainDialog = false" />
+        </div>
+
+      </form>
+
+    </Dialog>
+
+    <!-- DELETE -->
+    <DeleteConfirmDialog
+      :visible="showDeleteDialog"
+      message="Supprimer cette annonce ?"
+      :onConfirm="deleteConfirmed"
+      :onCancel="() => showDeleteDialog = false"
+    />
 
   </div>
 </template>
-
 
 <script lang="ts">
 
@@ -132,7 +275,7 @@ import InputText from "primevue/inputtext"
 import InputNumber from "primevue/inputnumber"
 import Textarea from "primevue/textarea"
 import Select from "primevue/select"
-
+import TabView from "primevue/tabview"
 import DeleteConfirmDialog from "@/ui/components/dashboard/DeleteConfirmDialog.vue"
 import DashboardStats from "@/ui/components/dashboard/DashboardStats.vue"
 
@@ -161,8 +304,9 @@ import {
 
 import router from "@/router"
 import type { CreateDomain, Domain, UpdateDomainDto } from "@/types/domain"
-
-
+import DomainsTable from "../components/dashboard/DomainsTable.vue"
+import EquipementsTable from "../components/dashboard/EquipementsTable.vue"
+import { TabPanel } from "primevue"
 export default defineComponent({
 
   name: "VendorDashBoardPage",
@@ -178,7 +322,10 @@ export default defineComponent({
     Textarea,
     Select,
     DeleteConfirmDialog,
-    DashboardStats
+    DashboardStats,
+    EquipementsTable,
+    DomainsTable,
+    TabPanel
   },
 
   setup() {
@@ -242,7 +389,7 @@ export default defineComponent({
     const editDomainForm = ref<Domain>({
       domainId: "",
       name: "",
-      description: "",
+       description: "",
       city: "",
       country: "",
       pricePerDay: 0,
@@ -363,53 +510,67 @@ export default defineComponent({
     }
 
 
-    // const handleCreateDomain = async (item: Partial<CreateDomain>) => {
+    const handleCreateDomain = async (item: Partial<CreateDomain>) => {
 
-    //   if (!item.name || !item.pricePerDay) return
+      if (!item.name || !item.pricePerDay) return
 
-    //   try {
+      try {
 
-    //     const newDomain = await createDomain(item as CreateDomain)
+        const newDomain = await createDomain(item as CreateDomain)
 
-    //     domains.value.push(newDomain)
+        domains.value.push(newDomain)
 
-    //     showCreateDomainDialog.value = false
+        showCreateDomainDialog.value = false
 
-    //     domainForm.value = {
-    //       name: "",
-    //       description: "",
-    //       city: "",
-    //       country: "",
-    //       pricePerDay: undefined,
-    //       capacity: "",
-    //       companyId: ""
-    //     }
+        domainForm.value = {
+          name: "",
+          description: "",
+          city: "",
+          country: "",
+          pricePerDay: undefined,
+          capacity: "",
+          companyId: ""
+        }
 
-    //   } catch (e) {
-    //     console.error("Erreur création domain", e)
-    //   }
-    // }
-    // const editDomain = (row: Domain) => {
+      } catch (e) {
+        console.error("Erreur création domain", e)
+      }
+    }
+    const editDomain = (row: Domain) => {
 
-    //   editDomainForm.value = { ...row }
+      editDomainForm.value = { ...row }
 
-    //   showEditDomainDialog.value = true
-    // }
+      showEditDomainDialog.value = true
+    }
 
-    // const handleUpdateDomain = async (item: Domain) => {
+    const viewDomain = (row: Domain) => {
+      console.log("View domain", row)
+      router.push(`/productDetails/${row.domainId}`)
+    }
 
-    //   if (!item.domainId) return
+    const handleUpdateDomain = async (item: Domain) => {
 
-    //   const updated = await updateDomain(item.domainId, item)
+      if (!item.domainId) return
 
-    //   const index = domains.value.findIndex(
-    //     d => d.domainId === updated.domainId
-    //   )
+      const updateDomainDto: UpdateDomainDto = {
+        name: item.name,
+        description: item.description ?? '',
+        city: item.city ?? '',
+        country: item.country ?? '',
+        pricePerDay: item.pricePerDay ?? 0,
+        capacity: item.capacity ?? ''
+      }
+      const updated = await updateDomain(item.domainId, updateDomainDto)
 
-    //   if (index !== -1) domains.value[index] = updated
+      const index = domains.value.findIndex(
+        d => d.domainId === item.domainId
+      )
+      const updatedDomain = { ...updated, domainId: item.domainId, datetimeCreate: item.datetimeCreate } as Domain
 
-    //   showEditDomainDialog.value = false
-    // }
+      if (index !== -1) domains.value[index] = updatedDomain
+
+      showEditDomainDialog.value = false
+    }
 
 
     const confirmDeleteDomain = (row: Domain) => {
@@ -456,13 +617,16 @@ export default defineComponent({
       deleteConfirmed,
       viewEquipement,
       domains,
+      domainForm,
+      editDomainForm,
       showCreateDomainDialog,
       showEditDomainDialog,
       handleCreateDomain,
       editDomain,
       handleUpdateDomain,
       confirmDeleteDomain,
-      deleteDomainConfirmed
+      deleteDomainConfirmed,
+      viewDomain
     }
 
   }

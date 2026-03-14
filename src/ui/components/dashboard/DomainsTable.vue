@@ -55,7 +55,7 @@ import DataTable from "primevue/datatable"
 import Column from "primevue/column"
 import Button from "primevue/button"
 
-import type { UpdateDomainDto } from "@/types/domain"
+import type { Domain, UpdateDomainDto } from "@/types/domain"
 
 export default defineComponent({
 
@@ -71,7 +71,7 @@ export default defineComponent({
   props: {
 
     domains: {
-      type: Array as PropType<UpdateDomainDto[]>,
+      type: Array as PropType<Domain[]>,
       required: true
     }
 

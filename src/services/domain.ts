@@ -14,8 +14,8 @@ export const getDomain = async (id: string): Promise<Domain> => {
 }
 
 // Créer un domain
-export const createDomain = async (payload: CreateDomain): Promise<UpdateDomainDto> => {
-  const { data } = await apiClient.post<UpdateDomainDto>('/domain', payload)
+export const createDomain = async (payload: CreateDomain): Promise<Domain> => {
+  const { data } = await apiClient.post<Domain>('/domain', payload)
   return data
 }
 

@@ -176,12 +176,10 @@ export default defineComponent({
         id: 1,
         name: d.name ?? 'Nom indisponible',
         type: 'Domaine',
-        image: typeof d.imageUrl === 'string'
-    ? d.imageUrl
-    : 'https://placehold.co/400x300?text=No+Image',
+        image: d.imageUrl ? d.imageUrl : 'https://placehold.co/400x300?text=No+Image',
         price: d.pricePerDay ?? 0,
-        location: typeof d.city === 'string' ? d.city : '',
-        capacity: typeof d.capacity === 'number' ? d.capacity : undefined,
+        location: d.city && d.country ? `${d.city}, ${d.country}` : 'Localisation indisponible',
+        capacity: d.capacity ? parseInt(d.capacity) : undefined,
         rating: Math.round(Math.random() * 5 * 10) / 10 || 4.5, // note aléatoire pour exemple
       }));
     };

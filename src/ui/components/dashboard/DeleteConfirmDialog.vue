@@ -1,23 +1,52 @@
 <template>
-  <Dialog v-model:visible="visible" modal header="Confirmer">
+  <Dialog
+    header="Confirmation"
+    :visible="visible"
+    modal
+    @update:visible="$emit('update:visible', $event)"
+  >
     <p>{{ message }}</p>
-    <div class="flex gap-4 mt-4">
-      <Button label="Oui" severity="danger" @click="onConfirm" />
-      <Button label="Non" outlined @click="onCancel" />
+
+    <div class="flex justify-end gap-2 mt-4">
+      <Button
+        label="Annuler"
+        class="p-button-text"
+        @click="$emit('update:visible', false)"
+      />
+
+      <Button
+        label="Oui, supprimer"
+        class="p-button-danger"
+        @click="$emit('confirm')"
+      />
     </div>
   </Dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent } from "vue"
+import Dialog from "primevue/dialog"
+import Button from "primevue/button"
 
 export default defineComponent({
-  name: 'DeleteConfirmDialog',
+  name: "DeleteConfirmDialog",
+
+  components: {
+    Dialog,
+    Button
+  },
+
   props: {
-    visible: { type: Boolean, required: true },
-    message: { type: String, default: 'Êtes-vous sûr ?' },
-    onCancel: { type: Function as PropType<() => void>, required: true },
-    onConfirm: { type: Function as PropType<() => void>, required: true }
-  }
+    visible: {
+      type: Boolean,
+      required: true
+    },
+    message: {
+      type: String,
+      default: "Êtes-vous sûr ?"
+    }
+  },
+
+  emits: ["update:visible", "confirm"]
 })
 </script>

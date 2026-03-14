@@ -1012,29 +1012,29 @@ export interface components {
             /** @description Nom du domaine */
             name: string;
             /** @description Description du domaine */
-            description?: Record<string, never>;
+            description?: string | null;
             /** @description Nom de la rue */
-            streetName?: Record<string, never>;
+            streetName?: string | null;
             /** @description Complément de rue */
-            streetNameAdd?: Record<string, never>;
+            streetNameAdd?: string | null;
             /** @description Numéro de la maison */
-            houseNumber?: string;
+            houseNumber?: string | null;
             /** @description Code postal */
-            postcode?: Record<string, never>;
+            postcode?: string | null;
             /** @description Ville */
-            city?: Record<string, never>;
+            city?: string | null;
             /** @description Pays */
-            country?: Record<string, never>;
+            country?: string | null;
             /** @description Latitude */
-            latitude?: number;
+            latitude?: number | null;
             /** @description Longitude */
-            longitude?: number;
+            longitude?: number | null;
             /** @description Prix par jour */
-            pricePerDay?: number;
+            pricePerDay?: number | null;
             /** @description Capacité */
-            capacity?: string;
+            capacity?: string | null;
             /** @description URL de l’image */
-            imageUrl?: Record<string, never>;
+            imageUrl?: string | null;
             /**
              * Format: date
              * @description Date de création
@@ -1044,11 +1044,11 @@ export interface components {
              * Format: date
              * @description Date de mise à jour
              */
-            datetimeUpdate?: string;
+            datetimeUpdate?: string | null;
             /** @description ID de l’utilisateur créateur */
-            userCreateId?: string;
+            userCreateId?: string | null;
             /** @description ID de l’utilisateur mise à jour */
-            userUpdateId?: string;
+            userUpdateId?: string | null;
             /** @description ID de la société */
             companyId?: string;
             company?: components["schemas"]["Company"];
