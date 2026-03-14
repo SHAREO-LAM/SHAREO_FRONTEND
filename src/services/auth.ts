@@ -33,6 +33,7 @@ export interface UserProfile {
   email: string
   isAdmin: boolean
   isSuperAdmin: boolean
+  companyId: string
 }
 
 /**
@@ -98,6 +99,7 @@ export const register = async (credentials: RegisterCredentials): Promise<AuthRe
  */
 export const getProfile = async (): Promise<UserProfile> => {
   const response = await apiClient.get<UserProfile>('/auth/profile')
+  console.log("Profile du user", response.data)
   return response.data
 }
 

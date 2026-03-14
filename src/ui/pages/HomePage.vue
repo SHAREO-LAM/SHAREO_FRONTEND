@@ -140,6 +140,7 @@ import { ROUTES } from "@/constants/const";
 import ListingCard from "../components/ListingCard.vue";
 import { getDomains } from "@/services/domain";
 import type { Domain, UpdateDomainDto } from "@/types/domain";
+import { useAuthStore } from "@/stores/authStore";
 
 interface PopularListing {
   id: number;
@@ -159,7 +160,7 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-
+    const authStore = useAuthStore()
     const searchQuery = ref("");
     const location = ref("");
 
@@ -204,8 +205,21 @@ export default defineComponent({
 
 
     const goToVendorDashboard = () => {
-      router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
-    };
+      if (!authStore.isLoggedIn) {
+        // Non connecté → page login
+        router.push('/login')
+        return
+      }
+
+      if (!authStore.user?.companyId) {
+        // Connecté mais pas encore vendeur → page devenir vendeur
+        router.push('/become-seller')
+        return
+      }
+
+      // Connecté et déjà vendeur → dashboard
+      router.push({ name: ROUTES.VENDOR.DASHBOARD.name })
+    }
 
 
     const goToDomains = () => {

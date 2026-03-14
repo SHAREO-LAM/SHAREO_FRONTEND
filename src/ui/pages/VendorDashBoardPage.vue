@@ -69,11 +69,6 @@
       <form class="space-y-4 mt-4" @submit.prevent="handleCreateEquipement(form)">
 
         <div>
-          <label>Société ID</label>
-          <InputText v-model="form.companyId" class="w-full" />
-        </div>
-
-        <div>
           <label>Type équipement</label>
           <Select v-model="form.equipementTypeId" :options="equipementTypes" optionLabel="name"
             optionValue="equipementTypeId" placeholder="Choisir" class="w-full" />
@@ -116,11 +111,6 @@
       <form class="space-y-4 mt-4" @submit.prevent="handleCreateDomain(domainForm)">
 
         <div>
-          <label>Société ID</label>
-          <InputText v-model="domainForm.companyId" class="w-full" />
-        </div>
-
-        <div>
           <label>Nom du domaine</label>
           <InputText v-model="domainForm.name" class="w-full" />
         </div>
@@ -142,12 +132,12 @@
 
         <div>
           <label>Prix / jour</label>
-          <InputNumber v-model="domainForm.pricePerDay" class="w-full" />
+          <InputNumber v-model="domainForm.pricePerDay" class="w-full" :min="1"/>
         </div>
 
         <div>
           <label>Capacité</label>
-          <InputText v-model="domainForm.capacity" class="w-full" />
+          <InputText v-model="domainForm.capacity" type="number" class="w-full" />
         </div>
 
         <div class="flex gap-4 mt-4">
@@ -291,6 +281,8 @@ import {
 } from "@/services/domain"
 
 import router from "@/router"
+import { useAuthStore } from "@/stores/authStore"
+
 import type { CreateDomain, Domain, UpdateDomainDto } from "@/types/domain"
 import DomainsTable from "../components/dashboard/DomainsTable.vue"
 import EquipementsTable from "../components/dashboard/EquipementsTable.vue"
@@ -321,7 +313,7 @@ export default defineComponent({
   },
 
   setup() {
-
+    const authStore = useAuthStore()
     const showCreateDialog = ref(false)
     const showEditDialog = ref(false)
     const showDeleteDialog = ref(false)
@@ -349,7 +341,7 @@ export default defineComponent({
 
 
     const formEquipement = ref<Partial<CreateEquipementCompany>>({
-      companyId: "",
+      companyId: authStore.user?.companyId ?? "",
       equipementTypeId: "",
       displayName: "",
       description: "",
@@ -364,7 +356,7 @@ export default defineComponent({
       description: "",
       pricePerDay: 0,
       stock: "",
-      companyId: "",
+      companyId:authStore.user?.companyId ?? "",
       equipementTypeId: ""
     })
 
@@ -375,7 +367,7 @@ export default defineComponent({
       country: "",
       pricePerDay: undefined,
       capacity: "",
-      companyId: ""
+      companyId: authStore.user?.companyId ?? ""
     })
 
     const editDomainForm = ref<Domain>({
@@ -409,7 +401,7 @@ export default defineComponent({
         submitError.value = "Nom, prix et type requis"
         return
       }
-
+      item.companyId = authStore.user?.companyId
       isSubmitting.value = true
 
       try {
@@ -421,7 +413,7 @@ export default defineComponent({
         showCreateDialog.value = false
 
         formEquipement.value = {
-          companyId: "",
+          companyId: authStore.user?.companyId ?? "",
           equipementTypeId: "",
           displayName: "",
           description: "",
@@ -508,7 +500,7 @@ export default defineComponent({
       if (!item.name || !item.pricePerDay) return
 
       try {
-
+        item.companyId = authStore.user?.companyId
         const newDomain = await createDomain(item as CreateDomain)
 
         domains.value.push(newDomain)
@@ -522,7 +514,7 @@ export default defineComponent({
           country: "",
           pricePerDay: undefined,
           capacity: "",
-          companyId: ""
+          companyId: authStore.user?.companyId ?? ""
         }
 
       } catch (e) {
