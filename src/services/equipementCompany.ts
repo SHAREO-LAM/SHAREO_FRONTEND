@@ -25,9 +25,7 @@ export const updateEquipementCompany = async (
   id: string,
   payload: Partial<CreateEquipementCompany>
 ): Promise<EquipementCompanyReadDto> => {
-  console.log('TEST  TEST TEST Updating equipement with ID:', id, 'and payload:', payload) 
   const { data } = await apiClient.patch<EquipementCompanyReadDto>(`equipement-company/${id}`, payload)
-  console.log('Received updated equipement data:', data)
   return data
 }
 

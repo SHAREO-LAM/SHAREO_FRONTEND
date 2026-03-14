@@ -235,6 +235,9 @@
       :onCancel="() => showDeleteDialog = false"
     />
 
+
+
+
   </div>
 </template>
 
@@ -529,7 +532,6 @@ export default defineComponent({
     }
 
     const viewDomain = (row: Domain) => {
-      console.log("View domain", row)
       router.push(`/productDetails/${row.domainId}`)
     }
 
@@ -565,8 +567,6 @@ const confirmDeleteDomain = (row: Domain) => {
 }
 
     const deleteDomainConfirmed = async () => {
-
-      console.log("Delete domain", domainToDelete.value)
       if (!domainToDelete.value?.domainId) return
 
       await deleteDomain(domainToDelete.value.domainId)
