@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/authStore'
 import CartPageVue from '@/ui/pages/CartPage.vue'
 import CheckoutPage from '@/ui/pages/CheckoutPage.vue'
 import OrderConfirmed from '@/ui/pages/OrderConfirmed.vue'
+import UserOrdersPage from '@/ui/pages/UserOrdersPage.vue'
 import VendorDashBoardPage from '@/ui/pages/VendorDashBoardPage.vue'
 import { ROUTES } from '@/constants/const'
 
@@ -23,6 +24,7 @@ const routes = [
   { path: '/signup', component: SignupPage, name: 'signup', meta: { requiresGuest: true } },
   { path: '/account', component: AccountPage, name: 'account', meta: { requiresAuth: true } },
   { path: '/become-seller', component: BecomeSellerPage, name: 'become-seller', meta: { requiresAuth: true } },
+  { path: '/orders', component: UserOrdersPage, name: 'orders' },
   {
     path: ROUTES.VENDOR.DASHBOARD.path,
     name: ROUTES.VENDOR.DASHBOARD.name,
