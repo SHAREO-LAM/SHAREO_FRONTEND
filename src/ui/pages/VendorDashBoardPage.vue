@@ -132,7 +132,7 @@
 
         <div>
           <label>Prix / jour</label>
-          <InputNumber v-model="domainForm.pricePerDay" class="w-full" :min="1"/>
+          <InputNumber v-model="domainForm.pricePerDay" class="w-full" :min="1" />
         </div>
 
         <div>
@@ -228,15 +228,13 @@
     </Dialog>
 
     <!-- DELETE -->
-    <DeleteConfirmDialog
-      :visible="showDeleteDialog"
-      message="Supprimer cette annonce ?"
-      :onConfirm="() => deleteAction && deleteAction()"
-      :onCancel="() => showDeleteDialog = false"
-    />
+    <DeleteConfirmDialog :visible="showDeleteDialog" message="Supprimer cette annonce ?"
+      :onConfirm="() => deleteAction && deleteAction()" :onCancel="() => showDeleteDialog = false" />
 
 
-
+    <div>
+      <CompanyOrdersTable></CompanyOrdersTable>
+    </div>
 
   </div>
 </template>
@@ -290,6 +288,7 @@ import type { CreateDomain, Domain, UpdateDomainDto } from "@/types/domain"
 import DomainsTable from "../components/dashboard/DomainsTable.vue"
 import EquipementsTable from "../components/dashboard/EquipementsTable.vue"
 import { TabPanel } from "primevue"
+import CompanyOrdersTable from "../components/CompanyOrdersTable.vue"
 export default defineComponent({
 
   name: "VendorDashBoardPage",
@@ -313,6 +312,7 @@ export default defineComponent({
     TabList,
     Tab,
     TabPanels,
+    CompanyOrdersTable
   },
 
   setup() {
@@ -359,7 +359,7 @@ export default defineComponent({
       description: "",
       pricePerDay: 0,
       stock: "",
-      companyId:authStore.user?.companyId ?? "",
+      companyId: authStore.user?.companyId ?? "",
       equipementTypeId: ""
     })
 
@@ -473,10 +473,10 @@ export default defineComponent({
 
 
     const confirmDeleteEquipement = (row: EquipementCompanyReadDto) => {
-  equipToDelete.value = row
-  deleteAction.value = deleteEquipementConfirmed
-  showDeleteDialog.value = true
-}
+      equipToDelete.value = row
+      deleteAction.value = deleteEquipementConfirmed
+      showDeleteDialog.value = true
+    }
 
     const deleteEquipementConfirmed = async () => {
 
@@ -560,11 +560,11 @@ export default defineComponent({
     }
 
 
-const confirmDeleteDomain = (row: Domain) => {
-  domainToDelete.value = row
-  deleteAction.value = deleteDomainConfirmed
-  showDeleteDialog.value = true
-}
+    const confirmDeleteDomain = (row: Domain) => {
+      domainToDelete.value = row
+      deleteAction.value = deleteDomainConfirmed
+      showDeleteDialog.value = true
+    }
 
     const deleteDomainConfirmed = async () => {
       if (!domainToDelete.value?.domainId) return
