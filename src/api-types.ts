@@ -490,6 +490,23 @@ export interface paths {
         patch: operations["OrderController_update"];
         trace?: never;
     };
+    "/api/order/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer toutes les commandes d'un utilisateur avec ses articles */
+        get: operations["OrderController_ordersByUserIdWithItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/order-item": {
         parameters: {
             query?: never;
@@ -2822,6 +2839,27 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Order"];
                 };
+            };
+        };
+    };
+    OrderController_ordersByUserIdWithItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de l'utilisateur */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Commandes récupérées avec succès. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

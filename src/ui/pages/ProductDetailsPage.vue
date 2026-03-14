@@ -206,7 +206,7 @@ import InputNumber from 'primevue/inputnumber';
 
 import { getDomain, getUnavailableDates } from '@/services/domain';
 import { getEquipementCompany, getUnavailableDatesEquipement } from '@/services/equipementCompany';
-import type { UpdateDomainDto } from '@/types/domain';
+import type { Domain, UpdateDomainDto } from '@/types/domain';
 import type { EquipementCompanyReadDto } from '@/types/equipementCompany';
 import CompanyCard from '@/ui/components/CompanyCard.vue';
 import type { Company } from '@/types/company';
@@ -233,7 +233,7 @@ export default defineComponent({
   },
   data() {
     return {
-      domain: null as UpdateDomainDto | null,
+      domain: null as Domain | null,
       equipement: null as EquipementCompanyReadDto | null,
       company: undefined as Company | undefined,
       unavailableDates: [] as string[],
@@ -269,7 +269,7 @@ export default defineComponent({
       return '';
     },
     productDescription(): string {
-      if (this.productType === 'domain') return this.domain?.description ?? '';
+      //if (this.productType === 'domain') return this.domain?.description ?? '';
       if (this.productType === 'equipment') return this.equipement?.description ?? '';
       return '';
     },

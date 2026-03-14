@@ -139,7 +139,7 @@ import DatePicker from "primevue/datepicker";
 import { ROUTES } from "@/constants/const";
 import ListingCard from "../components/ListingCard.vue";
 import { getDomains } from "@/services/domain";
-import type { UpdateDomainDto } from "@/types/domain";
+import type { Domain, UpdateDomainDto } from "@/types/domain";
 
 interface PopularListing {
   id: number;
@@ -172,13 +172,15 @@ export default defineComponent({
 
     const fetchPopularDomains = async () => {
       const domains = await getDomains();
-      popularListings.value = domains.map((d: UpdateDomainDto, index: number) => ({
+      popularListings.value = domains.map((d: Domain, index: number) => ({
         id: 1,
         name: d.name ?? 'Nom indisponible',
         type: 'Domaine',
-        image: d.imageUrl ?? 'https://placehold.co/400x300?text=No+Image',
+        image: typeof d.imageUrl === 'string'
+    ? d.imageUrl
+    : 'https://placehold.co/400x300?text=No+Image',
         price: d.pricePerDay ?? 0,
-        location: d.city ?? '',
+        location: typeof d.city === 'string' ? d.city : '',
         capacity: typeof d.capacity === 'number' ? d.capacity : undefined,
         rating: Math.round(Math.random() * 5 * 10) / 10 || 4.5, // note aléatoire pour exemple
       }));

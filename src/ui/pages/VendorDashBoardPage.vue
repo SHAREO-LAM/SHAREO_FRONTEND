@@ -9,32 +9,19 @@
           <p class="text-gray-600">Gérez vos annonces et vos réservations</p>
         </div>
 
-        <Button
-          icon="pi pi-plus"
-          label="Créer une annonce"
-          class="bg-orange-500 hover:bg-orange-600 border-none"
-          @click="showCreateDialog = true"
-        />
+        <Button icon="pi pi-plus" label="Créer une annonce" class="bg-orange-500 hover:bg-orange-600 border-none"
+          @click="showCreateDialog = true" />
       </div>
 
       <!-- Stats -->
       <DashboardStats :stats="stats" />
 
       <!-- TABLE EQUIPEMENTS -->
-    <EquipementsTable
-      :equipments="equipments"
-      @view="viewEquipement"
-      @edit="editEquipement"
-      @delete="confirmDeleteEquipement"
-    />
+      <EquipementsTable :equipments="equipments" @view="viewEquipement" @edit="editEquipement"
+        @delete="confirmDeleteEquipement" />
 
-    <!-- TABLE DOMAINS -->
-    <DomainsTable
-      :domains="domains"
-      @view="viewDomain"
-      @edit="editDomain"
-      @delete="confirmDeleteDomain"
-    />
+      <!-- TABLE DOMAINS -->
+      <DomainsTable :domains="domains" @view="viewDomain" @edit="editDomain" @delete="confirmDeleteDomain" />
 
     </div>
 
@@ -46,44 +33,38 @@
 
         <div>
           <label>Société ID</label>
-          <InputText v-model="form.companyId" class="w-full"/>
+          <InputText v-model="form.companyId" class="w-full" />
         </div>
 
         <div>
           <label>Type équipement</label>
-          <Select
-            v-model="form.equipementTypeId"
-            :options="equipementTypes"
-            optionLabel="name"
-            optionValue="equipementTypeId"
-            placeholder="Choisir"
-            class="w-full"
-          />
+          <Select v-model="form.equipementTypeId" :options="equipementTypes" optionLabel="name"
+            optionValue="equipementTypeId" placeholder="Choisir" class="w-full" />
         </div>
 
         <div>
           <label>Nom annonce</label>
-          <InputText v-model="form.displayName" class="w-full"/>
+          <InputText v-model="form.displayName" class="w-full" />
         </div>
 
         <div>
           <label>Description</label>
-          <Textarea v-model="form.description" rows="3" class="w-full"/>
+          <Textarea v-model="form.description" rows="3" class="w-full" />
         </div>
 
         <div>
           <label>Prix / jour</label>
-          <InputNumber v-model="form.pricePerDay" class="w-full"/>
+          <InputNumber v-model="form.pricePerDay" class="w-full" />
         </div>
 
         <div>
           <label>Stock</label>
-          <InputText v-model="form.stock" class="w-full"/>
+          <InputText v-model="form.stock" class="w-full" />
         </div>
 
         <div class="flex gap-4 mt-4">
-          <Button label="Enregistrer" type="submit" :loading="isSubmitting"/>
-          <Button label="Annuler" severity="secondary" @click="showCreateDialog=false"/>
+          <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
+          <Button label="Annuler" severity="secondary" @click="showCreateDialog = false" />
         </div>
 
         <p v-if="submitError" class="text-red-500">{{ submitError }}</p>
@@ -101,27 +82,27 @@
 
         <div>
           <label>Nom annonce</label>
-          <InputText v-model="editForm.displayName" class="w-full"/>
+          <InputText v-model="editForm.displayName" class="w-full" />
         </div>
 
         <div>
           <label>Description</label>
-          <Textarea v-model="editForm.description" rows="3" class="w-full"/>
+          <Textarea v-model="editForm.description" rows="3" class="w-full" />
         </div>
 
         <div>
           <label>Prix / jour</label>
-          <InputNumber v-model="editForm.pricePerDay" class="w-full"/>
+          <InputNumber v-model="editForm.pricePerDay" class="w-full" />
         </div>
 
         <div>
           <label>Stock</label>
-          <InputText v-model="editForm.stock" class="w-full"/>
+          <InputText v-model="editForm.stock" class="w-full" />
         </div>
 
         <div class="flex gap-4 mt-4">
-          <Button label="Enregistrer" type="submit" :loading="isSubmitting"/>
-          <Button label="Annuler" severity="secondary" @click="showEditDialog=false"/>
+          <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
+          <Button label="Annuler" severity="secondary" @click="showEditDialog = false" />
         </div>
 
       </form>
@@ -131,12 +112,8 @@
 
     <!-- DELETE DIALOG -->
 
-    <DeleteConfirmDialog
-      :visible="showDeleteDialog"
-      message="Supprimer cette annonce ?"
-      :onConfirm="deleteConfirmed"
-      :onCancel="() => showDeleteDialog = false"
-    />
+    <DeleteConfirmDialog :visible="showDeleteDialog" message="Supprimer cette annonce ?" :onConfirm="deleteConfirmed"
+      :onCancel="() => showDeleteDialog = false" />
 
   </div>
 </template>
@@ -175,8 +152,15 @@ import type {
 
 import type { EquipementType } from "@/types/equipementType"
 
+import {
+  getDomains,
+  createDomain,
+  updateDomain,
+  deleteDomain
+} from "@/services/domain"
+
 import router from "@/router"
-import type { UpdateDomainDto } from "@/types/domain"
+import type { CreateDomain, Domain, UpdateDomainDto } from "@/types/domain"
 
 
 export default defineComponent({
@@ -209,7 +193,13 @@ export default defineComponent({
     const equipments = ref<EquipementCompanyReadDto[]>([])
     const equipementTypes = ref<EquipementType[]>([])
     const equipToDelete = ref<EquipementCompanyReadDto | null>(null)
+
+
     const domains = ref<Domain[]>([])
+    const domainToDelete = ref<Domain | null>(null)
+
+    const showCreateDomainDialog = ref(false)
+    const showEditDomainDialog = ref(false)
 
     const stats = ref([
       { label: "Annonces", value: 12, change: "+2", icon: "pi-briefcase" },
@@ -219,7 +209,7 @@ export default defineComponent({
     ])
 
 
-    const form = ref<Partial<CreateEquipementCompany>>({
+    const formEquipement = ref<Partial<CreateEquipementCompany>>({
       companyId: "",
       equipementTypeId: "",
       displayName: "",
@@ -229,7 +219,7 @@ export default defineComponent({
     })
 
 
-    const editForm = ref<EquipementCompanyReadDto>({
+    const editFormEquipement = ref<EquipementCompanyReadDto>({
       equipementCompanyId: "",
       displayName: "",
       description: "",
@@ -239,7 +229,30 @@ export default defineComponent({
       equipementTypeId: ""
     })
 
+    const domainForm = ref<Partial<CreateDomain>>({
+      name: "",
+      description: "",
+      city: "",
+      country: "",
+      pricePerDay: undefined,
+      capacity: "",
+      companyId: ""
+    })
 
+    const editDomainForm = ref<Domain>({
+      domainId: "",
+      name: "",
+      description: "",
+      city: "",
+      country: "",
+      pricePerDay: 0,
+      capacity: "",
+      datetimeCreate: ""
+    })
+
+    const loadDomains = async () => {
+      domains.value = await getDomains()
+    }
     const loadEquipementTypes = async () => {
       equipementTypes.value = await fetchEquipementTypes()
     }
@@ -268,7 +281,7 @@ export default defineComponent({
 
         showCreateDialog.value = false
 
-        form.value = {
+        formEquipement.value = {
           companyId: "",
           equipementTypeId: "",
           displayName: "",
@@ -292,7 +305,7 @@ export default defineComponent({
 
     const editEquipement = (row: EquipementCompanyReadDto) => {
 
-      editForm.value = { ...row }
+      editFormEquipement.value = { ...row }
       showEditDialog.value = true
 
     }
@@ -330,7 +343,6 @@ export default defineComponent({
       showDeleteDialog.value = true
     }
 
-
     const deleteConfirmed = async () => {
 
       if (!equipToDelete.value?.equipementCompanyId) return
@@ -351,9 +363,78 @@ export default defineComponent({
     }
 
 
+    // const handleCreateDomain = async (item: Partial<CreateDomain>) => {
+
+    //   if (!item.name || !item.pricePerDay) return
+
+    //   try {
+
+    //     const newDomain = await createDomain(item as CreateDomain)
+
+    //     domains.value.push(newDomain)
+
+    //     showCreateDomainDialog.value = false
+
+    //     domainForm.value = {
+    //       name: "",
+    //       description: "",
+    //       city: "",
+    //       country: "",
+    //       pricePerDay: undefined,
+    //       capacity: "",
+    //       companyId: ""
+    //     }
+
+    //   } catch (e) {
+    //     console.error("Erreur création domain", e)
+    //   }
+    // }
+    // const editDomain = (row: Domain) => {
+
+    //   editDomainForm.value = { ...row }
+
+    //   showEditDomainDialog.value = true
+    // }
+
+    // const handleUpdateDomain = async (item: Domain) => {
+
+    //   if (!item.domainId) return
+
+    //   const updated = await updateDomain(item.domainId, item)
+
+    //   const index = domains.value.findIndex(
+    //     d => d.domainId === updated.domainId
+    //   )
+
+    //   if (index !== -1) domains.value[index] = updated
+
+    //   showEditDomainDialog.value = false
+    // }
+
+
+    const confirmDeleteDomain = (row: Domain) => {
+
+      domainToDelete.value = row
+      showDeleteDialog.value = true
+    }
+
+    const deleteDomainConfirmed = async () => {
+
+      if (!domainToDelete.value?.domainId) return
+
+      await deleteDomain(domainToDelete.value.domainId)
+
+      domains.value = domains.value.filter(
+        d => d.domainId !== domainToDelete.value!.domainId
+      )
+
+      showDeleteDialog.value = false
+    }
+
     onMounted(async () => {
       await loadEquipementTypes()
       await loadEquipements()
+      await loadDomains()
     })
 
 
@@ -363,8 +444,8 @@ export default defineComponent({
       showDeleteDialog,
       isSubmitting,
       submitError,
-      form,
-      editForm,
+      form: formEquipement,
+      editForm: editFormEquipement,
       equipments,
       equipementTypes,
       stats,
@@ -373,7 +454,15 @@ export default defineComponent({
       handleUpdateEquipement,
       confirmDeleteEquipement,
       deleteConfirmed,
-      viewEquipement
+      viewEquipement,
+      domains,
+      showCreateDomainDialog,
+      showEditDomainDialog,
+      handleCreateDomain,
+      editDomain,
+      handleUpdateDomain,
+      confirmDeleteDomain,
+      deleteDomainConfirmed
     }
 
   }

@@ -1,17 +1,15 @@
 import apiClient from './api'
-import type { UpdateDomainDto, CreateDomain } from '@/types/domain'
+import type { UpdateDomainDto, CreateDomain, Domain } from '@/types/domain'
 
 // Lister tous les domains
-export const getDomains = async (): Promise<UpdateDomainDto[]> => {
-  console.log('Fetching domains...') // Log pour indiquer que la requête est en cours
-  const { data } = await apiClient.get<UpdateDomainDto[]>('domain')
-  console.log('Fetched domains:', data) // Log pour vérifier les données reçues
+export const getDomains = async (): Promise<Domain[]> => {
+  const { data } = await apiClient.get<Domain[]>('domain')
   return data
 }
 
 // Récupérer un domain par ID
-export const getDomain = async (id: string): Promise<UpdateDomainDto> => {
-  const { data } = await apiClient.get<UpdateDomainDto>(`domain/${id}`)
+export const getDomain = async (id: string): Promise<Domain> => {
+  const { data } = await apiClient.get<Domain>(`domain/${id}`)
   return data
 }
 
@@ -29,7 +27,7 @@ export const updateDomain = async (id: string, payload: UpdateDomainDto): Promis
 
 // Supprimer un domain
 export const deleteDomain = async (id: string): Promise<void> => {
-  await apiClient.delete(`/api/domain/${id}`)
+  await apiClient.delete(`/domain/${id}`)
 }
 
 export const getUnavailableDates = async (id: string): Promise<{ disabledDates: string[] }> => {
