@@ -12,63 +12,55 @@
       <DashboardStats :stats="stats" />
 
       <!-- TABS -->
-      <TabView class="mt-8">
+      <Tabs value="equipements" class="mt-8">
 
-        <!-- TAB EQUIPEMENTS -->
-        <TabPanel header="Équipements" value="equipements">
+        <TabList>
+          <Tab value="equipements">Équipements</Tab>
+          <Tab value="domains">Domaines</Tab>
+        </TabList>
 
-          <div class="bg-white rounded-xl shadow p-6">
+        <TabPanels>
 
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-semibold">Mes équipements</h2>
+          <!-- EQUIPEMENTS -->
+          <TabPanel value="equipements">
 
-              <Button
-                icon="pi pi-plus"
-                label="Créer un équipement"
-                class="bg-orange-500 hover:bg-orange-600 border-none"
-                @click="showCreateDialog = true"
-              />
+            <div class="bg-white rounded-xl shadow p-6">
+
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold">Mes équipements</h2>
+
+                <Button icon="pi pi-plus" label="Créer un équipement" class="bg-orange-500 border-none"
+                  @click="showCreateDialog = true" />
+              </div>
+
+              <EquipementsTable :equipments="equipments" @view="viewEquipement" @edit="editEquipement"
+                @delete="confirmDeleteEquipement" />
+
             </div>
 
-            <EquipementsTable
-              :equipments="equipments"
-              @view="viewEquipement"
-              @edit="editEquipement"
-              @delete="confirmDeleteEquipement"
-            />
+          </TabPanel>
 
-          </div>
+          <!-- DOMAINES -->
+          <TabPanel value="domains">
 
-        </TabPanel>
+            <div class="bg-white rounded-xl shadow p-6">
 
-        <!-- TAB DOMAINES -->
-        <TabPanel header="Domaines" value="domains">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold">Mes domaines</h2>
 
-          <div class="bg-white rounded-xl shadow p-6">
+                <Button icon="pi pi-plus" label="Créer un domaine" class="bg-orange-500 border-none"
+                  @click="showCreateDomainDialog = true" />
+              </div>
 
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-semibold">Mes domaines</h2>
+              <DomainsTable :domains="domains" @view="viewDomain" @edit="editDomain" @delete="confirmDeleteDomain" />
 
-              <Button
-                icon="pi pi-plus"
-                label="Créer un domaine"
-                class="bg-orange-500 hover:bg-orange-600 border-none"
-                @click="showCreateDomainDialog = true"
-              />
             </div>
 
-            <DomainsTable
-              :domains="domains"
-              @view="viewDomain"
-              @edit="editDomain"
-              @delete="confirmDeleteDomain"
-            />
+          </TabPanel>
 
-          </div>
+        </TabPanels>
 
-        </TabPanel>
-
-      </TabView>
+      </Tabs>
     </div>
 
     <!-- CREATE EQUIPEMENT -->
@@ -83,14 +75,8 @@
 
         <div>
           <label>Type équipement</label>
-          <Select
-            v-model="form.equipementTypeId"
-            :options="equipementTypes"
-            optionLabel="name"
-            optionValue="equipementTypeId"
-            placeholder="Choisir"
-            class="w-full"
-          />
+          <Select v-model="form.equipementTypeId" :options="equipementTypes" optionLabel="name"
+            optionValue="equipementTypeId" placeholder="Choisir" class="w-full" />
         </div>
 
         <div>
@@ -255,7 +241,7 @@
     <DeleteConfirmDialog
       :visible="showDeleteDialog"
       message="Supprimer cette annonce ?"
-      :onConfirm="deleteConfirmed"
+      :onConfirm="() => deleteAction && deleteAction()"
       :onCancel="() => showDeleteDialog = false"
     />
 
@@ -275,10 +261,12 @@ import InputText from "primevue/inputtext"
 import InputNumber from "primevue/inputnumber"
 import Textarea from "primevue/textarea"
 import Select from "primevue/select"
-import TabView from "primevue/tabview"
 import DeleteConfirmDialog from "@/ui/components/dashboard/DeleteConfirmDialog.vue"
 import DashboardStats from "@/ui/components/dashboard/DashboardStats.vue"
-
+import Tabs from "primevue/tabs"
+import TabList from "primevue/tablist"
+import Tab from "primevue/tab"
+import TabPanels from "primevue/tabpanels"
 import {
   getEquipementsCompany,
   createEquipementCompany,
@@ -325,7 +313,11 @@ export default defineComponent({
     DashboardStats,
     EquipementsTable,
     DomainsTable,
-    TabPanel
+    TabPanel,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
   },
 
   setup() {
@@ -347,7 +339,7 @@ export default defineComponent({
 
     const showCreateDomainDialog = ref(false)
     const showEditDomainDialog = ref(false)
-
+    const deleteAction = ref<(() => Promise<void>) | null>(null)
     const stats = ref([
       { label: "Annonces", value: 12, change: "+2", icon: "pi-briefcase" },
       { label: "Réservations", value: 8, change: "+1", icon: "pi-calendar" },
@@ -389,7 +381,7 @@ export default defineComponent({
     const editDomainForm = ref<Domain>({
       domainId: "",
       name: "",
-       description: "",
+      description: "",
       city: "",
       country: "",
       pricePerDay: 0,
@@ -486,11 +478,12 @@ export default defineComponent({
 
 
     const confirmDeleteEquipement = (row: EquipementCompanyReadDto) => {
-      equipToDelete.value = row
-      showDeleteDialog.value = true
-    }
+  equipToDelete.value = row
+  deleteAction.value = deleteEquipementConfirmed
+  showDeleteDialog.value = true
+}
 
-    const deleteConfirmed = async () => {
+    const deleteEquipementConfirmed = async () => {
 
       if (!equipToDelete.value?.equipementCompanyId) return
 
@@ -573,14 +566,15 @@ export default defineComponent({
     }
 
 
-    const confirmDeleteDomain = (row: Domain) => {
-
-      domainToDelete.value = row
-      showDeleteDialog.value = true
-    }
+const confirmDeleteDomain = (row: Domain) => {
+  domainToDelete.value = row
+  deleteAction.value = deleteDomainConfirmed
+  showDeleteDialog.value = true
+}
 
     const deleteDomainConfirmed = async () => {
 
+      console.log("Delete domain", domainToDelete.value)
       if (!domainToDelete.value?.domainId) return
 
       await deleteDomain(domainToDelete.value.domainId)
@@ -614,7 +608,6 @@ export default defineComponent({
       editEquipement,
       handleUpdateEquipement,
       confirmDeleteEquipement,
-      deleteConfirmed,
       viewEquipement,
       domains,
       domainForm,
@@ -626,6 +619,7 @@ export default defineComponent({
       handleUpdateDomain,
       confirmDeleteDomain,
       deleteDomainConfirmed,
+      deleteAction,
       viewDomain
     }
 
