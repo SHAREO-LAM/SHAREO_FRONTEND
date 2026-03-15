@@ -21,6 +21,8 @@ declare module 'vue-router' {
     requiresRole?: string[]
   }
 }
+import VendorDashBoardPage from '@/ui/pages/VendorDashBoardPage.vue'
+import { ROUTES } from '@/constants/const'
 
 const routes = [
   { path: '/', component: HomePage, name: 'home' },
@@ -33,7 +35,11 @@ const routes = [
   { path: '/become-seller', component: BecomeSellerPage, name: 'become-seller', meta: { requiresAuth: true } },
   { path: '/orders', component: UserOrdersPage, name: 'orders' },
   { path: '/admin', component: AdminDashboards, name: 'admin', meta: { requiresAuth: true, requiresRole: ['admin', 'superadmin'] } },
-  // { path: '/search', component: SearchResults },
+  {
+    path: ROUTES.VENDOR.DASHBOARD.path,
+    name: ROUTES.VENDOR.DASHBOARD.name,
+    component: VendorDashBoardPage,
+  },
   // { path: '/listing/:id', component: ListingDetail },
   { path: '/cart', component: CartPageVue },
   { path: '/checkout', component: CheckoutPage },

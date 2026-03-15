@@ -33,6 +33,7 @@ export interface UserProfile {
   email: string
   isAdmin: boolean
   isSuperAdmin: boolean
+  companyId: string
 }
 
 /**

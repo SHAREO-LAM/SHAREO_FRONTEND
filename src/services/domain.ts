@@ -1,5 +1,5 @@
 import apiClient from './api'
-import type { Domain, CreateDomain } from '@/types/domain'
+import type { UpdateDomainDto, CreateDomain, Domain } from '@/types/domain'
 
 // Lister tous les domains
 export const getDomains = async (): Promise<Domain[]> => {
@@ -20,8 +20,8 @@ export const createDomain = async (payload: CreateDomain): Promise<Domain> => {
 }
 
 // Mettre à jour un domain
-export const updateDomain = async (id: string, payload: Domain): Promise<Domain> => {
-  const { data } = await apiClient.patch<Domain>(`/domain/${id}`, payload)
+export const updateDomain = async (id: string, payload: UpdateDomainDto): Promise<UpdateDomainDto> => {
+  const { data } = await apiClient.patch<UpdateDomainDto>(`/domain/${id}`, payload)
   return data
 }
 

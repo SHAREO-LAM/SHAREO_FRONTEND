@@ -21,7 +21,7 @@ import { defineComponent } from 'vue'
 import CatalogBase from '@/ui/components/CatalogBase.vue'
 import type { CatalogBaseItem, FilterConfig } from '@/ui/components/catalogTypes'
 import { getDomains } from '@/services/domain'
-import type { Domain } from '@/types/domain'
+import type { UpdateDomainDto } from '@/types/domain'
 
 export default defineComponent({
   name: 'DomainsCatalogPage',
@@ -61,7 +61,7 @@ export default defineComponent({
     async fetchItems(): Promise<CatalogBaseItem[]> {
       const domains = await getDomains()
 
-      type DomainLike = Domain & {
+      type DomainLike = UpdateDomainDto & {
         domainId?: string
         id?: string
         name?: string

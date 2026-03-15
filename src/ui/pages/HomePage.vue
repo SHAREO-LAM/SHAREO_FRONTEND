@@ -139,7 +139,8 @@ import DatePicker from "primevue/datepicker";
 import { ROUTES } from "@/constants/const";
 import ListingCard from "../components/ListingCard.vue";
 import { getDomains } from "@/services/domain";
-import type { Domain } from "@/types/domain";
+import type { Domain, UpdateDomainDto } from "@/types/domain";
+import { useAuthStore } from "@/stores/authStore";
 
 interface PopularListing {
   id: number;
@@ -159,7 +160,7 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-
+    const authStore = useAuthStore()
     const searchQuery = ref("");
     const location = ref("");
 
@@ -176,10 +177,10 @@ export default defineComponent({
         id: 1,
         name: d.name ?? 'Nom indisponible',
         type: 'Domaine',
-        image: d.imageUrl ?? 'https://via.placeholder.com/400x300?text=No+Image',
+        image: d.imageUrl ? d.imageUrl : 'https://placehold.co/400x300?text=No+Image',
         price: d.pricePerDay ?? 0,
-        location: d.city ?? '',
-        capacity: typeof d.capacity === 'number' ? d.capacity : undefined,
+        location: d.city && d.country ? `${d.city}, ${d.country}` : 'Localisation indisponible',
+        capacity: d.capacity ? parseInt(d.capacity) : undefined,
         rating: Math.round(Math.random() * 5 * 10) / 10 || 4.5, // note aléatoire pour exemple
       }));
     };
@@ -204,8 +205,21 @@ export default defineComponent({
 
 
     const goToVendorDashboard = () => {
-      router.push({ name: ROUTES.VENDOR.DASHBOARD.name });
-    };
+      if (!authStore.isLoggedIn) {
+        // Non connecté → page login
+        router.push('/login')
+        return
+      }
+
+      if (!authStore.user?.companyId) {
+        // Connecté mais pas encore vendeur → page devenir vendeur
+        router.push('/become-seller')
+        return
+      }
+
+      // Connecté et déjà vendeur → dashboard
+      router.push({ name: ROUTES.VENDOR.DASHBOARD.name })
+    }
 
 
     const goToDomains = () => {

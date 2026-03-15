@@ -206,8 +206,8 @@ import InputNumber from 'primevue/inputnumber';
 
 import { getDomain, getUnavailableDates } from '@/services/domain';
 import { getEquipementCompany, getUnavailableDatesEquipement } from '@/services/equipementCompany';
-import type { Domain } from '@/types/domain';
-import type { EquipementCompanyRead } from '@/types/equipementCompany';
+import type { Domain, UpdateDomainDto } from '@/types/domain';
+import type { EquipementCompanyReadDto } from '@/types/equipementCompany';
 import CompanyCard from '@/ui/components/CompanyCard.vue';
 import type { Company } from '@/types/company';
 import { getCompany } from '@/services/company';
@@ -234,7 +234,7 @@ export default defineComponent({
   data() {
     return {
       domain: null as Domain | null,
-      equipement: null as EquipementCompanyRead | null,
+      equipement: null as EquipementCompanyReadDto | null,
       company: undefined as Company | undefined,
       unavailableDates: [] as string[],
       hasUnavailableDateInRange: false,
@@ -269,7 +269,7 @@ export default defineComponent({
       return '';
     },
     productDescription(): string {
-      if (this.productType === 'domain') return this.domain?.description ?? '';
+      //if (this.productType === 'domain') return this.domain?.description ?? '';
       if (this.productType === 'equipment') return this.equipement?.description ?? '';
       return '';
     },
@@ -332,21 +332,28 @@ export default defineComponent({
     handleBookNow() {
       if (!this.company) return
 
-      const newCartItem: CartItem = {
-        type: this.productType,
+      const newCartItem = this.productType === 'equipment'
+    ? {
+        type: 'equipment',
         productId: this.id,
         companyId: this.company.companyId,
         company: this.company,
-        product: this.productType === 'equipment'
-          ? this.equipement!
-          : this.domain!,
+        product: this.equipement!,
         startDate: this.formatDateLocal(this.startDate),
         endDate: this.formatDateLocal(this.endDate),
-        quantity: this.productType === 'equipment'
-          ? this.quantity.toString()
-          : undefined,
+        quantity: this.quantity.toString(),
         unitPrice: this.totalPrice
-      };
+      } as CartItem
+    : {
+        type: 'domain',
+        productId: this.id,
+        companyId: this.company.companyId,
+        company: this.company,
+        product: this.domain!,
+        startDate: this.formatDateLocal(this.startDate),
+        endDate: this.formatDateLocal(this.endDate),
+        unitPrice: this.totalPrice
+      } as CartItem;
 
       if (this.checkItemAlreadyInCart(newCartItem)) {
         this.$toast.add({

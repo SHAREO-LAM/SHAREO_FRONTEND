@@ -490,6 +490,76 @@ export interface paths {
         patch: operations["OrderController_update"];
         trace?: never;
     };
+    "/api/order/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer toutes les commandes d'un utilisateur avec ses articles */
+        get: operations["OrderController_ordersByUserIdWithItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/order/company/{companyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrderController_getOrdersByCompany"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/company-payout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer tous les paiements de société */
+        get: operations["CompanyPayoutController_findAll"];
+        put?: never;
+        /** Créer un paiement pour une société */
+        post: operations["CompanyPayoutController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/company-payout/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer un paiement de société par ID */
+        get: operations["CompanyPayoutController_findOne"];
+        put?: never;
+        post?: never;
+        /** Supprimer un paiement de société */
+        delete: operations["CompanyPayoutController_remove"];
+        options?: never;
+        head?: never;
+        /** Mettre à jour un paiement de société */
+        patch: operations["CompanyPayoutController_update"];
+        trace?: never;
+    };
     "/api/order-item": {
         parameters: {
             query?: never;
@@ -619,43 +689,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/api/company-payout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Récupérer tous les paiements de société */
-        get: operations["CompanyPayoutController_findAll"];
-        put?: never;
-        /** Créer un paiement pour une société */
-        post: operations["CompanyPayoutController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/company-payout/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Récupérer un paiement de société par ID */
-        get: operations["CompanyPayoutController_findOne"];
-        put?: never;
-        post?: never;
-        /** Supprimer un paiement de société */
-        delete: operations["CompanyPayoutController_remove"];
-        options?: never;
-        head?: never;
-        /** Mettre à jour un paiement de société */
-        patch: operations["CompanyPayoutController_update"];
         trace?: never;
     };
     "/api/payout-status": {
@@ -789,7 +822,258 @@ export interface components {
             /** @description ID de l’utilisateur associé */
             userId: string;
         };
-        UserInformations: Record<string, never>;
+        OrderStatus: {
+            /** @description ID du statut */
+            orderStatusId: string;
+            /** @description Code du statut */
+            code: string;
+            /** @description Nom du statut */
+            name: string;
+            /** @description Date de création */
+            datetimeCreate: string;
+            /** @description Date de mise à jour */
+            datetimeUpdate?: Record<string, never>;
+            /** @description ID de l’utilisateur ayant créé le statut */
+            userCreateId?: Record<string, never>;
+            /** @description ID de l’utilisateur ayant mis à jour le statut */
+            userUpdateId?: Record<string, never>;
+            /** @description Commandes associées à ce statut */
+            orders: components["schemas"]["Order"][];
+        };
+        Company: Record<string, never>;
+        PayoutStatus: {
+            /** @description ID du statut de payout */
+            payoutStatusId: string;
+            /** @description Code du statut de payout */
+            code: string;
+            /** @description Nom du statut de payout */
+            name: string;
+            /** @description Date de création du statut de payout */
+            datetimeCreate: string;
+            /** @description Date de mise à jour du statut de payout */
+            datetimeUpdate: Record<string, never>;
+            /** @description ID utilisateur créateur du statut de payout */
+            userCreateId: Record<string, never>;
+            /** @description ID utilisateur mise à jour du statut de payout */
+            userUpdateId: Record<string, never>;
+            /** @description Liste des payouts associés à ce statut */
+            companyPayouts: components["schemas"]["CompanyPayout"][];
+        };
+        CompanyPayout: {
+            /** @description ID du payout */
+            companyPayoutId: string;
+            /** @description ID de la société */
+            companyId: string;
+            /** @description ID de l’item de commande */
+            orderItemId: string;
+            /** @description Montant du payout */
+            amount: number;
+            /** @description ID du statut du payout */
+            payoutStatusId: string;
+            /** @description Date de création du payout */
+            datetimeCreate: string;
+            /** @description Date de mise à jour du payout */
+            datetimeUpdate?: Record<string, never>;
+            /** @description ID utilisateur créateur du payout */
+            userCreateId?: Record<string, never>;
+            /** @description ID utilisateur mise à jour du payout */
+            userUpdateId?: Record<string, never>;
+            /** @description Société associée */
+            company: components["schemas"]["Company"];
+            /** @description Item de commande associé */
+            orderItem: components["schemas"]["OrderItem"];
+            /** @description Statut du payout */
+            payoutStatus: components["schemas"]["PayoutStatus"];
+        };
+        Domain: {
+            /** @description ID du domaine */
+            domainId: string;
+            /** @description Nom du domaine */
+            name: string;
+            /** @description Description du domaine */
+            description?: string | null;
+            /** @description Nom de la rue */
+            streetName?: string | null;
+            /** @description Complément de rue */
+            streetNameAdd?: string | null;
+            /** @description Numéro de la maison */
+            houseNumber?: string | null;
+            /** @description Code postal */
+            postcode?: string | null;
+            /** @description Ville */
+            city?: string | null;
+            /** @description Pays */
+            country?: string | null;
+            /** @description Latitude */
+            latitude?: number | null;
+            /** @description Longitude */
+            longitude?: number | null;
+            /** @description Prix par jour */
+            pricePerDay?: number | null;
+            /** @description Capacité */
+            capacity?: string | null;
+            /** @description URL de l’image */
+            imageUrl?: string | null;
+            /**
+             * Format: date
+             * @description Date de création
+             */
+            datetimeCreate: string;
+            /**
+             * Format: date
+             * @description Date de mise à jour
+             */
+            datetimeUpdate?: string | null;
+            /** @description ID de l’utilisateur créateur */
+            userCreateId?: string | null;
+            /** @description ID de l’utilisateur mise à jour */
+            userUpdateId?: string | null;
+            /** @description ID de la société */
+            companyId?: string;
+            company?: components["schemas"]["Company"];
+            orderItems?: components["schemas"]["OrderItem"][];
+        };
+        EquipementCompany: Record<string, never>;
+        OrderItem: {
+            /** @description ID de l’item de commande */
+            orderItemId: string;
+            /** @description Quantité */
+            quantity: string;
+            /** @description Date de début */
+            startDate: string;
+            /** @description Date de fin */
+            endDate: string;
+            /** @description Prix unitaire */
+            unitPrice: number;
+            /** @description Date de création */
+            datetimeCreate: string;
+            /** @description Date de mise à jour */
+            datetimeUpdate?: Record<string, never>;
+            /** @description ID utilisateur créateur */
+            userCreateId?: Record<string, never>;
+            /** @description ID utilisateur mise à jour */
+            userUpdateId?: Record<string, never>;
+            /** @description ID du domaine associé */
+            domainId?: string;
+            /** @description ID de l’équipement associé */
+            equipementCompanyId?: string;
+            /** @description ID de la commande */
+            orderId?: string;
+            /** @description Payouts associés à cet item */
+            companyPayouts: components["schemas"]["CompanyPayout"][];
+            /** @description Domaine associé */
+            domain?: components["schemas"]["Domain"];
+            /** @description Équipement associé */
+            equipementCompany?: components["schemas"]["EquipementCompany"];
+            /** @description Commande parente */
+            order: components["schemas"]["Order"];
+        };
+        PaymentStatus: {
+            /** @description ID du statut de paiement */
+            paymentStatusId: string;
+            /** @description Code du statut de paiement */
+            code: string;
+            /** @description Nom du statut de paiement */
+            name: string;
+            /** @description Date de création du statut de paiement */
+            datetimeCreate: string;
+            /** @description Date de mise à jour du statut de paiement */
+            datetimeUpdate: Record<string, never>;
+            /** @description ID utilisateur créateur du statut */
+            userCreateId: Record<string, never>;
+            /** @description ID utilisateur mise à jour du statut */
+            userUpdateId: Record<string, never>;
+            /** @description Paiements associés au statut */
+            payments: components["schemas"]["Payment"][];
+        };
+        Payment: {
+            /** @description ID du paiement */
+            paymentId: string;
+            /** @description Montant du paiement */
+            amount: number;
+            /** @description Fournisseur du paiement */
+            provider?: Record<string, never>;
+            /** @description Date de création du paiement */
+            datetimeCreate: string;
+            /** @description Date de mise à jour du paiement */
+            datetimeUpdate?: Record<string, never>;
+            /** @description ID utilisateur créateur du paiement */
+            userCreateId?: Record<string, never>;
+            /** @description ID utilisateur mise à jour du paiement */
+            userUpdateId?: Record<string, never>;
+            /** @description ID de la commande associée */
+            orderId: string;
+            /** @description ID du statut de paiement associé */
+            paymentStatusId: string;
+            /** @description Commande associée au paiement */
+            order: components["schemas"]["Order"];
+            /** @description Statut du paiement */
+            paymentStatus: components["schemas"]["PaymentStatus"];
+        };
+        Order: {
+            /** @description ID de la commande */
+            orderId: string;
+            /** @description Date de création de la commande */
+            datetimeCreate: string;
+            /** @description Date de mise à jour de la commande */
+            datetimeUpdate?: Record<string, never>;
+            /** @description ID de l’utilisateur ayant créé la commande */
+            userCreateId?: Record<string, never>;
+            /** @description ID de l’utilisateur ayant mis à jour la commande */
+            userUpdateId?: Record<string, never>;
+            /** @description ID du statut de la commande */
+            statusId: string;
+            /** @description ID de l’utilisateur */
+            userId: string;
+            /** @description Statut de la commande */
+            status: components["schemas"]["OrderStatus"];
+            /** @description Utilisateur ayant passé la commande */
+            user: components["schemas"]["User"];
+            /** @description Liste des items de la commande */
+            orderItems: components["schemas"]["OrderItem"][];
+            /** @description Liste des paiements associés */
+            payments: components["schemas"]["Payment"][];
+            /** @description Informations supplémentaires de la commande */
+            userOrderInformations: components["schemas"]["UserOrderInformations"][];
+        };
+        UserOrderInformations: {
+            /** @description ID de la commande associée */
+            orderId: string;
+            /** @description Prénom de l’utilisateur */
+            name?: Record<string, never>;
+            /** @description Nom de famille de l’utilisateur */
+            lastName?: Record<string, never>;
+            /** @description Adresse – rue principale */
+            streetName?: Record<string, never>;
+            /** @description Adresse – complément de rue */
+            streetNameAdd?: Record<string, never>;
+            /** @description Numéro de maison */
+            houseNumber?: Record<string, never>;
+            /** @description Code postal */
+            postcode?: Record<string, never>;
+            /** @description Ville */
+            city?: Record<string, never>;
+            /** @description Pays */
+            country?: Record<string, never>;
+            /** @description Téléphone */
+            phone?: Record<string, never>;
+            /** @description Date de création de l’enregistrement */
+            datetimeCreate: string;
+            /** @description Date de mise à jour de l’enregistrement */
+            datetimeUpdate?: Record<string, never>;
+            /** @description Commande associée */
+            order: components["schemas"]["Order"];
+        };
+        UserInformations: {
+            /** @description Prénom */
+            name?: Record<string, never>;
+            /** @description Nom de famille */
+            lastName?: Record<string, never>;
+            /** @description Utilisateur associé */
+            user: components["schemas"]["User"];
+            /** @description Commandes liées à ces informations utilisateur */
+            userOrderInformations: components["schemas"]["UserOrderInformations"][];
+        };
         UpdateUserInformationsDto: {
             /** @description Prénom */
             name?: string;
@@ -855,6 +1139,11 @@ export interface components {
             website?: string;
             /** @description Logo URL */
             logoUrl?: string;
+            /**
+             * @description Statut de l’entreprise
+             * @enum {string}
+             */
+            status?: "PENDING_VALIDATION" | "VALIDATED";
             /** @description Date de création */
             datetimeCreate?: string;
             /** @description Date de mise à jour */
@@ -864,7 +1153,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        Company: Record<string, never>;
         UpdateCompanyDto: {
             /** @description Nom de l’entreprise */
             name?: string;
@@ -900,6 +1188,11 @@ export interface components {
             website?: string;
             /** @description Logo URL */
             logoUrl?: string;
+            /**
+             * @description Statut de l’entreprise
+             * @enum {string}
+             */
+            status?: "PENDING_VALIDATION" | "VALIDATED";
             /** @description Date de création */
             datetimeCreate?: string;
             /** @description Date de mise à jour */
@@ -978,7 +1271,6 @@ export interface components {
             /** @description ID de l’entreprise associée */
             companyId: string;
         };
-        Domain: Record<string, never>;
         UpdateDomainDto: {
             /** @description Nom du domaine */
             name?: string;
@@ -1045,6 +1337,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID de la catégorie */
+            id: string;
         };
         CreateEquipementTypeDto: {
             /** @description Nom du type d’équipement */
@@ -1101,7 +1395,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        EquipementCompany: Record<string, never>;
         EquipementTypeReadDto: {
             /** @description Nom du type d’équipement */
             name?: string;
@@ -1117,6 +1410,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID du type d’équipement */
+            id: string;
             equipementCategory?: components["schemas"]["UpdateEquipementCategoryDto"];
         };
         EquipementCompanyReadDto: {
@@ -1140,6 +1435,8 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+            /** @description ID de l'équipement */
+            equipementCompanyId: string;
             equipementType?: components["schemas"]["EquipementTypeReadDto"];
         };
         UpdateEquipementCompanyDto: {
@@ -1178,7 +1475,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        OrderStatus: Record<string, never>;
         UpdateOrderStatusDto: {
             /** @description Code du statut */
             code?: string;
@@ -1207,7 +1503,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        Order: Record<string, never>;
         UpdateOrderDto: {
             /** @description ID du statut de la commande */
             statusId?: string;
@@ -1221,6 +1516,34 @@ export interface components {
             userCreateId?: string;
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
+        };
+        CreateCompanyPayoutDto: {
+            /** @description Montant du paiement */
+            amount: number;
+            /** @description ID de l'utilisateur qui crée */
+            userCreateId?: string;
+            /** @description ID de l'utilisateur qui met à jour */
+            userUpdateId?: string;
+            /** @description ID de la société */
+            companyId: string;
+            /** @description ID de l'order item */
+            orderItemId: string;
+            /** @description ID du statut du paiement */
+            payoutStatusId: string;
+        };
+        UpdateCompanyPayoutDto: {
+            /** @description Montant du paiement */
+            amount?: number;
+            /** @description ID de l'utilisateur qui crée */
+            userCreateId?: string;
+            /** @description ID de l'utilisateur qui met à jour */
+            userUpdateId?: string;
+            /** @description ID de la société */
+            companyId?: string;
+            /** @description ID de l'order item */
+            orderItemId?: string;
+            /** @description ID du statut du paiement */
+            payoutStatusId?: string;
         };
         CreateOrderItemDto: {
             /** @description ID de la commande associée */
@@ -1246,7 +1569,6 @@ export interface components {
             /** @description ID de l'utilisateur modificateur */
             userUpdateId?: string;
         };
-        OrderItem: Record<string, never>;
         UpdateOrderItemDto: {
             /** @description ID de la commande associée */
             orderId?: string;
@@ -1293,7 +1615,6 @@ export interface components {
              */
             userUpdateId?: string;
         };
-        PaymentStatus: Record<string, never>;
         UpdatePaymentStatusDto: {
             /**
              * @description Code du statut de paiement
@@ -1330,7 +1651,6 @@ export interface components {
             /** @description ID du statut de paiement */
             paymentStatusId: string;
         };
-        Payment: Record<string, never>;
         UpdatePaymentDto: {
             /** @description Montant du paiement */
             amount?: number;
@@ -1345,35 +1665,6 @@ export interface components {
             /** @description ID du statut de paiement */
             paymentStatusId?: string;
         };
-        CreateCompanyPayoutDto: {
-            /** @description Montant du paiement */
-            amount: number;
-            /** @description ID de l'utilisateur qui crée */
-            userCreateId?: string;
-            /** @description ID de l'utilisateur qui met à jour */
-            userUpdateId?: string;
-            /** @description ID de la société */
-            companyId: string;
-            /** @description ID de l'order item */
-            orderItemId: string;
-            /** @description ID du statut du paiement */
-            payoutStatusId: string;
-        };
-        CompanyPayout: Record<string, never>;
-        UpdateCompanyPayoutDto: {
-            /** @description Montant du paiement */
-            amount?: number;
-            /** @description ID de l'utilisateur qui crée */
-            userCreateId?: string;
-            /** @description ID de l'utilisateur qui met à jour */
-            userUpdateId?: string;
-            /** @description ID de la société */
-            companyId?: string;
-            /** @description ID de l'order item */
-            orderItemId?: string;
-            /** @description ID du statut du paiement */
-            payoutStatusId?: string;
-        };
         CreatePayoutStatusDto: {
             /** @description Code du statut */
             code: string;
@@ -1384,7 +1675,6 @@ export interface components {
             /** @description ID de l’utilisateur modificateur */
             userUpdateId?: string;
         };
-        PayoutStatus: Record<string, never>;
         UpdatePayoutStatusDto: {
             /** @description Code du statut */
             code?: string;
@@ -2370,7 +2660,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"][];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"][];
                 };
             };
         };
@@ -2394,7 +2684,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"];
                 };
             };
         };
@@ -2465,7 +2755,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EquipementCompany"];
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"];
                 };
             };
         };
@@ -2759,6 +3049,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    OrderController_ordersByUserIdWithItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de l'utilisateur */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Commandes récupérées avec succès. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrderController_getOrdersByCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                companyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Récupère les commandes pour une entreprise */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    CompanyPayoutController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des paiements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPayout"][];
+                };
+            };
+        };
+    };
+    CompanyPayoutController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCompanyPayoutDto"];
+            };
+        };
+        responses: {
+            /** @description Paiement créé */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPayout"];
+                };
+            };
+        };
+    };
+    CompanyPayoutController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du paiement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paiement trouvé */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPayout"];
+                };
+            };
+        };
+    };
+    CompanyPayoutController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du paiement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paiement supprimé */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CompanyPayoutController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID du paiement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCompanyPayoutDto"];
+            };
+        };
+        responses: {
+            /** @description Paiement mis à jour */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPayout"];
                 };
             };
         };
@@ -3135,121 +3583,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    CompanyPayoutController_findAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Liste des paiements */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CompanyPayout"][];
-                };
-            };
-        };
-    };
-    CompanyPayoutController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCompanyPayoutDto"];
-            };
-        };
-        responses: {
-            /** @description Paiement créé */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CompanyPayout"];
-                };
-            };
-        };
-    };
-    CompanyPayoutController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID du paiement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Paiement trouvé */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CompanyPayout"];
-                };
-            };
-        };
-    };
-    CompanyPayoutController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID du paiement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Paiement supprimé */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CompanyPayoutController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID du paiement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateCompanyPayoutDto"];
-            };
-        };
-        responses: {
-            /** @description Paiement mis à jour */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CompanyPayout"];
-                };
             };
         };
     };
