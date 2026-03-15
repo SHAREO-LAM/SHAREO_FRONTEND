@@ -15,9 +15,10 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(PrimeVuePlugin)
 app.use(ToastService)
-app.use(router)
 
 const authStore = useAuthStore()
 await authStore.initialize()
+
+app.use(router)
 
 app.mount('#app')

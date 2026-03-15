@@ -28,11 +28,33 @@ export const updateCompany = async (id: string, payload: Company): Promise<Compa
 
 // Supprimer un company
 export const deleteCompany = async (id: string): Promise<void> => {
-  await apiClient.delete(`/api/company/${id}`)
+  await apiClient.delete(`/company/${id}`)
 }
 
 // Associer un utilisateur à une compagnie
 export const createUserCompany = async (payload: CreateUserCompany): Promise<any> => {
   const { data } = await apiClient.post('/user-company', payload)
   return data
+}
+// Lister toutes les associations utilisateur-compagnie
+export const getUserCompanies = async (): Promise<any[]> => {
+  const { data } = await apiClient.get('/user-company')
+  return data
+}
+
+// Récupérer une association par ID
+export const getUserCompany = async (id: string): Promise<any> => {
+  const { data } = await apiClient.get(`/user-company/${id}`)
+  return data
+}
+
+// Mettre à jour une association
+export const updateUserCompany = async (id: string, payload: any): Promise<any> => {
+  const { data } = await apiClient.patch(`/user-company/${id}`, payload)
+  return data
+}
+
+// Supprimer une association
+export const deleteUserCompany = async (id: string): Promise<void> => {
+  await apiClient.delete(`/user-company/${id}`)
 }
