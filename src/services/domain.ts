@@ -27,7 +27,7 @@ export const updateDomain = async (id: string, payload: Domain): Promise<Domain>
 
 // Supprimer un domain
 export const deleteDomain = async (id: string): Promise<void> => {
-  await apiClient.delete(`/api/domain/${id}`)
+  await apiClient.delete(`/domain/${id}`)
 }
 
 export const getUnavailableDates = async (id: string): Promise<{ disabledDates: string[] }> => {

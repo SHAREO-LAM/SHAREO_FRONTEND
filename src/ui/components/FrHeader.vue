@@ -14,8 +14,14 @@
         </nav>
 
         <div class="flex items-center gap-2">
+          <Button v-if="authStore.userRole === 'vendor'" outlined severity="secondary" class="hidden md:flex !text-sm"
+            label="Vendor Dashboard" @click="navigate('vendor')" />
+
+          <Button v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'" outlined severity="warning"
+            class="hidden md:flex !text-sm" icon="pi pi-shield" label="Admin Dashboard" @click="navigate('admin')" />
+
           <Button
-            v-if="userRole !== 'vendor'"
+            v-if="authStore.userRole == 'user' || authStore.userRole == 'guest'"
             outlined
             severity="primary"
             class="!hidden md:!flex !text-sm"
@@ -57,7 +63,7 @@
           @click="navigate(item.value)" />
 
         <Button
-          v-if="userRole !== 'vendor'"
+          v-if="authStore.userRole == 'user' || authStore.userRole == 'guest'"
           text
           class="!justify-start !text-black hover:!bg-gray-100"
           icon="pi pi-shop"
@@ -71,6 +77,12 @@
         <Button v-if="authStore.isLoggedIn" text @click="handleLogout"
           icon="pi pi-sign-out" label="Déconnexion"
           class="!w-full !justify-start !text-red-600 !px-4 !py-2 !text-md hover:!bg-gray-50" />
+
+        <Button v-if="authStore.userRole === 'vendor' || authStore.userRole === 'admin'" text
+          class="!justify-start !text-gray-700 hover:!bg-gray-100" label="Vendor Dashboard" @click="navigate('vendor')" />
+
+        <Button v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'" text
+          class="!justify-start !text-gray-700 hover:!bg-gray-100" icon="pi pi-shield" label="Admin Dashboard" @click="navigate('admin')" />
 
         <Button v-else class="!w-full !justify-start !text-md" label="Connexion" icon="pi pi-user"
           @click="$emit('navigate', 'login')" />
@@ -101,10 +113,6 @@ export default defineComponent({
     currentPage: {
       type: String,
       required: true,
-    },
-    userRole: {
-      type: String as () => 'guest' | 'user' | 'vendor' | 'admin' | 'superadmin',
-      default: 'guest',
     },
   },
   emits: ['navigate'],
