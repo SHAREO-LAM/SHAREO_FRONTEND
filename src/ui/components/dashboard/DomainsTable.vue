@@ -11,7 +11,8 @@
         <Column field="name" header="Nom" />
         <Column field="description" header="Description" />
         <Column field="pricePerDay" header="Prix / jour" />
-
+        <Column field="capacity" header="Capacité" />
+        <Column field="city" header="Ville" />
         <Column header="Actions">
 
           <template #body="{ data }">
