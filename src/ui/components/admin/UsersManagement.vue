@@ -276,8 +276,6 @@ interface FormData {
 
 interface AdminOrder extends Order {
   orderId: string;
-  userId?: string;
-  statusId?: string;
 }
 
 interface AdminOrderStatus extends OrderStatus {

@@ -4,7 +4,7 @@
       :model-value="searchValue"
       :placeholder="searchPlaceholder"
       class="w-full md:max-w-[28rem]"
-      @update:model-value="$emit('update:searchValue', $event)"
+      @update:model-value="onSearchUpdate"
     />
     <div class="flex w-full gap-2 md:w-auto">
       <Dropdown
@@ -15,7 +15,7 @@
         option-value="value"
         :placeholder="filterPlaceholder"
         class="w-full md:w-56"
-        @update:model-value="$emit('update:filterValue', $event)"
+        @update:model-value="onFilterUpdate"
       />
       <Button label="Reset" severity="secondary" outlined @click="$emit('reset')" />
     </div>
@@ -48,9 +48,17 @@ withDefaults(
   },
 )
 
-defineEmits<{
+const emit = defineEmits<{
   'update:searchValue': [value: string]
   'update:filterValue': [value: string]
   reset: []
 }>()
+
+const onSearchUpdate = (value: string | undefined) => {
+  emit('update:searchValue', value ?? '')
+}
+
+const onFilterUpdate = (value: string | undefined) => {
+  emit('update:filterValue', value ?? 'all')
+}
 </script>
