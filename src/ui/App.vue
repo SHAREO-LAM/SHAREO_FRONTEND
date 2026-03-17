@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="app-shell">
     <Toast position="top-right" group="cart">
       <template #message="slotProps">
         <div class="flex items-start gap-3">
@@ -26,7 +26,7 @@
     <FrHeader :current-page="currentPage" :cart-item-count="cartItemCount"
       @navigate="handleNavigate" />
 
-    <main class="flex-1 pt-20">
+    <main class="app-main">
       <router-view />
     </main>
 
@@ -40,7 +40,6 @@ import { useCartStore } from '@/stores/cartStore';
 import FrHeader from './components/FrHeader.vue';
 import FrFooter from './components/FrFooter.vue';
 import Toast from 'primevue/toast';
-import { ROUTES } from '@/constants/const';
 
 export default defineComponent({
   name: 'App',
@@ -49,22 +48,9 @@ export default defineComponent({
     FrFooter,
     Toast,
   },
-  data() {
-    return {
-      ROUTES,
-    };
-  },
   computed: {
     currentPage(): string {
-      const route = this.$route;
-      switch (route.path) {
-        case ROUTES.COMMON.HOME.path:
-          return ROUTES.COMMON.HOME.name;
-        case ROUTES.COMMON.CATALOG.path:
-          return ROUTES.COMMON.CATALOG.name;
-        default:
-          return 'home';
-      }
+      return String(this.$route.name ?? 'home');
     },
     cartItemCount(): number {
       const cartStore = useCartStore();
@@ -73,13 +59,21 @@ export default defineComponent({
   },
   methods: {
     handleNavigate(page: string) {
-      console.log(`Navigating to ${page} page`);
-      this.$router.push(`/${page}`);
+      const map: Record<string, string> = {
+        home: '/',
+        domains: '/domains',
+        equipments: '/equipments',
+        login: '/login',
+        signup: '/signup',
+        cart: '/cart',
+        account: '/account',
+        admin: '/admin',
+        vendor: '/vendor/dashboard',
+        orders: '/orders',
+      };
+
+      this.$router.push(map[page] ?? '/');
     },
   },
 });
 </script>
-
-<style>
-/* Style global des pages */
-</style>

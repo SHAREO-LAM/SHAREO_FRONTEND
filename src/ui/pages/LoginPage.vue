@@ -1,80 +1,68 @@
 <template>
-  <div class="login-page">
-    <div class="login-container">
-      <div class="login-card">
-        <!-- Header -->
-        <div class="header">
-          <h1>Connexion</h1>
-          <p>Connectez-vous à votre compte SHAREO</p>
-        </div>
-
-        <!-- Error message -->
-        <div v-if="error" class="message message--error">
-          {{ error }}
-        </div>
-
-        <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="login-form">
-          <!-- Email -->
-          <div class="form-group">
-            <label for="email">
-              Email
-            </label>
-            <input
-              id="email"
-              v-model="formData.email"
-              type="email"
-              required
-              autocomplete="email"
-              placeholder="email@exemple.com"
-            />
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <label for="password">
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              v-model="formData.password"
-              type="password"
-              required
-              autocomplete="current-password"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <!-- Submit Button -->
-          <Button
-            type="submit"
-            :label="isLoading ? 'Connexion en cours...' : 'Se connecter'"
-            :loading="isLoading"
-            :disabled="isLoading"
-          />
-        </form>
-
-        <!-- Footer -->
-      <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
-          Vous n'avez pas de compte ?
-          <router-link
-            :to="route.query.redirect ? `/signup?redirect=${route.query.redirect}` : '/signup'"
-            class="text-indigo-600 font-medium no-underline hover:text-indigo-700"
-          >
-            Créer un compte
-          </router-link>
-        </p>
+  <AppAuthCard
+    title="Connexion"
+    subtitle="Retrouvez vos réservations, vos favoris et vos commandes en cours."
+    :error="error"
+  >
+    <form @submit.prevent="handleLogin" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <label for="email" class="font-medium text-slate-700">Email</label>
+        <InputText
+          id="email"
+          v-model="formData.email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="email@exemple.com"
+          class="w-full"
+        />
       </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="password" class="font-medium text-slate-700">Mot de passe</label>
+        <Password
+          id="password"
+          v-model="formData.password"
+          required
+          autocomplete="current-password"
+          placeholder="Votre mot de passe"
+          :feedback="false"
+          toggleMask
+          fluid
+        />
       </div>
-    </div>
-  </div>
+
+      <Button
+        type="submit"
+        :label="isLoading ? 'Connexion en cours...' : 'Se connecter'"
+        :loading="isLoading"
+        :disabled="isLoading"
+        icon="pi pi-sign-in"
+      />
+    </form>
+
+    <template #footer>
+      <div class="text-center text-sm text-slate-600">
+        Vous n'avez pas de compte ?
+        <router-link
+          :to="route.query.redirect ? `/signup?redirect=${route.query.redirect}` : '/signup'"
+          class="ml-1 font-semibold no-underline"
+        >
+          Créer un compte
+        </router-link>
+      </div>
+    </template>
+  </AppAuthCard>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
+import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
+import Button from 'primevue/button'
+import AppAuthCard from '@/ui/components/AppAuthCard.vue'
 import { useAuthStore } from '@/stores/authStore'
 import type { LoginCredentials } from '@/services/auth'
 
@@ -100,10 +88,10 @@ const handleLogin = async () => {
     toast.add({
       severity: 'success',
       summary: 'Connexion réussie',
-      detail: `Vous êtes maintenant connecté en tant que ${authStore.user?.login}.`,
+      detail: `Bienvenue ${authStore.user?.login}.`,
       life: 3000
-    });
-    const redirect = route.query.redirect as string || '/'
+    })
+    const redirect = (route.query.redirect as string) || '/'
     router.push(redirect)
   } catch (err: unknown) {
     const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -113,85 +101,3 @@ const handleLogin = async () => {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.login-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
-  padding: 5rem;
-}
-
-.login-container {
-  max-width: 28rem;
-  width: 100%;
-}
-
-.login-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  padding: 2rem;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: #4b5563;
-  }
-}
-
-.message {
-  margin-bottom: 1.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  border-width: 1px;
-
-  &--error {
-    background-color: #fef2f2;
-    border-color: #fecaca;
-    color: #b91c1c;
-  }
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.5rem;
-  }
-
-  input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-
-    &:focus {
-      outline: none;
-      ring: 2px;
-      ring-color: #6366f1;
-      border-color: transparent;
-    }
-  }
-}
-</style>

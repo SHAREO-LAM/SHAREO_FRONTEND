@@ -17,7 +17,7 @@
         class="w-full md:w-56"
         @update:model-value="onFilterUpdate"
       />
-      <Button label="Reset" severity="secondary" outlined @click="$emit('reset')" />
+      <Button label="Réinitialiser" severity="secondary" outlined @click="$emit('reset')" />
     </div>
   </div>
 </template>

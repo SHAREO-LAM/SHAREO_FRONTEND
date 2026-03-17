@@ -1,5 +1,5 @@
 // Composants de base
-import Lara from '@primevue/themes/lara'
+import Aura from '@primevue/themes/aura'
 import { DatePicker, Drawer, Listbox, MultiSelect, Select, SelectButton } from 'primevue'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
@@ -26,7 +26,7 @@ export default {
   install(app: App) {
     app.use(PrimeVue, {
       theme: {
-        preset: Lara,
+        preset: Aura,
         options: {
           darkModeSelector: false,
         }

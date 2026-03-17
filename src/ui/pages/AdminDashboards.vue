@@ -1,14 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-6">
-    <div class="container mx-auto px-4">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p class="text-gray-600 mt-2">Gérez les utilisateurs, les lieux, les équipements et les demandes de vendeurs</p>
+  <div class="admin-shell page-wrap">
+    <div class="glass-panel admin-panel">
+      <div class="mb-6">
+        <h1 class="section-title">Admin Dashboard</h1>
+        <p class="section-lead">Gérez les utilisateurs, les lieux, les équipements et les demandes de vendeurs.</p>
+        <div class="color-strip mt-4" />
       </div>
 
-      <!-- Tabs -->
-      <TabView class="custom-tabs">
+      <TabView class="admin-tabs">
         <!-- Users Tab -->
         <TabPanel header="Utilisateurs" value="users" leftIcon="pi pi-users">
           <div class="py-4">
@@ -75,30 +74,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-:deep(.custom-tabs .p-tabview-nav) {
-  background-color: white;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-:deep(.custom-tabs .p-tabview-nav button) {
-  color: #6b7280;
-  font-weight: 500;
-  border: none;
-}
-
-:deep(.custom-tabs .p-tabview-nav button:hover) {
-  background-color: #f3f4f6;
-  color: #111827;
-}
-
-:deep(.custom-tabs .p-tabview-nav button.p-tabview-selected) {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
-}
-
-:deep(.custom-tabs .p-tabview-panels) {
-  padding: 2rem 0;
-}
-</style>

@@ -11,8 +11,8 @@
       v-model:search-value="equipmentSearch"
       v-model:filter-value="equipmentCompanyFilter"
       :filter-options="equipmentCompanyFilterOptions"
-      search-placeholder="Rechercher (nom, description, societe)"
-      filter-placeholder="Filtre societe"
+      search-placeholder="Rechercher (nom, description, société)"
+      filter-placeholder="Filtre société"
       @reset="resetEquipmentFilters"
     />
 
@@ -422,23 +422,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-:deep(.custom-datatable) {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #f9fafb;
-  font-weight: 600;
-}
-
-:deep(.p-inputtext),
-:deep(.p-inputtextarea),
-:deep(.p-inputnumber) {
-  width: 100%;
-  border-radius: 0.375rem;
-}
-</style>
