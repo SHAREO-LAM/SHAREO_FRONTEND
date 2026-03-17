@@ -2,27 +2,27 @@
 
 // === CSS Variables (runtime) ===
 :root {
-  --primary-color: #365314;
-  --primary-color-text: #f8f7f1;
-  --primary-color-light: #dbe6c4;
+  --primary-color: #1f3b5b;
+  --primary-color-text: #f6f8fb;
+  --primary-color-light: #d9e5f2;
 
-  --secondary-color: #b45309;
-  --secondary-color-text: #fffaf0;
-  --secondary-color-light: #f5d9b3;
+  --secondary-color: #b68457;
+  --secondary-color-text: #fffaf4;
+  --secondary-color-light: #efdcc7;
 
-  --background-color: #f6f1e8;
-  --background-color-strong: #ebe3d4;
-  --foreground-color: #1f2937;
-  --surface-color: rgba(255, 252, 246, 0.92);
-  --surface-elevated: rgba(255, 255, 255, 0.84);
-  --surface-muted: #ddd4c3;
-  --muted-color: #5f5a4f;
-  --line-color: rgba(92, 78, 55, 0.14);
-  --accent-olive: #6b8f3c;
-  --accent-clay: #c26a2d;
-  --accent-gold: #d4a73f;
-  --accent-berry: #8b5e3c;
-  --shadow-color: rgba(72, 57, 33, 0.14);
+  --background-color: #ffffff;
+  --background-color-strong: #f4f6fa;
+  --foreground-color: #1e2938;
+  --surface-color: rgba(255, 255, 255, 0.9);
+  --surface-elevated: rgba(255, 255, 255, 0.94);
+  --surface-muted: #d8d2c7;
+  --muted-color: #5b6472;
+  --line-color: rgba(37, 52, 74, 0.14);
+  --accent-olive: #4f6b8a;
+  --accent-clay: #b68457;
+  --accent-gold: #d3b181;
+  --accent-berry: #7e5a49;
+  --shadow-color: rgba(22, 32, 46, 0.16);
 
   --radius-sm: 0.5rem;
   --radius-md: 0.85rem;
@@ -31,17 +31,17 @@
 }
 
 // === SCSS Variables ===
-$color-primary: #365314;
-$color-primary-foreground: #f8f7f1;
-$color-primary-light: #dbe6c4;
+$color-primary: #1f3b5b;
+$color-primary-foreground: #f6f8fb;
+$color-primary-light: #d9e5f2;
 
-$color-secondary: #b45309;
-$color-secondary-foreground: #fffaf0;
-$color-secondary-light: #f5d9b3;
+$color-secondary: #b68457;
+$color-secondary-foreground: #fffaf4;
+$color-secondary-light: #efdcc7;
 
-$color-background: #f6f1e8;
-$color-foreground: #1f2937;
-$color-muted-foreground: #5f5a4f;
+$color-background: #ffffff;
+$color-foreground: #1e2938;
+$color-muted-foreground: #5b6472;
 
 $radius-md: 0.85rem;
 $font-weight-medium: 500;

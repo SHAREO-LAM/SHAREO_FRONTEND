@@ -351,7 +351,7 @@ export default defineComponent({
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #7a4a18;
+    color: #8d5f3e;
   }
 
   .home-hero__title {
@@ -382,11 +382,11 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    border: 1px solid rgba(92, 78, 55, 0.12);
+    border: 1px solid rgba(37, 52, 74, 0.2);
     border-radius: 1.5rem;
-    background: linear-gradient(180deg, rgba(54, 83, 20, 0.94) 0%, rgba(76, 104, 39, 0.96) 100%);
-    color: #f8f7f1;
-    box-shadow: 0 20px 40px rgba(54, 83, 20, 0.18);
+    background: linear-gradient(180deg, rgba(31, 59, 91, 0.95) 0%, rgba(46, 77, 114, 0.97) 100%);
+    color: #f6f8fb;
+    box-shadow: 0 20px 40px rgba(31, 59, 91, 0.2);
   }
 
   .home-spotlight__topline {
@@ -397,7 +397,7 @@ export default defineComponent({
     font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(248, 247, 241, 0.72);
+    color: rgba(246, 248, 251, 0.72);
   }
 
   .home-spotlight h2 {
@@ -428,7 +428,7 @@ export default defineComponent({
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
-    background: linear-gradient(180deg, rgba(20, 28, 9, 0.12) 0%, rgba(20, 28, 9, 0.75) 100%);
+    background: linear-gradient(180deg, rgba(19, 34, 51, 0.12) 0%, rgba(19, 34, 51, 0.75) 100%);
   }
 
   .home-spotlight__badge {
@@ -439,8 +439,8 @@ export default defineComponent({
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #1f2f12;
-    background: rgba(248, 238, 214, 0.92);
+    color: #213550;
+    background: rgba(245, 237, 224, 0.95);
   }
 
   .home-spotlight__place {
@@ -448,14 +448,14 @@ export default defineComponent({
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: rgba(248, 247, 241, 0.72);
+    color: rgba(246, 248, 251, 0.72);
   }
 
   .home-spotlight__name {
     margin: 0;
     font-size: 1.35rem;
     line-height: 1.1;
-    color: #fffaf0;
+    color: #fffaf4;
   }
 
   .home-spotlight__body {
@@ -467,7 +467,7 @@ export default defineComponent({
   .home-spotlight p {
     margin: 0;
     font-size: 0.92rem;
-    color: rgba(248, 247, 241, 0.78);
+    color: rgba(246, 248, 251, 0.78);
     line-height: 1.45;
   }
 
@@ -481,8 +481,8 @@ export default defineComponent({
   .home-spotlight__features > div {
     padding: 0.8rem;
     border-radius: 1rem;
-    background: rgba(255, 250, 240, 0.08);
-    border: 1px solid rgba(255, 250, 240, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
   }
 
   .home-spotlight__features strong {
@@ -495,7 +495,7 @@ export default defineComponent({
     display: block;
     margin-top: 0.2rem;
     font-size: 0.8rem;
-    color: rgba(248, 247, 241, 0.72);
+    color: rgba(246, 248, 251, 0.72);
   }
 
   .home-spotlight__cta {
@@ -520,9 +520,9 @@ export default defineComponent({
       padding: 0.55rem 0.8rem;
       border-radius: 1rem !important;
       overflow: hidden;
-      border: 1px solid rgba(122, 74, 24, 0.22);
-      background: linear-gradient(180deg, rgba(255, 253, 249, 0.96) 0%, rgba(246, 239, 227, 0.88) 100%);
-      color: #4b4a42;
+      border: 1px solid rgba(37, 52, 74, 0.22);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 240, 235, 0.9) 100%);
+      color: #475468;
     }
 
     :deep(.p-togglebutton .p-togglebutton-content) {
@@ -537,19 +537,19 @@ export default defineComponent({
     :deep(.p-togglebutton.p-togglebutton-checked),
     :deep(.p-togglebutton.p-highlight),
     :deep(.p-togglebutton[aria-pressed='true']) {
-      border-color: rgba(54, 83, 20, 0.95);
-      background: linear-gradient(135deg, rgba(93, 129, 51, 0.98) 0%, rgba(54, 83, 20, 0.98) 100%) !important;
-      background-color: rgba(54, 83, 20, 0.98) !important;
-      color: #f7fbf0;
-      box-shadow: 0 10px 18px rgba(54, 83, 20, 0.22);
+      border-color: rgba(31, 59, 91, 0.95);
+      background: linear-gradient(135deg, rgba(51, 80, 116, 0.98) 0%, rgba(31, 59, 91, 0.98) 100%) !important;
+      background-color: rgba(31, 59, 91, 0.98) !important;
+      color: #f6f8fb;
+      box-shadow: 0 10px 18px rgba(31, 59, 91, 0.24);
     }
 
     :deep(.p-togglebutton.p-togglebutton-checked:hover),
     :deep(.p-togglebutton.p-highlight:hover),
     :deep(.p-togglebutton[aria-pressed='true']:hover) {
-      border-color: rgba(54, 83, 20, 1);
-      background: linear-gradient(135deg, rgba(103, 141, 57, 1) 0%, rgba(54, 83, 20, 1) 100%);
-      color: #f7fbf0;
+      border-color: rgba(31, 59, 91, 1);
+      background: linear-gradient(135deg, rgba(59, 90, 127, 1) 0%, rgba(31, 59, 91, 1) 100%);
+      color: #f6f8fb;
     }
   }
 
@@ -563,7 +563,7 @@ export default defineComponent({
   }
 
   .home-search-toggle__option--active {
-    color: #fffaf0;
+    color: #fffaf4;
   }
 
   .home-search-button {

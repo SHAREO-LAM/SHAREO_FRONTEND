@@ -12,18 +12,18 @@
                 <div class="footer-column">
                     <h4 class="footer-subtitle">Explorer</h4>
                     <ul class="footer-list">
-                        <li><Button label="Tous les lieux" link @click="navigate('domains')" /></li>
-                        <li><Button label="Tous les équipements" link @click="navigate('equipments')" /></li>
-                        <li><Button label="Mes commandes" link @click="navigate('orders')" /></li>
+                        <li><Button class="footer-link-btn" label="Tous les lieux" link @click="navigate('domains')" /></li>
+                        <li><Button class="footer-link-btn" label="Tous les équipements" link @click="navigate('equipments')" /></li>
+                        <li><Button class="footer-link-btn" label="Mes commandes" link @click="navigate('orders')" /></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
                     <h4 class="footer-subtitle">Professionnels</h4>
                     <ul class="footer-list">
-                        <li><Button label="Devenir vendeur" link @click="navigate('become-seller')" /></li>
-                        <li><Button label="Espace vendeur" link @click="navigate('vendor/dashboard')" /></li>
-                        <li><Button label="Admin" link @click="navigate('admin')" /></li>
+                        <li><Button class="footer-link-btn" label="Devenir vendeur" link @click="navigate('become-seller')" /></li>
+                        <li><Button class="footer-link-btn" label="Espace vendeur" link @click="navigate('vendor/dashboard')" /></li>
+                        <li><Button class="footer-link-btn" label="Admin" link @click="navigate('admin')" /></li>
                     </ul>
                 </div>
             </div>
@@ -45,3 +45,19 @@ const navigate = (route: string) => {
     router.push({ path: `/${route}` });
 };
 </script>
+
+<style scoped lang="scss">
+.footer-list {
+    :deep(.footer-link-btn.p-button-link),
+    :deep(.footer-link-btn.p-button-link .p-button-label),
+    :deep(.footer-link-btn.p-button-link .pi) {
+        color: #ffffff !important;
+    }
+
+    :deep(.footer-link-btn.p-button-link:hover),
+    :deep(.footer-link-btn.p-button-link:hover .p-button-label),
+    :deep(.footer-link-btn.p-button-link:hover .pi) {
+        color: #ffffff !important;
+    }
+}
+</style>
