@@ -110,10 +110,6 @@
                     <strong>À partir de {{ spotlightListing.price }} EUR</strong>
                     <span>par jour pour des offres visibles immédiatement</span>
                   </div>
-                  <div>
-                    <strong>Navigation fluide</strong>
-                    <span>Réservations et contacts rapides !</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -473,7 +469,7 @@ export default defineComponent({
 
   .home-spotlight__features {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 0.6rem;
     margin-top: 1rem;
   }

@@ -133,36 +133,12 @@
         </div>
 
         <div v-if="selectedEquipmentId">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-          <div class="space-y-2">
-            <img
-              v-if="selectedEquipmentImageUrl"
-              :src="selectedEquipmentImageUrl"
-              alt="Image équipement"
-              class="h-24 w-32 rounded border object-cover"
-            />
-            <p v-else class="text-sm text-gray-500">Aucune image</p>
-
-            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onEquipmentFileSelected" />
-
-            <div class="flex gap-2">
-              <Button
-                label="Téléverser"
-                type="button"
-                :disabled="!selectedEquipmentFile"
-                :loading="isImageSaving"
-                @click="saveEquipmentImage"
-              />
-              <Button
-                v-if="selectedEquipmentImageUrl"
-                label="Supprimer l'image"
-                type="button"
-                severity="danger"
-                :loading="isImageSaving"
-                @click="removeEquipmentImage"
-              />
-            </div>
-          </div>
+          <ImageGalleryManager
+            :imageUrls="selectedEquipmentImageUrls"
+            :isLoading="isImageSaving"
+            @upload="(file) => uploadEquipmentImageHandler(file)"
+            @remove="(index) => removeEquipmentImageHandler(index)"
+          />
         </div>
       </form>
 
@@ -190,6 +166,7 @@ import AccordionTab from 'primevue/accordiontab';
 import AdminEmptyState from '@/ui/components/admin/components/AdminEmptyState.vue';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
 import AdminTableToolbar from '@/ui/components/admin/components/AdminTableToolbar.vue';
+import ImageGalleryManager from '@/ui/components/ImageGalleryManager.vue';
 import {
   getEquipementsCompany,
   createEquipementCompany,
@@ -228,6 +205,7 @@ export default defineComponent({
     AdminEmptyState,
     AdminSectionHeader,
     AdminTableToolbar,
+    ImageGalleryManager,
   },
   data() {
     return {
@@ -256,6 +234,7 @@ export default defineComponent({
       }>,
       selectedEquipmentFile: null as File | null,
       selectedEquipmentImageUrl: '' as string,
+      selectedEquipmentImageUrls: [] as string[],
       isImageSaving: false,
     };
   },
@@ -339,6 +318,7 @@ export default defineComponent({
       this.selectedEquipmentId = equipment.equipementCompanyId;
       this.selectedEquipmentFile = null;
       this.selectedEquipmentImageUrl = String(equipment.imageUrl || '');
+      this.selectedEquipmentImageUrls = equipment.imageUrls || [equipment.imageUrl || ''].filter(Boolean);
       this.formData = {
         name: equipment.displayName || '',
         quantity: equipment.stock ? parseInt(equipment.stock) : 1,
@@ -456,14 +436,14 @@ export default defineComponent({
 
       this.selectedEquipmentFile = file;
     },
-    async saveEquipmentImage() {
-      if (!this.selectedEquipmentId || !this.selectedEquipmentFile) return;
+    async uploadEquipmentImageHandler(file: File) {
+      if (!this.selectedEquipmentId) return;
 
       this.isImageSaving = true;
       try {
-        const updated = await uploadEquipementImage(this.selectedEquipmentId, this.selectedEquipmentFile);
+        const updated = await uploadEquipementImage(this.selectedEquipmentId, file);
         this.selectedEquipmentImageUrl = String(updated.imageUrl || '');
-        this.selectedEquipmentFile = null;
+        this.selectedEquipmentImageUrls = updated.imageUrls || [updated.imageUrl || ''].filter(Boolean);
         await this.loadEquipments();
         this.$toast.add({
           severity: 'success',
@@ -482,13 +462,14 @@ export default defineComponent({
         this.isImageSaving = false;
       }
     },
-    async removeEquipmentImage() {
+    async removeEquipmentImageHandler(index: number) {
       if (!this.selectedEquipmentId) return;
 
       this.isImageSaving = true;
       try {
-        await deleteEquipementImage(this.selectedEquipmentId);
-        this.selectedEquipmentImageUrl = '';
+        const updated = await deleteEquipementImage(this.selectedEquipmentId, index);
+        this.selectedEquipmentImageUrl = String(updated.imageUrl || '');
+        this.selectedEquipmentImageUrls = updated.imageUrls || [updated.imageUrl || ''].filter(Boolean);
         await this.loadEquipments();
         this.$toast.add({
           severity: 'success',
@@ -511,6 +492,7 @@ export default defineComponent({
       this.selectedEquipmentId = null;
       this.selectedEquipmentFile = null;
       this.selectedEquipmentImageUrl = '';
+      this.selectedEquipmentImageUrls = [];
       this.formData = {
         name: '',
         quantity: 1,

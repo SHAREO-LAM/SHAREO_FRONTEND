@@ -237,36 +237,12 @@
           <InputText v-model="editForm.stock" class="w-full" />
         </div>
 
-        <div>
-          <label>Image</label>
-          <div class="mt-2 space-y-2">
-            <img
-              v-if="editForm.imageUrl"
-              :src="editForm.imageUrl"
-              alt="Image équipement"
-              class="h-24 w-32 rounded object-cover border"
-            />
-            <p v-else class="text-sm text-gray-500">Aucune image</p>
-            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onEquipementImageSelected" />
-            <div class="flex gap-2">
-              <Button
-                label="Téléverser"
-                type="button"
-                :disabled="!selectedEquipementImage"
-                :loading="isEquipementImageSubmitting"
-                @click="uploadEquipementImage"
-              />
-              <Button
-                v-if="editForm.imageUrl"
-                label="Supprimer l'image"
-                type="button"
-                severity="danger"
-                :loading="isEquipementImageSubmitting"
-                @click="removeEquipementImage"
-              />
-            </div>
-          </div>
-        </div>
+        <ImageGalleryManager
+          :imageUrls="editForm.imageUrls || undefined"
+          :isLoading="isEquipementImageSubmitting"
+          @upload="(file) => uploadEquipementImage(editForm.equipementCompanyId ?? '', file)"
+          @remove="(index) => removeEquipementImage(editForm.equipementCompanyId ?? '', index)"
+        />
 
         <div class="flex gap-4 mt-4">
           <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
@@ -314,36 +290,12 @@
           <InputText v-model="editDomainForm.capacity" class="w-full" />
         </div>
 
-        <div>
-          <label>Image</label>
-          <div class="mt-2 space-y-2">
-            <img
-              v-if="editDomainForm.imageUrl"
-              :src="editDomainForm.imageUrl"
-              alt="Image domaine"
-              class="h-24 w-32 rounded object-cover border"
-            />
-            <p v-else class="text-sm text-gray-500">Aucune image</p>
-            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onDomainImageSelected" />
-            <div class="flex gap-2">
-              <Button
-                label="Téléverser"
-                type="button"
-                :disabled="!selectedDomainImage"
-                :loading="isDomainImageSubmitting"
-                @click="uploadDomainImage"
-              />
-              <Button
-                v-if="editDomainForm.imageUrl"
-                label="Supprimer l'image"
-                type="button"
-                severity="danger"
-                :loading="isDomainImageSubmitting"
-                @click="removeDomainImage"
-              />
-            </div>
-          </div>
-        </div>
+        <ImageGalleryManager
+          :imageUrls="editDomainForm.imageUrls || undefined"
+          :isLoading="isDomainImageSubmitting"
+          @upload="(file) => uploadDomainImage(editDomainForm.domainId ?? '', file)"
+          @remove="(index) => removeDomainImage(editDomainForm.domainId ?? '', index)"
+        />
 
         <div class="flex gap-4 mt-4">
           <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
@@ -427,6 +379,7 @@ import CompanyOrdersTable from "../components/CompanyOrdersTable.vue"
 import type { Order } from "@/types/order"
 import { getOrdersByCompany } from "@/services/orders"
 import type { Stats } from "@/types/stats"
+import ImageGalleryManager from "../components/ImageGalleryManager.vue"
 import { UI } from "@/constants/const"
 export default defineComponent({
 
@@ -451,7 +404,8 @@ export default defineComponent({
     TabList,
     Tab,
     TabPanels,
-    CompanyOrdersTable
+    CompanyOrdersTable,
+    ImageGalleryManager
   },
 
   setup() {
@@ -465,8 +419,6 @@ export default defineComponent({
     const submitError = ref<string | null>(null)
     const isEquipementImageSubmitting = ref(false)
     const isDomainImageSubmitting = ref(false)
-    const selectedEquipementImage = ref<File | null>(null)
-    const selectedDomainImage = ref<File | null>(null)
 
     const equipments = ref<EquipementCompanyReadDto[]>([])
     const equipementTypes = ref<EquipementType[]>([])
@@ -654,7 +606,6 @@ export default defineComponent({
     const editEquipement = (row: EquipementCompanyReadDto) => {
 
       editFormEquipement.value = { ...row }
-      selectedEquipementImage.value = null
       submitError.value = null
       showEditDialog.value = true
 
@@ -743,7 +694,6 @@ export default defineComponent({
     const editDomain = (row: Domain) => {
 
       editDomainForm.value = { ...row }
-      selectedDomainImage.value = null
       submitError.value = null
 
       showEditDomainDialog.value = true
@@ -761,57 +711,14 @@ export default defineComponent({
       return null
     }
 
-    const onEquipementImageSelected = (event: Event) => {
-      const target = event.target as HTMLInputElement
-      const file = target.files?.[0] ?? null
-      submitError.value = null
-
-      if (!file) {
-        selectedEquipementImage.value = null
-        return
-      }
-
-      const error = validateImage(file)
-      if (error) {
-        selectedEquipementImage.value = null
-        submitError.value = error
-        return
-      }
-
-      selectedEquipementImage.value = file
-    }
-
-    const onDomainImageSelected = (event: Event) => {
-      const target = event.target as HTMLInputElement
-      const file = target.files?.[0] ?? null
-      submitError.value = null
-
-      if (!file) {
-        selectedDomainImage.value = null
-        return
-      }
-
-      const error = validateImage(file)
-      if (error) {
-        selectedDomainImage.value = null
-        submitError.value = error
-        return
-      }
-
-      selectedDomainImage.value = file
-    }
-
-    const uploadEquipementImage = async () => {
-      if (!editFormEquipement.value.equipementCompanyId || !selectedEquipementImage.value) return
+    const uploadEquipementImage = async (equipmentId: string, file: File) => {
+      if (!equipmentId || !file) return
 
       isEquipementImageSubmitting.value = true
       submitError.value = null
 
       try {
-        const updated = await uploadEquipementImageRequest(
-          editFormEquipement.value.equipementCompanyId,
-          selectedEquipementImage.value
-        )
+        const updated = await uploadEquipementImageRequest(equipmentId, file)
 
         editFormEquipement.value = { ...editFormEquipement.value, ...updated }
         const index = equipments.value.findIndex(
@@ -819,22 +726,22 @@ export default defineComponent({
         )
 
         if (index !== -1) equipments.value[index] = updated
-        selectedEquipementImage.value = null
-      } catch {
+      } catch (error) {
         submitError.value = "Erreur lors du téléversement de l'image"
+        console.error(error)
       } finally {
         isEquipementImageSubmitting.value = false
       }
     }
 
-    const removeEquipementImage = async () => {
-      if (!editFormEquipement.value.equipementCompanyId) return
+    const removeEquipementImage = async (equipmentId: string, imageIndex: number) => {
+      if (!equipmentId) return
 
       isEquipementImageSubmitting.value = true
       submitError.value = null
 
       try {
-        const updated = await deleteEquipementImageRequest(editFormEquipement.value.equipementCompanyId)
+        const updated = await deleteEquipementImageRequest(equipmentId, imageIndex)
         editFormEquipement.value = { ...editFormEquipement.value, ...updated }
 
         const index = equipments.value.findIndex(
@@ -842,21 +749,22 @@ export default defineComponent({
         )
 
         if (index !== -1) equipments.value[index] = updated
-      } catch {
+      } catch (error) {
         submitError.value = "Erreur lors de la suppression de l'image"
+        console.error(error)
       } finally {
         isEquipementImageSubmitting.value = false
       }
     }
 
-    const uploadDomainImage = async () => {
-      if (!editDomainForm.value.domainId || !selectedDomainImage.value) return
+    const uploadDomainImage = async (domainId: string, file: File) => {
+      if (!domainId || !file) return
 
       isDomainImageSubmitting.value = true
       submitError.value = null
 
       try {
-        const updated = await uploadDomainImageRequest(editDomainForm.value.domainId, selectedDomainImage.value)
+        const updated = await uploadDomainImageRequest(domainId, file)
         editDomainForm.value = { ...editDomainForm.value, ...updated }
 
         const index = domains.value.findIndex(
@@ -864,22 +772,22 @@ export default defineComponent({
         )
 
         if (index !== -1) domains.value[index] = updated
-        selectedDomainImage.value = null
-      } catch {
+      } catch (error) {
         submitError.value = "Erreur lors du téléversement de l'image"
+        console.error(error)
       } finally {
         isDomainImageSubmitting.value = false
       }
     }
 
-    const removeDomainImage = async () => {
-      if (!editDomainForm.value.domainId) return
+    const removeDomainImage = async (domainId: string, imageIndex: number) => {
+      if (!domainId) return
 
       isDomainImageSubmitting.value = true
       submitError.value = null
 
       try {
-        const updated = await deleteDomainImageRequest(editDomainForm.value.domainId)
+        const updated = await deleteDomainImageRequest(domainId, imageIndex)
         editDomainForm.value = { ...editDomainForm.value, ...updated }
 
         const index = domains.value.findIndex(
@@ -887,8 +795,9 @@ export default defineComponent({
         )
 
         if (index !== -1) domains.value[index] = updated
-      } catch {
+      } catch (error) {
         submitError.value = "Erreur lors de la suppression de l'image"
+        console.error(error)
       } finally {
         isDomainImageSubmitting.value = false
       }
@@ -1016,8 +925,6 @@ export default defineComponent({
       removeEquipementImage,
       uploadDomainImage,
       removeDomainImage,
-      selectedEquipementImage,
-      selectedDomainImage,
       isEquipementImageSubmitting,
       isDomainImageSubmitting
     }

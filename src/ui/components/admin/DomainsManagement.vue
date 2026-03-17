@@ -108,36 +108,12 @@
         </div>
 
         <div v-if="selectedDomainId">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-          <div class="space-y-2">
-            <img
-              v-if="selectedDomainImageUrl"
-              :src="selectedDomainImageUrl"
-              alt="Image du lieu"
-              class="h-24 w-32 rounded border object-cover"
-            />
-            <p v-else class="text-sm text-gray-500">Aucune image</p>
-
-            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onDomainFileSelected" />
-
-            <div class="flex gap-2">
-              <Button
-                label="Téléverser"
-                type="button"
-                :disabled="!selectedDomainFile"
-                :loading="isImageSaving"
-                @click="saveDomainImage"
-              />
-              <Button
-                v-if="selectedDomainImageUrl"
-                label="Supprimer l'image"
-                type="button"
-                severity="danger"
-                :loading="isImageSaving"
-                @click="removeDomainImage"
-              />
-            </div>
-          </div>
+          <ImageGalleryManager
+            :imageUrls="selectedDomainImageUrls"
+            :isLoading="isImageSaving"
+            @upload="(file) => uploadDomainImageHandler(file)"
+            @remove="(index) => removeDomainImageHandler(index)"
+          />
         </div>
       </form>
 
@@ -160,6 +136,7 @@ import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
 import AdminTableToolbar from '@/ui/components/admin/components/AdminTableToolbar.vue';
+import ImageGalleryManager from '@/ui/components/ImageGalleryManager.vue';
 import {
   getDomains,
   createDomain,
@@ -192,6 +169,7 @@ export default defineComponent({
     Dropdown,
     AdminSectionHeader,
     AdminTableToolbar,
+    ImageGalleryManager,
   },
   data() {
     return {
@@ -216,6 +194,7 @@ export default defineComponent({
       }>,
       selectedDomainFile: null as File | null,
       selectedDomainImageUrl: '' as string,
+      selectedDomainImageUrls: [] as string[],
       isImageSaving: false,
     };
   },
@@ -261,6 +240,7 @@ export default defineComponent({
       this.selectedDomainId = (domain as any).domainId as string;
       this.selectedDomainFile = null;
       this.selectedDomainImageUrl = String(domain.imageUrl || '');
+      this.selectedDomainImageUrls = domain.imageUrls || [domain.imageUrl || ''].filter(Boolean);
       this.formData = {
         name: domain.name || '',
         description: domain.description || '',
@@ -381,15 +361,15 @@ export default defineComponent({
 
       this.selectedDomainFile = file;
     },
-    async saveDomainImage() {
-      if (!this.selectedDomainId || !this.selectedDomainFile) return;
+    async uploadDomainImageHandler(file: File) {
+      if (!this.selectedDomainId) return;
 
       this.isImageSaving = true;
       try {
-        const updated = await uploadDomainImage(this.selectedDomainId, this.selectedDomainFile);
+        const updated = await uploadDomainImage(this.selectedDomainId, file);
         this.selectedDomainImageUrl = String(updated.imageUrl || '');
+        this.selectedDomainImageUrls = updated.imageUrls || [updated.imageUrl || ''].filter(Boolean);
         await this.loadDomains();
-        this.selectedDomainFile = null;
         this.$toast.add({
           severity: 'success',
           summary: 'Succès',
@@ -407,13 +387,14 @@ export default defineComponent({
         this.isImageSaving = false;
       }
     },
-    async removeDomainImage() {
+    async removeDomainImageHandler(index: number) {
       if (!this.selectedDomainId) return;
 
       this.isImageSaving = true;
       try {
-        await deleteDomainImage(this.selectedDomainId);
-        this.selectedDomainImageUrl = '';
+        const updated = await deleteDomainImage(this.selectedDomainId, index);
+        this.selectedDomainImageUrl = String(updated.imageUrl || '');
+        this.selectedDomainImageUrls = updated.imageUrls || [updated.imageUrl || ''].filter(Boolean);
         await this.loadDomains();
         this.$toast.add({
           severity: 'success',
@@ -436,6 +417,7 @@ export default defineComponent({
       this.selectedDomainId = null;
       this.selectedDomainFile = null;
       this.selectedDomainImageUrl = '';
+      this.selectedDomainImageUrls = [];
       this.formData = {
         name: '',
         description: '',
