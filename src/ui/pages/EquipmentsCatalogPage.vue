@@ -59,6 +59,11 @@ export default defineComponent({
       type EquipementCompanyLike = EquipementCompanyReadDto
 
       return (equipements as EquipementCompanyLike[]).map((equipement) => {
+        const imageFromArray = Array.isArray(equipement.imageUrls)
+          ? equipement.imageUrls.find((url) => Boolean(url))
+          : undefined
+        const image = imageFromArray || equipement.imageUrl || undefined
+
         let stockNumber: number | undefined
         if (typeof equipement.stock === 'number') {
           stockNumber = equipement.stock
@@ -72,6 +77,7 @@ export default defineComponent({
           id: equipement.equipementCompanyId ?? '',
           name: equipement.displayName ?? '',
           description: equipement.description ?? undefined,
+          image,
           pricePerDay: equipement.pricePerDay ?? undefined,
           stock,
         }

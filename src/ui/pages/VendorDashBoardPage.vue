@@ -353,7 +353,8 @@ import { fetchEquipementTypes } from "@/services/equipement"
 
 import type {
   CreateEquipementCompany,
-  EquipementCompanyReadDto
+  EquipementCompanyReadDto,
+  UpdateEquipementCompanyDto
 } from "@/types/equipementCompany"
 
 import type { EquipementType } from "@/types/equipementType"
@@ -616,11 +617,23 @@ export default defineComponent({
 
       if (!item.equipementCompanyId) return
 
+      const payload: UpdateEquipementCompanyDto = {
+        displayName: item.displayName,
+        description: item.description ?? '',
+        pricePerDay: item.pricePerDay,
+        stock: item.stock ?? '',
+        equipementTypeId: item.equipementTypeId,
+      }
+
+      if (item.companyId && String(item.companyId).trim() !== '') {
+        payload.companyId = item.companyId
+      }
+
       isSubmitting.value = true
 
       try {
 
-        const updated = await updateEquipementCompany(item.equipementCompanyId, item)
+        const updated = await updateEquipementCompany(item.equipementCompanyId, payload)
 
         const index = equipments.value.findIndex(
           e => e.equipementCompanyId === updated.equipementCompanyId
