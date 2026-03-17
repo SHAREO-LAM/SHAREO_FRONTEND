@@ -38,6 +38,36 @@ export const deleteEquipementCompany = async (id: string): Promise<void> => {
   await apiClient.delete(`equipement-company/${id}`)
 }
 
+export const uploadEquipementImage = async (
+  id: string,
+  file: File
+): Promise<EquipementCompanyReadDto> => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const { data } = await apiClient.post<EquipementCompanyReadDto>(
+    `equipement-company/${id}/image`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
+
+  return data
+}
+
+export const deleteEquipementImage = async (
+  id: string,
+  index = 0
+): Promise<EquipementCompanyReadDto> => {
+  const { data } = await apiClient.delete<EquipementCompanyReadDto>(`equipement-company/${id}/image`, {
+    params: { index },
+  })
+  return data
+}
+
 // Récupérer les dates indisponibles pour un équipement
 export const getUnavailableDatesEquipement = async (id: string): Promise<{ disabledDates: string[] }> => {
   const { data } = await apiClient.get<{ disabledDates: string[] }>(`/equipement-company/${id}/unavailable-dates`);

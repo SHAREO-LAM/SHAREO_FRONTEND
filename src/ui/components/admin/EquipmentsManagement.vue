@@ -37,6 +37,17 @@
           sortMode="multiple"
         >
           <Column field="displayName" header="Nom" style="width: 25%" sortable />
+          <Column header="Image" style="width: 10%">
+            <template #body="slotProps">
+              <img
+                v-if="(slotProps.data.imageUrls && slotProps.data.imageUrls.length > 0) || slotProps.data.imageUrl"
+                :src="(slotProps.data.imageUrls && slotProps.data.imageUrls.length > 0) ? slotProps.data.imageUrls[0] : slotProps.data.imageUrl"
+                alt="Image de l'équipement"
+                class="h-12 w-16 rounded object-cover"
+              />
+              <span v-else class="text-xs text-gray-400">Aucune</span>
+            </template>
+          </Column>
           <Column field="stock" header="Quantité" style="width: 12%" sortable>
             <template #body="slotProps">
               <Tag :value="`${slotProps.data.stock}`" severity="info" />
@@ -120,6 +131,39 @@
           <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <Textarea id="description" v-model="formData.description" rows="3" class="w-full" />
         </div>
+
+        <div v-if="selectedEquipmentId">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          <div class="space-y-2">
+            <img
+              v-if="selectedEquipmentImageUrl"
+              :src="selectedEquipmentImageUrl"
+              alt="Image équipement"
+              class="h-24 w-32 rounded border object-cover"
+            />
+            <p v-else class="text-sm text-gray-500">Aucune image</p>
+
+            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onEquipmentFileSelected" />
+
+            <div class="flex gap-2">
+              <Button
+                label="Téléverser"
+                type="button"
+                :disabled="!selectedEquipmentFile"
+                :loading="isImageSaving"
+                @click="saveEquipmentImage"
+              />
+              <Button
+                v-if="selectedEquipmentImageUrl"
+                label="Supprimer l'image"
+                type="button"
+                severity="danger"
+                :loading="isImageSaving"
+                @click="removeEquipmentImage"
+              />
+            </div>
+          </div>
+        </div>
       </form>
 
       <template #footer>
@@ -146,10 +190,18 @@ import AccordionTab from 'primevue/accordiontab';
 import AdminEmptyState from '@/ui/components/admin/components/AdminEmptyState.vue';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
 import AdminTableToolbar from '@/ui/components/admin/components/AdminTableToolbar.vue';
-import { getEquipementsCompany, createEquipementCompany, updateEquipementCompany, deleteEquipementCompany } from '@/services/equipementCompany';
+import {
+  getEquipementsCompany,
+  createEquipementCompany,
+  updateEquipementCompany,
+  deleteEquipementCompany,
+  uploadEquipementImage,
+  deleteEquipementImage,
+} from '@/services/equipementCompany';
 import { getCompanies } from '@/services/company';
 import { useAuthStore } from '@/stores/authStore';
 import type { EquipementCompany, CreateEquipementCompany } from '@/types/equipementCompany';
+import { UI } from '@/constants/const';
 
 interface FormData {
   name: string;
@@ -202,6 +254,9 @@ export default defineComponent({
         label: string;
         value: string;
       }>,
+      selectedEquipmentFile: null as File | null,
+      selectedEquipmentImageUrl: '' as string,
+      isImageSaving: false,
     };
   },
   methods: {
@@ -282,6 +337,8 @@ export default defineComponent({
     editEquipment(equipment: any) {
       this.dialogMode = 'edit';
       this.selectedEquipmentId = equipment.equipementCompanyId;
+      this.selectedEquipmentFile = null;
+      this.selectedEquipmentImageUrl = String(equipment.imageUrl || '');
       this.formData = {
         name: equipment.displayName || '',
         quantity: equipment.stock ? parseInt(equipment.stock) : 1,
@@ -365,8 +422,95 @@ export default defineComponent({
         });
       }
     },
+    validateImage(file: File): string | null {
+      if (!UI.ALLOWED_IMAGE_TYPES.includes(file.type as (typeof UI.ALLOWED_IMAGE_TYPES)[number])) {
+        return 'Format invalide (PNG, JPEG ou WEBP)';
+      }
+
+      if (file.size > UI.MAX_UPLOAD_SIZE_BYTES) {
+        return `Fichier trop volumineux (max ${(UI.MAX_UPLOAD_SIZE_BYTES / (1024 * 1024)).toFixed(0)}MB)`;
+      }
+
+      return null;
+    },
+    onEquipmentFileSelected(event: Event) {
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0] ?? null;
+
+      if (!file) {
+        this.selectedEquipmentFile = null;
+        return;
+      }
+
+      const validationError = this.validateImage(file);
+      if (validationError) {
+        this.selectedEquipmentFile = null;
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Fichier invalide',
+          detail: validationError,
+          life: 3000,
+        });
+        return;
+      }
+
+      this.selectedEquipmentFile = file;
+    },
+    async saveEquipmentImage() {
+      if (!this.selectedEquipmentId || !this.selectedEquipmentFile) return;
+
+      this.isImageSaving = true;
+      try {
+        const updated = await uploadEquipementImage(this.selectedEquipmentId, this.selectedEquipmentFile);
+        this.selectedEquipmentImageUrl = String(updated.imageUrl || '');
+        this.selectedEquipmentFile = null;
+        await this.loadEquipments();
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Image mise à jour',
+          life: 3000,
+        });
+      } catch (error: any) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: error.response?.data?.message || 'Impossible de téléverser l\'image',
+          life: 3000,
+        });
+      } finally {
+        this.isImageSaving = false;
+      }
+    },
+    async removeEquipmentImage() {
+      if (!this.selectedEquipmentId) return;
+
+      this.isImageSaving = true;
+      try {
+        await deleteEquipementImage(this.selectedEquipmentId);
+        this.selectedEquipmentImageUrl = '';
+        await this.loadEquipments();
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Image supprimée',
+          life: 3000,
+        });
+      } catch (error: any) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: error.response?.data?.message || 'Impossible de supprimer l\'image',
+          life: 3000,
+        });
+      } finally {
+        this.isImageSaving = false;
+      }
+    },
     resetForm() {
       this.selectedEquipmentId = null;
+      this.selectedEquipmentFile = null;
+      this.selectedEquipmentImageUrl = '';
       this.formData = {
         name: '',
         quantity: 1,

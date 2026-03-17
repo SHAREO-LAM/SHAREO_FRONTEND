@@ -35,6 +35,26 @@ export const deleteDomain = async (id: string): Promise<void> => {
   await apiClient.delete(`/domain/${id}`)
 }
 
+export const uploadDomainImage = async (id: string, file: File): Promise<Domain> => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const { data } = await apiClient.post<Domain>(`/domain/${id}/image`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+
+  return data
+}
+
+export const deleteDomainImage = async (id: string, index = 0): Promise<Domain> => {
+  const { data } = await apiClient.delete<Domain>(`/domain/${id}/image`, {
+    params: { index },
+  })
+  return data
+}
+
 export const getUnavailableDates = async (id: string): Promise<{ disabledDates: string[] }> => {
   const { data } = await apiClient.get<{ disabledDates: string[] }>(`/domain/${id}/unavailable-dates`);
   return data;

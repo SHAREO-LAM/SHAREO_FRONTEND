@@ -29,7 +29,18 @@
         />
       </template>
 
-      <Column field="name" header="Nom" style="width: 25%" sortable />
+      <Column field="name" header="Nom" style="width: 20%" sortable />
+      <Column header="Image" style="width: 10%">
+        <template #body="slotProps">
+          <img
+            v-if="(slotProps.data.imageUrls && slotProps.data.imageUrls.length > 0) || slotProps.data.imageUrl"
+            :src="(slotProps.data.imageUrls && slotProps.data.imageUrls.length > 0) ? slotProps.data.imageUrls[0] : slotProps.data.imageUrl"
+            alt="Image du lieu"
+            class="h-12 w-16 rounded object-cover"
+          />
+          <span v-else class="text-xs text-gray-400">Aucune</span>
+        </template>
+      </Column>
       <Column field="description" header="Description" style="width: 30%" sortable>
         <template #body="slotProps">
           <span class="text-sm text-gray-600 truncate">{{ slotProps.data.description }}</span>
@@ -95,6 +106,39 @@
           <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <Textarea id="description" v-model="formData.description" rows="3" class="w-full" />
         </div>
+
+        <div v-if="selectedDomainId">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          <div class="space-y-2">
+            <img
+              v-if="selectedDomainImageUrl"
+              :src="selectedDomainImageUrl"
+              alt="Image du lieu"
+              class="h-24 w-32 rounded border object-cover"
+            />
+            <p v-else class="text-sm text-gray-500">Aucune image</p>
+
+            <input type="file" accept="image/png,image/jpeg,image/webp" @change="onDomainFileSelected" />
+
+            <div class="flex gap-2">
+              <Button
+                label="Téléverser"
+                type="button"
+                :disabled="!selectedDomainFile"
+                :loading="isImageSaving"
+                @click="saveDomainImage"
+              />
+              <Button
+                v-if="selectedDomainImageUrl"
+                label="Supprimer l'image"
+                type="button"
+                severity="danger"
+                :loading="isImageSaving"
+                @click="removeDomainImage"
+              />
+            </div>
+          </div>
+        </div>
       </form>
 
       <template #footer>
@@ -116,9 +160,17 @@ import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
 import AdminTableToolbar from '@/ui/components/admin/components/AdminTableToolbar.vue';
-import { getDomains, createDomain, updateDomain, deleteDomain } from '@/services/domain';
+import {
+  getDomains,
+  createDomain,
+  updateDomain,
+  deleteDomain,
+  uploadDomainImage,
+  deleteDomainImage,
+} from '@/services/domain';
 import { useAuthStore } from '@/stores/authStore';
 import type { Domain, CreateDomain } from '@/types/domain';
+import { UI } from '@/constants/const';
 
 interface FormData {
   name: string;
@@ -162,6 +214,9 @@ export default defineComponent({
         label: string;
         value: string;
       }>,
+      selectedDomainFile: null as File | null,
+      selectedDomainImageUrl: '' as string,
+      isImageSaving: false,
     };
   },
   methods: {
@@ -204,6 +259,8 @@ export default defineComponent({
     editDomain(domain: Domain) {
       this.dialogMode = 'edit';
       this.selectedDomainId = (domain as any).domainId as string;
+      this.selectedDomainFile = null;
+      this.selectedDomainImageUrl = String(domain.imageUrl || '');
       this.formData = {
         name: domain.name || '',
         description: domain.description || '',
@@ -290,8 +347,95 @@ export default defineComponent({
         });
       }
     },
+    validateImage(file: File): string | null {
+      if (!UI.ALLOWED_IMAGE_TYPES.includes(file.type as (typeof UI.ALLOWED_IMAGE_TYPES)[number])) {
+        return 'Format invalide (PNG, JPEG ou WEBP)';
+      }
+
+      if (file.size > UI.MAX_UPLOAD_SIZE_BYTES) {
+        return `Fichier trop volumineux (max ${(UI.MAX_UPLOAD_SIZE_BYTES / (1024 * 1024)).toFixed(0)}MB)`;
+      }
+
+      return null;
+    },
+    onDomainFileSelected(event: Event) {
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0] ?? null;
+
+      if (!file) {
+        this.selectedDomainFile = null;
+        return;
+      }
+
+      const validationError = this.validateImage(file);
+      if (validationError) {
+        this.selectedDomainFile = null;
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Fichier invalide',
+          detail: validationError,
+          life: 3000,
+        });
+        return;
+      }
+
+      this.selectedDomainFile = file;
+    },
+    async saveDomainImage() {
+      if (!this.selectedDomainId || !this.selectedDomainFile) return;
+
+      this.isImageSaving = true;
+      try {
+        const updated = await uploadDomainImage(this.selectedDomainId, this.selectedDomainFile);
+        this.selectedDomainImageUrl = String(updated.imageUrl || '');
+        await this.loadDomains();
+        this.selectedDomainFile = null;
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Image mise à jour',
+          life: 3000,
+        });
+      } catch (error: any) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: error.response?.data?.message || 'Impossible de téléverser l\'image',
+          life: 3000,
+        });
+      } finally {
+        this.isImageSaving = false;
+      }
+    },
+    async removeDomainImage() {
+      if (!this.selectedDomainId) return;
+
+      this.isImageSaving = true;
+      try {
+        await deleteDomainImage(this.selectedDomainId);
+        this.selectedDomainImageUrl = '';
+        await this.loadDomains();
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Succès',
+          detail: 'Image supprimée',
+          life: 3000,
+        });
+      } catch (error: any) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: error.response?.data?.message || 'Impossible de supprimer l\'image',
+          life: 3000,
+        });
+      } finally {
+        this.isImageSaving = false;
+      }
+    },
     resetForm() {
       this.selectedDomainId = null;
+      this.selectedDomainFile = null;
+      this.selectedDomainImageUrl = '';
       this.formData = {
         name: '',
         description: '',
