@@ -12,11 +12,61 @@
           </IconField>
           <Button label="Rechercher" icon="pi pi-search" @click="handleSearch" />
         </div>
-        <Button
-          :label="sortBy === 'price' ? (sortOrder === 'asc' ? 'Prix croissant' : 'Prix décroissant') : 'Trier par prix'"
-          :icon="sortBy === 'price' ? (sortOrder === 'asc' ? 'pi pi-sort-amount-up-alt' : 'pi pi-sort-amount-down') : 'pi pi-sort-alt'"
-          severity="secondary" outlined @click="togglePriceSort" />
+        <div class="flex items-center justify-between gap-3">
+          <Button
+            :label="sortBy === 'price' ? (sortOrder === 'asc' ? 'Prix croissant' : 'Prix décroissant') : 'Trier par prix'"
+            :icon="sortBy === 'price' ? (sortOrder === 'asc' ? 'pi pi-sort-amount-up-alt' : 'pi pi-sort-amount-down') : 'pi pi-sort-alt'"
+            severity="secondary" outlined @click="togglePriceSort" />
+
+          <Button
+            text
+            rounded
+            icon="pi pi-bars"
+            label="Filtres"
+            class="theme-text-strong mobile-filters-trigger lg:hidden"
+            @click="mobileFiltersVisible = true"
+          />
+        </div>
       </div>
+
+      <Drawer
+        v-model:visible="mobileFiltersVisible"
+        position="right"
+        class="w-72"
+      >
+        <template #header>
+          <h3 class="theme-text-strong text-xl font-semibold">Filtres</h3>
+        </template>
+
+        <div class="space-y-6">
+          <template v-for="f in filterConfig" :key="`mobile-${filterKey(f)}`">
+            <div v-if="f.kind === 'text'">
+              <h4 class="font-medium mb-3">{{ f.label }}</h4>
+              <InputText v-model="filtersTextDraft[f.stateKey]" :placeholder="f.placeholder" class="w-full" />
+            </div>
+
+            <div v-else>
+              <h4 class="font-medium mb-3">{{ f.label }}</h4>
+              <div class="grid grid-cols-2 gap-2">
+                <InputNumber v-model="filtersNumberDraft[f.minKey]" :placeholder="f.minPlaceholder ?? 'Min'"
+                  class="w-full" inputClass="w-full" :min="f.minValue" />
+                <InputNumber v-model="filtersNumberDraft[f.maxKey]" :placeholder="f.maxPlaceholder ?? 'Max'"
+                  class="w-full" inputClass="w-full" :min="f.minValue" />
+              </div>
+            </div>
+          </template>
+
+          <h4 class="font-medium mb-3">Disponibilité</h4>
+          <div class="space-y-2">
+            <InputText v-model="startDate" type="date" class="w-full" />
+            <InputText v-model="endDate" type="date" class="w-full" />
+          </div>
+
+          <Button label="Valider" class="w-full" @click="applyFiltersAndCloseMobile" />
+          <Button label="Réinitialiser les filtres" severity="secondary" outlined class="w-full"
+            @click="resetFiltersAndCloseMobile" />
+        </div>
+      </Drawer>
 
       <div class="flex gap-8">
         <aside class="hidden lg:block w-64 shrink-0">
@@ -76,17 +126,17 @@
           </div>
 
           <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            <Card v-for="item in filteredItems" :key="item.id" class="cursor-pointer overflow-hidden transition hover:-translate-y-0.5"
+            <Card v-for="item in filteredItems" :key="item.id" class="catalog-grid-card cursor-pointer overflow-hidden transition hover:-translate-y-0.5"
               @click="handleNavigateToDetail(item)">
               <template #header>
                 <img :src="(item.image as string) || getDefaultImage()" :alt="(item.name as string)"
                   class="w-full h-48 object-cover" />
               </template>
               <template #title>
-                <span class="text-lg">{{ item.name }}</span>
+                <span class="catalog-item-title text-lg">{{ item.name }}</span>
               </template>
               <template #subtitle>
-                <p class="text-sm text-gray-600 mb-2">{{ item.description || 'Aucune description' }}</p>
+                <p class="catalog-item-description text-sm text-gray-600 mb-2">{{ item.description || 'Aucune description' }}</p>
                 <div class="flex items-center justify-between mt-3">
                   <div class="flex flex-col gap-1">
                     <slot name="itemMeta" :item="item" :view="viewMode" />
@@ -191,6 +241,7 @@ export default defineComponent({
       sortOrder: 'asc' as 'asc' | 'desc',
       startDate: '' as string,
       endDate: '' as string,
+      mobileFiltersVisible: false,
     }
   },
   computed: {
@@ -332,6 +383,10 @@ export default defineComponent({
       this.filtersText = { ...this.filtersTextDraft }
       this.filtersNumber = { ...this.filtersNumberDraft }
     },
+    applyFiltersAndCloseMobile() {
+      this.applyFilters()
+      this.mobileFiltersVisible = false
+    },
     resetFilters() {
       const defaults = this.getDefaultFiltersFromConfig(this.filterConfig)
       this.filtersText = defaults.text
@@ -341,6 +396,10 @@ export default defineComponent({
       this.searchQuery = ''
       this.sortBy = 'name'
       this.sortOrder = 'asc'
+    },
+    resetFiltersAndCloseMobile() {
+      this.resetFilters()
+      this.mobileFiltersVisible = false
     },
     getDefaultImage() {
       return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800'
@@ -358,5 +417,41 @@ export default defineComponent({
 <style scoped lang="scss">
 .catalog-page {
   min-height: calc(100vh - 6rem);
+}
+
+:deep(.catalog-grid-card) {
+  max-height: 28rem;
+}
+
+:deep(.catalog-grid-card .p-card-body) {
+  max-height: calc(28rem - 12rem);
+  overflow: hidden;
+}
+
+.catalog-item-title,
+.catalog-item-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.catalog-item-title {
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+}
+
+.catalog-item-description {
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+:deep(.mobile-filters-trigger) {
+  background: rgba(31, 59, 91, 0.12);
+  border: 1px solid rgba(31, 59, 91, 0.28);
+}
+
+:deep(.mobile-filters-trigger:hover) {
+  background: rgba(31, 59, 91, 0.18);
 }
 </style>

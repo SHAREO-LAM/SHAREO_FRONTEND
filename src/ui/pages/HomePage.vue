@@ -5,9 +5,7 @@
         <div class="home-hero__grid">
           <div class="home-hero__content">
             <div class="mb-5 md:mb-6">
-              <p class="home-hero__eyebrow">Plateforme de location créative</p>
-              <h1 class="section-title home-hero__title">Trouvez un lieu et votre matériel sans perdre de temps.</h1>
-              <p class="section-lead home-hero__lead">Recherche rapide, dates, localisation et catégorie au même endroit.</p>
+              <h1 class="section-title home-hero__title">Trouvez un lieu et du matériel sans perdre de temps.</h1>
             </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -78,7 +76,7 @@
               <Button
                 label="Rechercher"
                 icon="pi pi-search"
-                class="home-search-button w-full md:w-auto md:min-w-60"
+                class="home-search-button w-full md:w-auto md:min-w-60 mt-5"
                 severity="warn"
                 @click="handleSearch"
               />
@@ -91,7 +89,21 @@
                 <span>Sélection SHAREO</span>
               </div>
 
-              <div class="home-spotlight__media">
+              <router-link
+                v-if="spotlightListing.id > 0"
+                :to="`/productDetails/${spotlightListing.id}`"
+                class="home-spotlight__media"
+              >
+                <img :src="spotlightListing.image" :alt="spotlightListing.name" class="home-spotlight__image">
+                <div class="home-spotlight__overlay">
+                  <span class="home-spotlight__badge">Coup de cœur</span>
+                  <div>
+                    <p class="home-spotlight__place">{{ spotlightListing.location }}</p>
+                    <h3 class="home-spotlight__name">{{ spotlightListing.name }}</h3>
+                  </div>
+                </div>
+              </router-link>
+              <div v-else class="home-spotlight__media">
                 <img :src="spotlightListing.image" :alt="spotlightListing.name" class="home-spotlight__image">
                 <div class="home-spotlight__overlay">
                   <span class="home-spotlight__badge">Coup de cœur</span>
@@ -404,6 +416,7 @@ export default defineComponent({
 
   .home-spotlight__media {
     position: relative;
+    display: block;
     overflow: hidden;
     min-height: 14.5rem;
     margin-bottom: 1rem;

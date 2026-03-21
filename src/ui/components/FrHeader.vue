@@ -43,15 +43,6 @@
         />
 
         <Button
-          v-if="authStore.userRole === 'user' || authStore.userRole === 'guest'"
-          severity="warn"
-          class="hidden md:flex !text-white"
-          icon="pi pi-shop"
-          label="Devenir vendeur"
-          @click="openBecomeSeller"
-        />
-
-        <Button
           text
           rounded
           class="theme-text-strong"
@@ -184,7 +175,6 @@ export default defineComponent({
       isMobile: false,
       mobileMenuVisible: false,
       navItems: [
-        { label: 'Accueil', value: 'home', icon: 'pi pi-home' },
         { label: 'Lieux', value: 'domains', icon: 'pi pi-map-marker' },
         { label: 'Équipements', value: 'equipments', icon: 'pi pi-cog' },
       ] as NavItem[],

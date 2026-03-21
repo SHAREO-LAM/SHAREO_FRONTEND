@@ -21,12 +21,11 @@
         class="
           lg:col-span-2
           space-y-4
-          overflow-hidden
           transition-all duration-300
         "
         :class="{
-          'max-h-0 opacity-0 lg:max-h-none lg:opacity-100': !isCartOpen,
-          'max-h-750 opacity-100': isCartOpen,
+          'max-h-0 opacity-0 overflow-hidden lg:max-h-none lg:opacity-100 lg:overflow-visible': !isCartOpen,
+          'max-h-[75vh] overflow-y-auto opacity-100 pr-1 lg:max-h-none lg:overflow-visible': isCartOpen,
         }"
       >
         <CartItemCard

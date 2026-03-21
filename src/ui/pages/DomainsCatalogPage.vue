@@ -3,12 +3,12 @@
     :filterConfig="filterConfig" :fetchItems="fetchItems">
     <template #itemMeta="{ item, view }">
       <div v-if="item.city || item.postcode" class="flex items-center gap-1 text-sm"
-        :class="view === 'grid' ? 'text-gray-300' : 'text-gray-600'">
+        :class="view === 'grid' ? 'text-gray-700' : 'text-gray-600'">
         <i class="pi pi-map-marker"></i>
-        <span>{{ item.postcode ? `${item.postcode} ` : '' }}{{ item.city ?? '' }}</span>
+        <span>{{ item.city ? `${item.city}` : `${item.postcode}` }}</span>
       </div>
       <div v-if="typeof item.capacity === 'number'" class="flex items-center gap-1 text-sm"
-        :class="view === 'grid' ? 'text-gray-300' : 'text-gray-600'">
+        :class="view === 'grid' ? 'text-gray-700' : 'text-gray-600'">
         <i class="pi pi-users"></i>
         <span>Capacité : {{ item.capacity }}</span>
       </div>
