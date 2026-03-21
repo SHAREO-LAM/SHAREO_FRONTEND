@@ -253,7 +253,7 @@ export default defineComponent({
 
     const fetchPopularDomains = async () => {
       const domains = await getDomains()
-      popularListings.value = domains.map((d: Domain, index: number) => ({
+      popularListings.value = domains.slice(0, 4).map((d: Domain, index: number) => ({
         id: Number(d.domainId ?? index + 1),
         name: d.name ?? 'Nom indisponible',
         type: 'Domaine',
