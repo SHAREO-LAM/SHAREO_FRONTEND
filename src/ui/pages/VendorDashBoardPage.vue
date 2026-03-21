@@ -932,8 +932,6 @@ export default defineComponent({
       equipementGlobalFilter,
       activeTab,
       filteredOrders,
-      onEquipementImageSelected,
-      onDomainImageSelected,
       uploadEquipementImage,
       removeEquipementImage,
       uploadDomainImage,
