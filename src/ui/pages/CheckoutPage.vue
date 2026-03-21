@@ -144,7 +144,7 @@
 
               <div class="flex flex-col gap-2">
                 <label for="address" :class="['font-medium', billingErrors.address ? 'text-red-500' : '']">
-                  Adresse *
+                  Rue *
                 </label>
                 <InputText
                   id="address"

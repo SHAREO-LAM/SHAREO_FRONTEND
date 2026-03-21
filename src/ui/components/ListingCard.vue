@@ -2,7 +2,7 @@
   <Card :class="cardClass" @click="onNavigate('listing')">
     <template #content>
       <div v-if="viewMode === 'list'" class="flex flex-col sm:flex-row">
-        <img :src="listing.image" class="h-48 w-full rounded-xl object-cover sm:h-auto sm:w-64" />
+        <img :src="listing.image" class="h-48 w-full rounded-2xl object-cover sm:h-auto sm:w-64" />
         <div class="p-4 flex-1">
           <h3 class="theme-text-strong text-lg font-semibold">{{ listing.name }}</h3>
           <p class="theme-text-soft text-sm">{{ listing.location }}</p>
@@ -12,7 +12,7 @@
       </div>
 
       <div v-else class="relative">
-        <img :src="listing.image" class="h-44 w-full rounded-xl object-cover" />
+        <img :src="listing.image" class="h-44 w-full rounded-2xl object-cover" />
         <div class="p-4">
           <p class="mb-1 text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--accent-berry);">{{ listing.type }}</p>
           <h3 class="theme-text-strong text-lg font-semibold">{{ listing.name }}</h3>

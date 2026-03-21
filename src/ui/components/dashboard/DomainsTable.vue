@@ -8,6 +8,17 @@
 
       <DataTable :value="domains" responsiveLayout="scroll">
 
+        <Column header="Image">
+          <template #body="{ data }">
+            <img
+              v-if="(data.imageUrls && data.imageUrls.length > 0) || data.imageUrl"
+              :src="(data.imageUrls && data.imageUrls.length > 0) ? data.imageUrls[0] : data.imageUrl"
+              alt="Image du domaine"
+              class="h-12 w-16 rounded object-cover"
+            />
+            <span v-else class="text-xs text-gray-400">Aucune</span>
+          </template>
+        </Column>
         <Column field="name" header="Nom" />
         <Column field="description" header="Description" />
         <Column field="pricePerDay" header="Prix / jour" />

@@ -7,20 +7,25 @@
         <div class="gallery-grid">
           <!-- Image principale à gauche -->
           <div class="gallery-main" @click="openGallery(0)">
-            <img :src="images[0]" alt="Image principale" />
+            <img :src="displayImages[0]" alt="Image principale" />
           </div>
 
-          <!-- 4 images à droite -->
-          <div class="gallery-side">
-            <div v-for="i in 4" :key="i" class="gallery-thumb" @click="openGallery(i)">
-              <img :src="images[i]" alt="Image produit" />
+          <!-- Images secondaires à droite -->
+          <div class="gallery-side" v-if="displayImages.length > 1">
+            <div
+              v-for="(image, index) in displayImages.slice(1, 5)"
+              :key="`${image}-${index}`"
+              class="gallery-thumb"
+              @click="openGallery(index + 1)"
+            >
+              <img :src="image" alt="Image produit" />
             </div>
           </div>
         </div>
       </section>
 
       <!-- GALLERIA LIGHTBOX -->
-      <Galleria v-model:visible="displayGallery" v-model:activeIndex="activeIndex" :value="images" :numVisible="5"
+      <Galleria v-model:visible="displayGallery" v-model:activeIndex="activeIndex" :value="displayImages" :numVisible="5"
         containerStyle="max-width: 90vw" :circular="true" :fullScreen="true" :showItemNavigators="true"
         :showThumbnails="false">
         <template #item="slotProps">
@@ -240,7 +245,7 @@ export default defineComponent({
       hasUnavailableDateInRange: false,
       displayGallery: false,
       activeIndex: 0,
-      images: [
+      fallbackImages: [
         'https://placehold.co/1200x900',
         'https://placehold.co/800x800',
         'https://placehold.co/800x800',
@@ -288,6 +293,21 @@ export default defineComponent({
     },
     disabledDatesObjects(): Date[] {
       return this.unavailableDates.map(d => new Date(d));
+    },
+    productImages(): string[] {
+      if (this.productType === 'domain') {
+        const fromArray = this.domain?.imageUrls?.filter(Boolean) ?? [];
+        if (fromArray.length > 0) return fromArray;
+        return this.domain?.imageUrl ? [this.domain.imageUrl] : [];
+      }
+
+      const fromArray = this.equipement?.imageUrls?.filter(Boolean) ?? [];
+      if (fromArray.length > 0) return fromArray;
+      return this.equipement?.imageUrl ? [this.equipement.imageUrl] : [];
+    },
+    displayImages(): string[] {
+      if (this.productImages.length === 0) return this.fallbackImages;
+      return this.productImages.slice(0, 5);
     },
   },
   mounted() {

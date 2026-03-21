@@ -237,10 +237,19 @@
           <InputText v-model="editForm.stock" class="w-full" />
         </div>
 
+        <ImageGalleryManager
+          :imageUrls="editForm.imageUrls || undefined"
+          :isLoading="isEquipementImageSubmitting"
+          @upload="(file) => uploadEquipementImage(editForm.equipementCompanyId ?? '', file)"
+          @remove="(index) => removeEquipementImage(editForm.equipementCompanyId ?? '', index)"
+        />
+
         <div class="flex gap-4 mt-4">
           <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
           <Button label="Annuler" severity="secondary" @click="showEditDialog = false" />
         </div>
+
+        <p v-if="submitError" class="text-red-500">{{ submitError }}</p>
 
       </form>
 
@@ -281,10 +290,19 @@
           <InputText v-model="editDomainForm.capacity" class="w-full" />
         </div>
 
+        <ImageGalleryManager
+          :imageUrls="editDomainForm.imageUrls || undefined"
+          :isLoading="isDomainImageSubmitting"
+          @upload="(file) => uploadDomainImage(editDomainForm.domainId ?? '', file)"
+          @remove="(index) => removeDomainImage(editDomainForm.domainId ?? '', index)"
+        />
+
         <div class="flex gap-4 mt-4">
           <Button label="Enregistrer" type="submit" :loading="isSubmitting" />
           <Button label="Annuler" severity="secondary" @click="showEditDomainDialog = false" />
         </div>
+
+        <p v-if="submitError" class="text-red-500">{{ submitError }}</p>
 
       </form>
 
@@ -326,14 +344,17 @@ import {
   createEquipementCompany,
   updateEquipementCompany,
   deleteEquipementCompany,
-  getEquipementsCompanyById
+  getEquipementsCompanyById,
+  uploadEquipementImage as uploadEquipementImageRequest,
+  deleteEquipementImage as deleteEquipementImageRequest
 } from "@/services/equipementCompany"
 
 import { fetchEquipementTypes } from "@/services/equipement"
 
 import type {
   CreateEquipementCompany,
-  EquipementCompanyReadDto
+  EquipementCompanyReadDto,
+  UpdateEquipementCompanyDto
 } from "@/types/equipementCompany"
 
 import type { EquipementType } from "@/types/equipementType"
@@ -343,7 +364,9 @@ import {
   createDomain,
   updateDomain,
   deleteDomain,
-  getDomainsByCompanyId
+  getDomainsByCompanyId,
+  uploadDomainImage as uploadDomainImageRequest,
+  deleteDomainImage as deleteDomainImageRequest
 } from "@/services/domain"
 
 import router from "@/router"
@@ -357,6 +380,8 @@ import CompanyOrdersTable from "../components/CompanyOrdersTable.vue"
 import type { Order } from "@/types/order"
 import { getOrdersByCompany } from "@/services/orders"
 import type { Stats } from "@/types/stats"
+import ImageGalleryManager from "../components/ImageGalleryManager.vue"
+import { UI } from "@/constants/const"
 export default defineComponent({
 
   name: "VendorDashBoardPage",
@@ -380,7 +405,8 @@ export default defineComponent({
     TabList,
     Tab,
     TabPanels,
-    CompanyOrdersTable
+    CompanyOrdersTable,
+    ImageGalleryManager
   },
 
   setup() {
@@ -392,6 +418,8 @@ export default defineComponent({
 
     const isSubmitting = ref(false)
     const submitError = ref<string | null>(null)
+    const isEquipementImageSubmitting = ref(false)
+    const isDomainImageSubmitting = ref(false)
 
     const equipments = ref<EquipementCompanyReadDto[]>([])
     const equipementTypes = ref<EquipementType[]>([])
@@ -579,6 +607,7 @@ export default defineComponent({
     const editEquipement = (row: EquipementCompanyReadDto) => {
 
       editFormEquipement.value = { ...row }
+      submitError.value = null
       showEditDialog.value = true
 
     }
@@ -588,11 +617,23 @@ export default defineComponent({
 
       if (!item.equipementCompanyId) return
 
+      const payload: UpdateEquipementCompanyDto = {
+        displayName: item.displayName,
+        description: item.description ?? '',
+        pricePerDay: item.pricePerDay,
+        stock: item.stock ?? '',
+        equipementTypeId: item.equipementTypeId,
+      }
+
+      if (item.companyId && String(item.companyId).trim() !== '') {
+        payload.companyId = item.companyId
+      }
+
       isSubmitting.value = true
 
       try {
 
-        const updated = await updateEquipementCompany(item.equipementCompanyId, item)
+        const updated = await updateEquipementCompany(item.equipementCompanyId, payload)
 
         const index = equipments.value.findIndex(
           e => e.equipementCompanyId === updated.equipementCompanyId
@@ -666,8 +707,113 @@ export default defineComponent({
     const editDomain = (row: Domain) => {
 
       editDomainForm.value = { ...row }
+      submitError.value = null
 
       showEditDomainDialog.value = true
+    }
+
+    const validateImage = (file: File): string | null => {
+      if (!UI.ALLOWED_IMAGE_TYPES.includes(file.type as (typeof UI.ALLOWED_IMAGE_TYPES)[number])) {
+        return "Format invalide (PNG, JPEG ou WEBP)"
+      }
+
+      if (file.size > UI.MAX_UPLOAD_SIZE_BYTES) {
+        return `Fichier trop volumineux (max ${(UI.MAX_UPLOAD_SIZE_BYTES / (1024 * 1024)).toFixed(0)}MB)`
+      }
+
+      return null
+    }
+
+    const uploadEquipementImage = async (equipmentId: string, file: File) => {
+      if (!equipmentId || !file) return
+
+      isEquipementImageSubmitting.value = true
+      submitError.value = null
+
+      try {
+        const updated = await uploadEquipementImageRequest(equipmentId, file)
+
+        editFormEquipement.value = { ...editFormEquipement.value, ...updated }
+        const index = equipments.value.findIndex(
+          e => e.equipementCompanyId === updated.equipementCompanyId
+        )
+
+        if (index !== -1) equipments.value[index] = updated
+      } catch (error) {
+        submitError.value = "Erreur lors du téléversement de l'image"
+        console.error(error)
+      } finally {
+        isEquipementImageSubmitting.value = false
+      }
+    }
+
+    const removeEquipementImage = async (equipmentId: string, imageIndex: number) => {
+      if (!equipmentId) return
+
+      isEquipementImageSubmitting.value = true
+      submitError.value = null
+
+      try {
+        const updated = await deleteEquipementImageRequest(equipmentId, imageIndex)
+        editFormEquipement.value = { ...editFormEquipement.value, ...updated }
+
+        const index = equipments.value.findIndex(
+          e => e.equipementCompanyId === updated.equipementCompanyId
+        )
+
+        if (index !== -1) equipments.value[index] = updated
+      } catch (error) {
+        submitError.value = "Erreur lors de la suppression de l'image"
+        console.error(error)
+      } finally {
+        isEquipementImageSubmitting.value = false
+      }
+    }
+
+    const uploadDomainImage = async (domainId: string, file: File) => {
+      if (!domainId || !file) return
+
+      isDomainImageSubmitting.value = true
+      submitError.value = null
+
+      try {
+        const updated = await uploadDomainImageRequest(domainId, file)
+        editDomainForm.value = { ...editDomainForm.value, ...updated }
+
+        const index = domains.value.findIndex(
+          d => d.domainId === updated.domainId
+        )
+
+        if (index !== -1) domains.value[index] = updated
+      } catch (error) {
+        submitError.value = "Erreur lors du téléversement de l'image"
+        console.error(error)
+      } finally {
+        isDomainImageSubmitting.value = false
+      }
+    }
+
+    const removeDomainImage = async (domainId: string, imageIndex: number) => {
+      if (!domainId) return
+
+      isDomainImageSubmitting.value = true
+      submitError.value = null
+
+      try {
+        const updated = await deleteDomainImageRequest(domainId, imageIndex)
+        editDomainForm.value = { ...editDomainForm.value, ...updated }
+
+        const index = domains.value.findIndex(
+          d => d.domainId === updated.domainId
+        )
+
+        if (index !== -1) domains.value[index] = updated
+      } catch (error) {
+        submitError.value = "Erreur lors de la suppression de l'image"
+        console.error(error)
+      } finally {
+        isDomainImageSubmitting.value = false
+      }
     }
 
     const viewDomain = (row: Domain) => {
@@ -785,7 +931,15 @@ export default defineComponent({
       equipementFilters,
       equipementGlobalFilter,
       activeTab,
-      filteredOrders
+      filteredOrders,
+      onEquipementImageSelected,
+      onDomainImageSelected,
+      uploadEquipementImage,
+      removeEquipementImage,
+      uploadDomainImage,
+      removeDomainImage,
+      isEquipementImageSubmitting,
+      isDomainImageSubmitting
     }
 
   }
