@@ -7,6 +7,11 @@ export const getDomains = async (): Promise<Domain[]> => {
   return data
 }
 
+export const getDomainsByCompanyId = async (companyId: string): Promise<Domain[]> => {
+  const { data } = await apiClient.get<Domain[]>(`domain/company/${companyId}`);
+  return data;
+}
+
 // Récupérer un domain par ID
 export const getDomain = async (id: string): Promise<Domain> => {
   const { data } = await apiClient.get<Domain>(`domain/${id}`)

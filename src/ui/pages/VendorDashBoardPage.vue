@@ -296,7 +296,7 @@
 
 
     <div>
-        <CompanyOrdersTable :orders="filteredOrders"/>
+      <CompanyOrdersTable :orders="filteredOrders" />
     </div>
 
   </div>
@@ -325,7 +325,8 @@ import {
   getEquipementsCompany,
   createEquipementCompany,
   updateEquipementCompany,
-  deleteEquipementCompany
+  deleteEquipementCompany,
+  getEquipementsCompanyById
 } from "@/services/equipementCompany"
 
 import { fetchEquipementTypes } from "@/services/equipement"
@@ -341,7 +342,8 @@ import {
   getDomains,
   createDomain,
   updateDomain,
-  deleteDomain
+  deleteDomain,
+  getDomainsByCompanyId
 } from "@/services/domain"
 
 import router from "@/router"
@@ -513,16 +515,24 @@ export default defineComponent({
       datetimeCreate: ""
     })
 
-    const loadDomains = async () => {
-      domains.value = await getDomains()
-    }
-    const loadEquipementTypes = async () => {
-      equipementTypes.value = await fetchEquipementTypes()
+
+    const loadData = async () => {
+      if (!authStore.user?.companyId) return
+
+      loading.value = true
+      try {
+        equipments.value = await getEquipementsCompanyById(authStore.user.companyId)
+        domains.value = await getDomainsByCompanyId(authStore.user.companyId)
+        equipementTypes.value = await fetchEquipementTypes()
+
+      } catch (err) {
+        console.error('Erreur récupération équipements/domaines/types :', err)
+      } finally {
+        loading.value = false
+      }
     }
 
-    const loadEquipements = async () => {
-      equipments.value = await getEquipementsCompany()
-    }
+    onMounted(loadData)
 
 
     const handleCreateEquipement = async (item: Partial<CreateEquipementCompany>) => {
@@ -724,21 +734,19 @@ export default defineComponent({
     watch(domainGlobalFilter, (val) => {
       domainFilters.value.global.value = val
     })
-  const filteredOrders = computed(() =>
-  orders.value.filter(order =>
-    order.orderItems.some(item =>
-      activeTab.value === 'equipements'
-        ? item.equipementCompany
-        : item.domain
+    const filteredOrders = computed(() =>
+      orders.value.filter(order =>
+        order.orderItems.some(item =>
+          activeTab.value === 'equipements'
+            ? item.equipementCompany
+            : item.domain
+        )
+      )
     )
-  )
-)
 
 
     onMounted(async () => {
-      await loadEquipementTypes()
-      await loadEquipements()
-      await loadDomains()
+      await loadData()
       await loadOrders()
       computeStats()
     })
