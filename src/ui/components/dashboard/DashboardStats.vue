@@ -14,20 +14,14 @@
 </template>
 
 <script lang="ts">
+import type { Stats } from '@/types/stats';
 import { defineComponent, type PropType } from 'vue'
-
-interface Stat {
-  label: string
-  value: string | number
-  change: string
-  icon: string
-}
 
 export default defineComponent({
   name: 'DashboardStats',
   props: {
     stats: {
-      type: Array as PropType<Stat[]>,
+      type: Array as PropType<Stats>,
       required: true
     }
   }
