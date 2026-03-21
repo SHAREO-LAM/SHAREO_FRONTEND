@@ -1,33 +1,48 @@
 // variables.scss
 
-// === CSS Variables pour runtime ===
+// === CSS Variables (runtime) ===
 :root {
-  --primary-color: #2563eb;
-  --primary-color-text: #ffffff;
-  --primary-color-light: #eff6ff; // bleu clair pour icônes, backgrounds
+  --primary-color: #1f3b5b;
+  --primary-color-text: #f6f8fb;
+  --primary-color-light: #d9e5f2;
 
-  --secondary-color: #f97316;
-  --secondary-color-text: #ffffff;
-  --secondary-color-light: #fed7aa; // orange clair pour gradients ou textes
+  --secondary-color: #b68457;
+  --secondary-color-text: #fffaf4;
+  --secondary-color-light: #efdcc7;
 
   --background-color: #ffffff;
-  --foreground-color: #252525;
-  --muted-color: #717182;
+  --background-color-strong: #f4f6fa;
+  --foreground-color: #1e2938;
+  --surface-color: rgba(255, 255, 255, 0.9);
+  --surface-elevated: rgba(255, 255, 255, 0.94);
+  --surface-muted: #d8d2c7;
+  --muted-color: #5b6472;
+  --line-color: rgba(37, 52, 74, 0.14);
+  --accent-olive: #4f6b8a;
+  --accent-clay: #b68457;
+  --accent-gold: #d3b181;
+  --accent-berry: #7e5a49;
+  --shadow-color: rgba(22, 32, 46, 0.16);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.85rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
 }
 
 // === SCSS Variables ===
-$color-primary: #2563eb;
-$color-primary-foreground: #ffffff;
-$color-primary-light: #eff6ff;
+$color-primary: #1f3b5b;
+$color-primary-foreground: #f6f8fb;
+$color-primary-light: #d9e5f2;
 
-$color-secondary: #f97316;
-$color-secondary-foreground: #ffffff;
-$color-secondary-light: #fed7aa;
+$color-secondary: #b68457;
+$color-secondary-foreground: #fffaf4;
+$color-secondary-light: #efdcc7;
 
 $color-background: #ffffff;
-$color-foreground: #252525;
-$color-muted-foreground: #717182;
+$color-foreground: #1e2938;
+$color-muted-foreground: #5b6472;
 
-$radius-md: 0.5rem;
+$radius-md: 0.85rem;
 $font-weight-medium: 500;
 $font-weight-normal: 400;

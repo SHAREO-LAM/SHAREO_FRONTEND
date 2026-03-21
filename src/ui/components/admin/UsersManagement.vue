@@ -24,7 +24,7 @@
           v-model:filter-value="userRoleFilter"
           :filter-options="userRoleFilterOptions"
           search-placeholder="Rechercher (id, login, email)"
-          filter-placeholder="Filtre role"
+          filter-placeholder="Filtre rôle"
           @reset="resetUserTableFilters"
         />
       </template>
@@ -152,7 +152,7 @@
             v-model:search-value="orderSearch"
             v-model:filter-value="orderStatusFilter"
             :filter-options="orderStatusFilterOptions"
-            search-placeholder="Rechercher (id commande, statut, lieu/equipement)"
+            search-placeholder="Rechercher (id commande, statut, lieu/équipement)"
             filter-placeholder="Filtre statut"
             @reset="resetOrderTableFilters"
           />
@@ -164,7 +164,7 @@
             <Tag :value="getOrderStatusLabel(slotProps.data.statusId)" severity="info" />
           </template>
         </Column>
-        <Column header="Lieux / Equipements reservés" style="width: 35%">
+        <Column header="Lieux / Équipements réservés" style="width: 35%">
           <template #body="slotProps">
             <ul class="text-sm text-gray-700 list-disc pl-4 space-y-1">
               <li
@@ -221,7 +221,7 @@
             :options="orderStatusOptions"
             option-label="label"
             option-value="value"
-            placeholder="Selectionner un statut"
+            placeholder="Sélectionner un statut"
             class="w-full"
           />
         </div>
@@ -590,7 +590,7 @@ export default defineComponent({
       for (const equipment of equipements) {
         const equipmentId = String((equipment as any).equipementCompanyId || '');
         if (equipmentId) {
-          map[equipmentId] = equipment.displayName || `Equipement #${equipmentId}`;
+          map[equipmentId] = equipment.displayName || `Équipement #${equipmentId}`;
         }
       }
       return map;
@@ -611,7 +611,7 @@ export default defineComponent({
       );
 
       if (items.length === 0) {
-        return ['Aucun lieu ou equipement reserve'];
+        return ['Aucun lieu ou équipement réservé'];
       }
 
       return items
@@ -699,25 +699,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-:deep(.custom-datatable) {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #f9fafb;
-  font-weight: 600;
-}
-
-:deep(.p-inputtext) {
-  width: 100%;
-  border-radius: 0.375rem;
-}
-
-:deep(.p-checkbox) {
-  margin-right: 0.5rem;
-}
-</style>

@@ -1,6 +1,6 @@
 import apiClient from './api'
 import type { Company, CreateCompany } from '@/types/company'
-import type { CreateUserCompany } from '@/types/userCompany'
+import type { CreateUserCompany, UserCompany } from '@/types/userCompany'
 
 // Lister tous les companies
 export const getCompanies = async (): Promise<Company[]> => {
@@ -36,15 +36,16 @@ export const createUserCompany = async (payload: CreateUserCompany): Promise<any
   const { data } = await apiClient.post('/user-company', payload)
   return data
 }
-// Lister toutes les associations utilisateur-compagnie
-export const getUserCompanies = async (): Promise<any[]> => {
-  const { data } = await apiClient.get('/user-company')
-  return data
-}
+
 
 // Récupérer une association par ID
 export const getUserCompany = async (id: string): Promise<any> => {
   const { data } = await apiClient.get(`/user-company/${id}`)
+  return data
+}
+
+export const getUserCompanies = async (userId: string | number): Promise<UserCompany[]> => {
+  const { data } = await apiClient.get<UserCompany[]>(`/user-company/user/${userId}`)
   return data
 }
 

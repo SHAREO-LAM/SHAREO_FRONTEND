@@ -98,7 +98,7 @@ export const useAuthStore = defineStore('auth', {
         this.isLoggedIn = true
         
         // Charger le statut de vendeur
-        await this.loadVendorStatus()
+        await this.loadVendorStatus(profile.userId)
         
         return profile
       } catch (error: any) {
@@ -113,9 +113,9 @@ export const useAuthStore = defineStore('auth', {
     /**
      * Charger le statut de vendeur (vérifie si l'utilisateur a une compagnie)
      */
-    async loadVendorStatus() {
+    async loadVendorStatus(id : string | number) {
       try {
-        const companies = await getUserCompanies()
+        const companies = await getUserCompanies(id.toString())
         this.isVendor = companies && companies.length > 0
       } catch (error) {
         // Si erreur, considérer que l'utilisateur n'est pas vendeur

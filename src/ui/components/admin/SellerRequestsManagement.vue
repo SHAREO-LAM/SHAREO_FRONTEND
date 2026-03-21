@@ -18,7 +18,7 @@
           v-model:search-value="sellerSearch"
           v-model:filter-value="sellerCityFilter"
           :filter-options="sellerCityFilterOptions"
-          search-placeholder="Rechercher (entreprise, email, telephone, siret)"
+          search-placeholder="Rechercher (entreprise, email, téléphone, siret)"
           filter-placeholder="Filtre ville"
           @reset="resetSellerFilters"
         />
@@ -292,16 +292,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-:deep(.custom-datatable) {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #f9fafb;
-  font-weight: 600;
-}
-</style>

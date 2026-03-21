@@ -1,9 +1,9 @@
 <template>
-  <div class="catalog-page">
-    <div class="container mx-auto px-4 py-8">
+  <div class="catalog-page page-wrap">
+    <div class="glass-panel p-5 md:p-7">
       <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-4">{{ title }}</h1>
-        <div class="flex gap-4 mb-4">
+        <h1 class="section-title mb-4">{{ title }}</h1>
+        <div class="mb-4 flex flex-col gap-3 md:flex-row">
           <IconField iconPosition="left" class="flex-1">
             <InputIcon>
               <i class="pi pi-search" />
@@ -20,7 +20,7 @@
 
       <div class="flex gap-8">
         <aside class="hidden lg:block w-64 shrink-0">
-          <div class="bg-gray-100 rounded-lg p-6 shadow sticky top-24">
+          <div class="sticky top-24 rounded-2xl border border-slate-200 bg-white p-6 shadow">
             <h3 class="text-xl font-semibold mb-4">Filtres</h3>
 
             <div class="space-y-6">
@@ -69,14 +69,14 @@
             <Button label="Réessayer" class="mt-4" @click="loadData" />
           </div>
 
-          <div v-else-if="filteredItems.length === 0" class="text-center py-12">
+          <div v-else-if="filteredItems.length === 0" class="py-12 text-center">
             <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
             <p class="text-gray-600 text-lg">Aucun résultat trouvé</p>
             <p class="text-gray-500 mt-2">Essayez de modifier vos critères de recherche</p>
           </div>
 
           <div v-else-if="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            <Card v-for="item in filteredItems" :key="item.id" class="cursor-pointer rounded-lg overflow-hidden"
+            <Card v-for="item in filteredItems" :key="item.id" class="cursor-pointer overflow-hidden transition hover:-translate-y-0.5"
               @click="handleNavigateToDetail(item)">
               <template #header>
                 <img :src="(item.image as string) || getDefaultImage()" :alt="(item.name as string)"
@@ -104,7 +104,7 @@
           </div>
 
           <div v-else class="space-y-4">
-            <Card v-for="item in filteredItems" :key="item.id" class="cursor-pointer rounded-lg overflow-hidden"
+            <Card v-for="item in filteredItems" :key="item.id" class="cursor-pointer overflow-hidden transition hover:shadow-xl"
               @click="handleNavigateToDetail(item)">
               <template #content>
                 <div class="flex flex-col sm:flex-row gap-4">
@@ -357,6 +357,6 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .catalog-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 6rem);
 }
 </style>

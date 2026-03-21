@@ -8,3 +8,5 @@ export const fetchEquipementTypes = async (): Promise<EquipementType[]> => {
     const response = await apiClient.get('/equipement-type');
     return response.data;
 }
+
+

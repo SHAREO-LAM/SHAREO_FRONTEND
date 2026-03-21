@@ -1,5 +1,6 @@
 // Composants de base
-import Lara from '@primevue/themes/lara'
+import Aura from '@primevue/themes/aura'
+import { definePreset } from '@primeuix/themes'
 import { DatePicker, Drawer, Listbox, MultiSelect, Select, SelectButton } from 'primevue'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
@@ -22,11 +23,19 @@ import Toolbar from 'primevue/toolbar'
 import Tooltip from 'primevue/tooltip'
 import type { App } from 'vue'
 
+const ShareoPreset = definePreset(Aura, {
+  primitive: {
+    emerald: {
+      500: '#1f3b5b',
+    },
+  },
+})
+
 export default {
   install(app: App) {
     app.use(PrimeVue, {
       theme: {
-        preset: Lara,
+        preset: ShareoPreset,
         options: {
           darkModeSelector: false,
         }

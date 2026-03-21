@@ -2,20 +2,22 @@
   <Card :class="cardClass" @click="onNavigate('listing')">
     <template #content>
       <div v-if="viewMode === 'list'" class="flex flex-col sm:flex-row">
-        <img :src="listing.image" class="w-full sm:w-64 h-48 object-cover sm:h-auto rounded" />
+        <img :src="listing.image" class="h-48 w-full rounded-xl object-cover sm:h-auto sm:w-64" />
         <div class="p-4 flex-1">
-          <h3>{{ listing.name }}</h3>
-          <p class="text-gray-600">{{ listing.location }}</p>
-          <p v-if="listing.capacity">Up to {{ listing.capacity }} guests</p>
-          <p class="text-green-600">${{ listing.price }}/day</p>
+          <h3 class="theme-text-strong text-lg font-semibold">{{ listing.name }}</h3>
+          <p class="theme-text-soft text-sm">{{ listing.location }}</p>
+          <p v-if="listing.capacity" class="theme-text-soft mt-2 text-sm">Jusqu'à {{ listing.capacity }} personnes</p>
+          <p class="mt-3 text-lg font-bold" style="color: var(--primary-color);">{{ listing.price }} EUR<span class="theme-text-soft text-sm font-medium"> / jour</span></p>
         </div>
       </div>
 
       <div v-else class="relative">
-        <img :src="listing.image" class="w-full h-48 object-cover rounded" />
+        <img :src="listing.image" class="h-44 w-full rounded-xl object-cover" />
         <div class="p-4">
-          <h3>{{ listing.name }}</h3>
-          <p class="text-gray-600">{{ listing.location }}</p>
+          <p class="mb-1 text-xs font-semibold uppercase tracking-[0.18em]" style="color: var(--accent-berry);">{{ listing.type }}</p>
+          <h3 class="theme-text-strong text-lg font-semibold">{{ listing.name }}</h3>
+          <p class="theme-text-soft text-sm">{{ listing.location }}</p>
+          <p class="theme-text-strong mt-3 text-lg font-bold">{{ listing.price }} EUR<span class="theme-text-soft text-sm font-medium"> / jour</span></p>
         </div>
       </div>
     </template>
@@ -58,8 +60,8 @@ export default defineComponent({
   computed: {
     cardClass(): string {
       return this.viewMode === 'grid'
-        ? 'hover:shadow-lg transition-shadow cursor-pointer'
-        : 'mb-4 hover:shadow-lg';
+        ? 'cursor-pointer border-none transition hover:-translate-y-1 hover:shadow-xl'
+        : 'mb-4 cursor-pointer border-none transition hover:-translate-y-0.5 hover:shadow-xl';
     },
   },
 });

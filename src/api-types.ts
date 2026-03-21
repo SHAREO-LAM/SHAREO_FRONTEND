@@ -200,6 +200,23 @@ export interface paths {
         patch: operations["UserCompanyController_update"];
         trace?: never;
     };
+    "/api/user-company/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer toutes les companies d’un utilisateur */
+        get: operations["UserCompanyController_findByUserId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/domain": {
         parameters: {
             query?: never;
@@ -263,6 +280,23 @@ export interface paths {
         };
         /** Vérifier la disponibilité d’un domaine sur une période donnée */
         get: operations["DomainController_checkAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/domain/company/{companyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer tous les domaines d’une company */
+        get: operations["DomainController_findByCompany"];
         put?: never;
         post?: never;
         delete?: never;
@@ -357,6 +391,23 @@ export interface paths {
         put?: never;
         /** Créer un équipement pour une société */
         post: operations["EquipementCompanyController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/equipement-company/company/{companyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Récupérer tous les équipements d’une company */
+        get: operations["EquipementCompanyController_findByCompany"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2237,6 +2288,29 @@ export interface operations {
             };
         };
     };
+    UserCompanyController_findByUserId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de l’utilisateur */
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des associations User-Company trouvées */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserCompany"][];
+                };
+            };
+        };
+    };
     DomainController_findAll: {
         parameters: {
             query?: never;
@@ -2412,6 +2486,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    DomainController_findByCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de la company */
+                companyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des domaines */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Domain"][];
+                };
             };
         };
     };
@@ -2685,6 +2782,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EquipementCompanyReadDto"];
+                };
+            };
+        };
+    };
+    EquipementCompanyController_findByCompany: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID de la company */
+                companyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des équipements pour la company */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquipementCompanyReadDto"][];
                 };
             };
         };

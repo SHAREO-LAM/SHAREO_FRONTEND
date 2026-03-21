@@ -26,10 +26,6 @@
             icon="pi pi-shield" label="Panneau Admin"
             class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
-          <Button v-if="authStore.isAdmin && !authStore.isSuperAdmin" text @click="handleNavigate('vendor')"
-            icon="pi pi-building" label="Espace entreprise"
-            class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
-
           <Button text @click="handleNavigate('orders')"
             icon="pi pi-list" label="Mes commandes"
             class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
@@ -49,10 +45,6 @@
 
       <Button v-if="authStore.isSuperAdmin" text @click="handleNavigate('admin')"
         icon="pi pi-shield" label="Panneau Admin"
-        class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
-
-      <Button v-if="authStore.isAdmin && !authStore.isSuperAdmin" text @click="handleNavigate('vendor')"
-        icon="pi pi-building" label="Espace entreprise"
         class="!w-full !justify-start !text-black text-md !rounded-none hover:!bg-gray-50" />
 
       <Button text @click="handleNavigate('orders')"

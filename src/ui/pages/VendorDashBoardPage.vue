@@ -12,7 +12,7 @@
       <DashboardStats :stats="stats" />
 
       <!-- TABS -->
-      <Tabs value="equipements" class="mt-8">
+      <Tabs v-model:value="activeTab" class="mt-8">
 
         <TabList>
           <Tab value="equipements">Équipements</Tab>
@@ -21,38 +21,101 @@
 
         <TabPanels>
 
+          <!-- ===================== -->
           <!-- EQUIPEMENTS -->
+          <!-- ===================== -->
           <TabPanel value="equipements">
 
             <div class="bg-white rounded-xl shadow p-6">
 
+              <!-- HEADER -->
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-semibold">Mes équipements</h2>
 
-                <Button icon="pi pi-plus" label="Créer un équipement" class="bg-orange-500 border-none"
-                  @click="showCreateDialog = true" />
+                <div class="flex gap-3">
+                  <InputText v-model="equipementGlobalFilter" placeholder="Rechercher..." class="w-64" />
+
+                  <Button icon="pi pi-plus" label="Créer un équipement" class="bg-orange-500 border-none"
+                    @click="showCreateDialog = true" />
+                </div>
               </div>
 
-              <EquipementsTable :equipments="equipments" @view="viewEquipement" @edit="editEquipement"
-                @delete="confirmDeleteEquipement" />
+              <!-- TABLE -->
+              <DataTable :value="equipments" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20]" sortMode="multiple"
+                :filters="equipementFilters" :globalFilterFields="['displayName', 'description', 'stock']"
+                responsiveLayout="scroll">
+
+                <Column field="displayName" header="Nom" sortable filter filterPlaceholder="Nom" />
+
+                <Column field="description" header="Description" />
+
+                <Column field="pricePerDay" header="Prix" sortable />
+
+                <Column field="stock" header="Stock" sortable />
+
+                <!-- ACTIONS -->
+                <Column header="Actions">
+                  <template #body="slotProps">
+                    <div class="flex gap-2">
+                      <Button icon="pi pi-eye" severity="info" text @click="viewEquipement(slotProps.data)" />
+                      <Button icon="pi pi-pencil" severity="warning" text @click="editEquipement(slotProps.data)" />
+                      <Button icon="pi pi-trash" severity="danger" text
+                        @click="confirmDeleteEquipement(slotProps.data)" />
+                    </div>
+                  </template>
+                </Column>
+
+              </DataTable>
 
             </div>
 
           </TabPanel>
 
+          <!-- ===================== -->
           <!-- DOMAINES -->
+          <!-- ===================== -->
           <TabPanel value="domains">
 
             <div class="bg-white rounded-xl shadow p-6">
 
+              <!-- HEADER -->
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-semibold">Mes domaines</h2>
 
-                <Button icon="pi pi-plus" label="Créer un domaine" class="bg-orange-500 border-none"
-                  @click="showCreateDomainDialog = true" />
+                <div class="flex gap-3">
+                  <InputText v-model="domainGlobalFilter" placeholder="Rechercher..." class="w-64" />
+
+                  <Button icon="pi pi-plus" label="Créer un domaine" class="bg-orange-500 border-none"
+                    @click="showCreateDomainDialog = true" />
+                </div>
               </div>
 
-              <DomainsTable :domains="domains" @view="viewDomain" @edit="editDomain" @delete="confirmDeleteDomain" />
+              <!-- TABLE -->
+              <DataTable :value="domains" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20]" sortMode="multiple"
+                :filters="domainFilters" :globalFilterFields="['name', 'city', 'country']" responsiveLayout="scroll">
+
+                <Column field="name" header="Nom" sortable filter filterPlaceholder="Nom" />
+
+                <Column field="city" header="Ville" sortable />
+
+                <Column field="country" header="Pays" sortable />
+
+                <Column field="pricePerDay" header="Prix" sortable />
+
+                <Column field="capacity" header="Capacité" sortable />
+
+                <!-- ACTIONS -->
+                <Column header="Actions">
+                  <template #body="slotProps">
+                    <div class="flex gap-2">
+                      <Button icon="pi pi-eye" severity="info" text @click="viewDomain(slotProps.data)" />
+                      <Button icon="pi pi-pencil" severity="warning" text @click="editDomain(slotProps.data)" />
+                      <Button icon="pi pi-trash" severity="danger" text @click="confirmDeleteDomain(slotProps.data)" />
+                    </div>
+                  </template>
+                </Column>
+
+              </DataTable>
 
             </div>
 
@@ -233,7 +296,7 @@
 
 
     <div>
-      <CompanyOrdersTable></CompanyOrdersTable>
+      <CompanyOrdersTable :orders="filteredOrders" />
     </div>
 
   </div>
@@ -241,7 +304,7 @@
 
 <script lang="ts">
 
-import { defineComponent, ref, onMounted } from "vue"
+import { defineComponent, ref, onMounted, watch, computed } from "vue"
 
 import Button from "primevue/button"
 import Card from "primevue/card"
@@ -262,7 +325,8 @@ import {
   getEquipementsCompany,
   createEquipementCompany,
   updateEquipementCompany,
-  deleteEquipementCompany
+  deleteEquipementCompany,
+  getEquipementsCompanyById
 } from "@/services/equipementCompany"
 
 import { fetchEquipementTypes } from "@/services/equipement"
@@ -278,7 +342,8 @@ import {
   getDomains,
   createDomain,
   updateDomain,
-  deleteDomain
+  deleteDomain,
+  getDomainsByCompanyId
 } from "@/services/domain"
 
 import router from "@/router"
@@ -289,6 +354,9 @@ import DomainsTable from "../components/dashboard/DomainsTable.vue"
 import EquipementsTable from "../components/dashboard/EquipementsTable.vue"
 import { TabPanel } from "primevue"
 import CompanyOrdersTable from "../components/CompanyOrdersTable.vue"
+import type { Order } from "@/types/order"
+import { getOrdersByCompany } from "@/services/orders"
+import type { Stats } from "@/types/stats"
 export default defineComponent({
 
   name: "VendorDashBoardPage",
@@ -316,6 +384,7 @@ export default defineComponent({
   },
 
   setup() {
+    const activeTab = ref<'equipements' | 'domains'>('equipements')
     const authStore = useAuthStore()
     const showCreateDialog = ref(false)
     const showEditDialog = ref(false)
@@ -335,13 +404,75 @@ export default defineComponent({
     const showCreateDomainDialog = ref(false)
     const showEditDomainDialog = ref(false)
     const deleteAction = ref<(() => Promise<void>) | null>(null)
-    const stats = ref([
-      { label: "Annonces", value: 12, change: "+2", icon: "pi-briefcase" },
-      { label: "Réservations", value: 8, change: "+1", icon: "pi-calendar" },
-      { label: "Revenus", value: "2450€", change: "+12%", icon: "pi-euro" },
-      { label: "Remplissage", value: "78%", change: "+5%", icon: "pi-chart-line" }
-    ])
 
+    const stats = ref<Stats>([])
+    const computeStats = () => {
+      const isEquipement = activeTab.value === 'equipements'
+
+      const filteredItems = orders.value.flatMap(order =>
+        order.orderItems.filter(item =>
+          isEquipement ? item.equipementCompany : item.domain
+        )
+      )
+
+      const totalReservations = filteredItems.length
+
+      const totalRevenue = filteredItems.reduce(
+        (sum, item) => sum + item.unitPrice * parseInt(item.quantity),
+        0
+      )
+
+      const totalAds = isEquipement
+        ? equipments.value.length
+        : domains.value.length
+
+      const fillRate = totalAds
+        ? Math.round((totalReservations / totalAds) * 100)
+        : 0
+
+      stats.value = [
+        {
+          label: "Annonces",
+          value: totalAds,
+          icon: "pi-briefcase",
+          change: "+2"
+        },
+        {
+          label: "Réservations",
+          value: totalReservations,
+          icon: "pi-calendar",
+          change: "+12%"
+        },
+        {
+          label: "Revenus",
+          value: `${totalRevenue}€`,
+          icon: "pi-euro",
+          change: "+5%"
+        },
+        {
+          label: "Remplissage",
+          value: `${fillRate}%`,
+          icon: "pi-chart-line",
+          change: "+3%"
+        }
+      ]
+    }
+
+    const orders = ref<Order[]>([]);
+    const loading = ref(false);
+
+    const loadOrders = async () => {
+      loading.value = true;
+      try {
+        const authStore = useAuthStore();
+        const data = await getOrdersByCompany(authStore.user?.companyId ?? '');
+        orders.value = data;
+      } catch (error) {
+        console.error('Erreur lors de la récupération des commandes :', error);
+      } finally {
+        loading.value = false;
+      }
+    };
 
     const formEquipement = ref<Partial<CreateEquipementCompany>>({
       companyId: authStore.user?.companyId ?? "",
@@ -384,16 +515,24 @@ export default defineComponent({
       datetimeCreate: ""
     })
 
-    const loadDomains = async () => {
-      domains.value = await getDomains()
-    }
-    const loadEquipementTypes = async () => {
-      equipementTypes.value = await fetchEquipementTypes()
+
+    const loadData = async () => {
+      if (!authStore.user?.companyId) return
+
+      loading.value = true
+      try {
+        equipments.value = await getEquipementsCompanyById(authStore.user.companyId)
+        domains.value = await getDomainsByCompanyId(authStore.user.companyId)
+        equipementTypes.value = await fetchEquipementTypes()
+
+      } catch (err) {
+        console.error('Erreur récupération équipements/domaines/types :', err)
+      } finally {
+        loading.value = false
+      }
     }
 
-    const loadEquipements = async () => {
-      equipments.value = await getEquipementsCompany()
-    }
+    onMounted(loadData)
 
 
     const handleCreateEquipement = async (item: Partial<CreateEquipementCompany>) => {
@@ -577,14 +716,42 @@ export default defineComponent({
 
       showDeleteDialog.value = false
     }
+    const equipementGlobalFilter = ref("")
+    const domainGlobalFilter = ref("")
 
-    onMounted(async () => {
-      await loadEquipementTypes()
-      await loadEquipements()
-      await loadDomains()
+    const equipementFilters = ref({
+      global: { value: '', matchMode: "contains" }
     })
 
+    const domainFilters = ref({
+      global: { value: '', matchMode: "contains" }
+    })
 
+    watch(equipementGlobalFilter, (val) => {
+      equipementFilters.value.global.value = val
+    })
+
+    watch(domainGlobalFilter, (val) => {
+      domainFilters.value.global.value = val
+    })
+    const filteredOrders = computed(() =>
+      orders.value.filter(order =>
+        order.orderItems.some(item =>
+          activeTab.value === 'equipements'
+            ? item.equipementCompany
+            : item.domain
+        )
+      )
+    )
+
+
+    onMounted(async () => {
+      await loadData()
+      await loadOrders()
+      computeStats()
+    })
+
+    watch([activeTab, orders, equipments, domains], computeStats)
     return {
       showCreateDialog,
       showEditDialog,
@@ -612,7 +779,13 @@ export default defineComponent({
       confirmDeleteDomain,
       deleteDomainConfirmed,
       deleteAction,
-      viewDomain
+      viewDomain,
+      domainGlobalFilter,
+      domainFilters,
+      equipementFilters,
+      equipementGlobalFilter,
+      activeTab,
+      filteredOrders
     }
 
   }

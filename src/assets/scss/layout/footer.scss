@@ -1,7 +1,10 @@
 .app-footer {
-    background-color: #111827;
-    color: #ffffff;
-    padding: 3rem 0;
+    margin-top: 2rem;
+    background:
+        radial-gradient(circle at top left, rgba(182, 132, 87, 0.18), transparent 26%),
+        linear-gradient(135deg, #1b2e47 0%, #26405f 55%, #325175 100%);
+    color: #f4f6fa;
+    padding: 3rem 0 2rem;
 }
 
 .footer-container {
@@ -27,18 +30,20 @@
 }
 
 .footer-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 .footer-subtitle {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fffaf4;
 }
 
 .footer-description {
-    font-size: 0.875rem;
-    color: #9ca3af;
+    font-size: 0.92rem;
+    color: rgba(244, 246, 250, 0.78);
     line-height: 1.5;
 }
 
@@ -51,22 +56,22 @@
         margin-bottom: 0.5rem;
 
         :deep(.p-button-link) {
-            color: #9ca3af;
+            color: rgba(244, 246, 250, 0.82);
             padding: 0;
             font-size: 0.875rem;
 
             &:hover {
-                color: #ffffff;
+                color: #fffaf4;
             }
         }
     }
 }
 
 .footer-bottom {
-    border-top: 1px solid #1f2937;
+    border-top: 1px solid rgba(255, 250, 244, 0.16);
     margin-top: 2rem;
-    padding-top: 2rem;
+    padding-top: 1.4rem;
     text-align: center;
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: rgba(244, 246, 250, 0.74);
 }

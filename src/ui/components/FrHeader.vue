@@ -1,71 +1,114 @@
 <template>
-  <header class="fixed left-0 top-0 z-50 w-full bg-white shadow-md transition-colors duration-200">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center justify-between py-4">
+  <header class="fixed inset-x-0 top-0 z-50 px-3 py-3 md:px-6">
+    <div class="glass-panel mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-5">
+      <Button
+        text
+        class="!text-lg !font-semibold theme-text-strong"
+        icon="pi pi-compass"
+        label="SHAREO"
+        @click="navigate('home')"
+      />
 
-        <Button text class="!text-xl !font-bold text-primary hover:text-primary/80 transition-colors"
-          icon="pi pi-calendar" label="SHAREO" @click="navigate('home')" />
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Main Navigation">
+        <Button
+          v-for="item in navItems"
+          :key="item.value"
+          text
+          :label="item.label"
+          :icon="item.icon"
+          class="theme-nav-link"
+          :class="{ 'theme-nav-link-active': isNavItemActive(item.value) }"
+          @click="navigate(item.value)"
+        />
+      </nav>
 
-        <nav class="hidden md:flex items-center gap-2" aria-label="Main Navigation">
-          <Button v-for="item in navItems" :key="item.value" text
-            class="!text-black hover:!text-primary transition-colors"
-            :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label"
-            @click="navigate(item.value)" />
-        </nav>
+      <div class="flex items-center gap-2">
+        <Button
+          v-if="authStore.userRole === 'vendor'"
+          outlined
+          severity="secondary"
+          class="hidden md:flex"
+          label="Espace vendeur"
+          @click="navigate('vendor')"
+        />
 
-        <div class="flex items-center gap-2">
-          <Button v-if="authStore.userRole === 'vendor'" outlined severity="secondary" class="hidden md:flex !text-sm"
-            label="Vendor Dashboard" @click="navigate('vendor')" />
+        <Button
+          v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'"
+          outlined
+          severity="contrast"
+          class="hidden md:flex"
+          icon="pi pi-shield"
+          label="Admin"
+          @click="navigate('admin')"
+        />
 
-          <Button v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'" outlined severity="warning"
-            class="hidden md:flex !text-sm" icon="pi pi-shield" label="Admin Dashboard" @click="navigate('admin')" />
+        <Button
+          v-if="authStore.userRole === 'user' || authStore.userRole === 'guest'"
+          severity="warn"
+          class="hidden md:flex !text-white"
+          icon="pi pi-shop"
+          label="Devenir vendeur"
+          @click="openBecomeSeller"
+        />
 
-          <Button
-            v-if="authStore.userRole == 'user' || authStore.userRole == 'guest'"
-            outlined
-            severity="primary"
-            class="!hidden md:!flex !text-sm"
-            icon="pi pi-shop"
-            label="Devenir vendeur"
-            @click="openBecomeSeller"
-          />
+        <Button
+          text
+          rounded
+          class="theme-text-strong"
+          icon="pi pi-shopping-cart"
+          @click="navigate('cart')"
+          :badge="String(cart.cartItems.length)"
+          badge-severity="warn"
+        />
 
-          <Button text rounded class="!text-black hover:!bg-gray-100 relative" icon="pi pi-shopping-cart"
-            @click="navigate('cart')" :badge="String(cart.cartItems.length)" badge-severity="warn" />
+        <Button
+          v-if="!isMobile && !authStore.isLoggedIn"
+          label="Connexion"
+          icon="pi pi-user"
+          @click="$emit('navigate', 'login')"
+        />
 
-          <Button v-if="!isMobile && !authStore.isLoggedIn" class="!text-md" label="Connexion" icon="pi pi-user"
-            @click="$emit('navigate', 'login')" />
-
-          <div class="hidden md:flex">
-            <UserMenu @navigate="navigate" />
-          </div>
-
-          <Button
-            v-if="isMobile"
-            text
-            rounded
-            class="md:hidden !text-black"
-            icon="pi pi-bars"
-            @click="mobileMenuVisible = true"
-          />
+        <div class="hidden md:flex">
+          <UserMenu @navigate="navigate" />
         </div>
+
+        <Button
+          v-if="isMobile"
+          text
+          rounded
+          class="md:hidden"
+          icon="pi pi-bars"
+          @click="mobileMenuVisible = true"
+        />
       </div>
     </div>
 
     <!-- Mobile Drawer -->
-    <Drawer v-if="isMobile" v-model:visible="mobileMenuVisible" position="right" class="w-72 !bg-white !text-black">
+    <Drawer
+      v-if="isMobile"
+      v-model:visible="mobileMenuVisible"
+      position="right"
+      class="w-72"
+    >
       <template #header>
-        <h3 class="text-xl font-bold text-gray-900">Menu</h3>
+        <h3 class="theme-text-strong text-xl font-semibold">Navigation</h3>
       </template>
       <nav class="flex flex-col gap-2">
-        <Button v-for="item in navItems" :key="item.value" text class="!justify-start !text-black hover:!bg-gray-50"
-          :class="{ '!text-primary !font-semibold': currentPage === item.value }" :label="item.label" :icon="item.icon"
-          @click="navigate(item.value)" />
+        <Button
+          v-for="item in navItems"
+          :key="item.value"
+          text
+          class="!justify-start theme-nav-link"
+          :class="{ 'theme-nav-link-active': isNavItemActive(item.value) }"
+          :label="item.label"
+          :icon="item.icon"
+          @click="navigate(item.value)"
+        />
 
         <Button
           v-if="authStore.userRole == 'user' || authStore.userRole == 'guest'"
           text
-          class="!justify-start !text-black hover:!bg-gray-100"
+          class="!justify-start"
           icon="pi pi-shop"
           label="Devenir vendeur"
           @click="openBecomeSeller"
@@ -73,18 +116,38 @@
 
         <UserMenu :mobile="true" @navigate="navigate" />
 
-        <div class="border-t border-gray-500 my-2" />
-        <Button v-if="authStore.isLoggedIn" text @click="handleLogout"
-          icon="pi pi-sign-out" label="Déconnexion"
-          class="!w-full !justify-start !text-red-600 !px-4 !py-2 !text-md hover:!bg-gray-50" />
+        <div class="my-2 border-t" style="border-color: var(--line-color);" />
+        <Button
+          v-if="authStore.isLoggedIn"
+          text
+          @click="handleLogout"
+          icon="pi pi-sign-out"
+          label="Déconnexion"
+          class="!w-full !justify-start !text-red-600"
+        />
 
-        <Button v-if="authStore.userRole === 'vendor' || authStore.userRole === 'admin'" text
-          class="!justify-start !text-gray-700 hover:!bg-gray-100" label="Vendor Dashboard" @click="navigate('vendor')" />
+        <Button
+          v-if="authStore.userRole === 'vendor'"
+          text
+          class="!justify-start"
+          label="Espace vendeur"
+          @click="navigate('vendor')"
+        />
 
-        <Button v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'" text
-          class="!justify-start !text-gray-700 hover:!bg-gray-100" icon="pi pi-shield" label="Admin Dashboard" @click="navigate('admin')" />
+        <Button
+          v-if="authStore.userRole === 'admin' || authStore.userRole === 'superadmin'"
+          text
+          class="!justify-start"
+          icon="pi pi-shield"
+          label="Admin"
+          @click="navigate('admin')"
+        />
 
-        <Button v-else class="!w-full !justify-start !text-md" label="Connexion" icon="pi pi-user"
+        <Button
+          v-else
+          class="!w-full !justify-start"
+          label="Connexion"
+          icon="pi pi-user"
           @click="$emit('navigate', 'login')" />
       </nav>
     </Drawer>
@@ -121,7 +184,7 @@ export default defineComponent({
       isMobile: false,
       mobileMenuVisible: false,
       navItems: [
-        { label: 'Accueil', value: '', icon: 'pi pi-home' },
+        { label: 'Accueil', value: 'home', icon: 'pi pi-home' },
         { label: 'Lieux', value: 'domains', icon: 'pi pi-map-marker' },
         { label: 'Équipements', value: 'equipments', icon: 'pi pi-cog' },
       ] as NavItem[],
@@ -136,6 +199,9 @@ export default defineComponent({
     },
   },
   methods: {
+    isNavItemActive(page: string) {
+      return this.currentPage === page;
+    },
     navigate(page: string) {
       this.$emit('navigate', page);
       this.mobileMenuVisible = false;

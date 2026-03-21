@@ -8,6 +8,10 @@ export const getEquipementsCompany = async (): Promise<EquipementCompanyReadDto[
   return data
 }
 
+export const getEquipementsCompanyById = async (companyId: string): Promise<EquipementCompanyReadDto[]> => {
+  const { data } = await apiClient.get<EquipementCompanyReadDto[]>(`equipement-company/company/${companyId}`);
+  return data;
+}
 // Récupérer un équipement par ID
 export const getEquipementCompany = async (id: string): Promise<EquipementCompanyReadDto> => {
   const { data } = await apiClient.get<EquipementCompanyReadDto>(`equipement-company/${id}`)
