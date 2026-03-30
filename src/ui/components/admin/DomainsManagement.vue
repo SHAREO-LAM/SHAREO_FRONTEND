@@ -51,12 +51,21 @@
       <Column header="Actions" style="width: 20%">
         <template #body="slotProps">
           <Button
+            icon="pi pi-link"
+            severity="secondary"
+            rounded
+            text
+            @click="goToDomainProduct(slotProps.data.domainId)"
+            class="mr-1"
+            aria-label="Ouvrir la page produit du lieu"
+          />
+          <Button
             icon="pi pi-pencil"
             severity="info"
             rounded
             text
             @click="editDomain(slotProps.data)"
-            class="mr-2"
+            class="mr-1"
           />
           <Button
             icon="pi pi-trash"
@@ -77,11 +86,43 @@
       class="w-full md:w-2/3"
       @hide="resetForm"
     >
-      <form @submit.prevent="saveDomain" class="space-y-4">
+      <form @submit.prevent="saveDomain" class="space-y-4" aria-label="Formulaire lieu admin">
+        <div>
+          <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
+          <Dropdown
+            id="company"
+            v-model="formData.companyId"
+            :options="companies"
+            option-label="name"
+            option-value="companyId"
+            placeholder="Sélectionner une entreprise"
+            class="w-full"
+            aria-required="true"
+          />
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-            <InputText id="name" v-model="formData.name" type="text" class="w-full" />
+            <InputText id="name" v-model="formData.name" type="text" class="w-full" aria-required="true" />
+          </div>
+
+          <div>
+            <label for="pricePerDay" class="block text-sm font-medium text-gray-700 mb-1">Tarif/Jour (€)</label>
+            <InputNumber
+              id="pricePerDay"
+              v-model="formData.pricePerDay"
+              class="w-full"
+              :min-fraction-digits="2"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label for="streetName" class="block text-sm font-medium text-gray-700 mb-1">Rue</label>
+            <InputText id="streetName" v-model="formData.streetName" type="text" class="w-full" />
           </div>
 
           <div>
@@ -105,6 +146,40 @@
         <div>
           <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <Textarea id="description" v-model="formData.description" rows="3" class="w-full" />
+        </div>
+
+        <div v-if="dialogMode === 'create'" class="space-y-2">
+          <label for="domain-create-images" class="block text-sm font-medium text-gray-700 mb-1">
+            Photos a televerser apres creation (max 5)
+          </label>
+          <input
+            id="domain-create-images"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            class="block w-full text-sm"
+            aria-describedby="domain-images-help"
+            @change="onCreateImagesSelected"
+          />
+          <p id="domain-images-help" class="text-xs text-gray-500">
+            Formats acceptés: PNG, JPEG, WEBP. Jusqu'à 5 images.
+          </p>
+          <div v-if="pendingCreateImages.length > 0" class="space-y-1">
+            <div
+              v-for="(file, index) in pendingCreateImages"
+              :key="`${file.name}-${index}`"
+              class="flex items-center justify-between text-sm"
+            >
+              <span class="truncate mr-2">{{ file.name }}</span>
+              <Button
+                icon="pi pi-times"
+                severity="secondary"
+                rounded
+                text
+                @click="removePendingCreateImage(index)"
+              />
+            </div>
+          </div>
         </div>
 
         <div v-if="selectedDomainId">
@@ -132,6 +207,7 @@ import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 import Dropdown from 'primevue/dropdown';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
@@ -145,16 +221,22 @@ import {
   uploadDomainImage,
   deleteDomainImage,
 } from '@/services/domain';
+import router from '@/router';
+import { getValidatedCompanies } from '@/services/company';
 import { useAuthStore } from '@/stores/authStore';
 import type { Domain, CreateDomain } from '@/types/domain';
+import type { Company } from '@/types/company';
 import { UI } from '@/constants/const';
 
 interface FormData {
+  companyId: string;
   name: string;
   description: string;
+  streetName: string;
   city: string;
   postcode: string;
   country: string;
+  pricePerDay: number | null;
 }
 
 export default defineComponent({
@@ -165,6 +247,7 @@ export default defineComponent({
     Dialog,
     Button,
     InputText,
+    InputNumber,
     Textarea,
     Dropdown,
     AdminSectionHeader,
@@ -174,6 +257,7 @@ export default defineComponent({
   data() {
     return {
       domains: [] as Domain[],
+      companies: [] as Company[],
       domainSearch: '',
       domainCityFilter: 'all',
       isLoading: false,
@@ -182,17 +266,21 @@ export default defineComponent({
       dialogMode: 'create' as 'create' | 'edit',
       selectedDomainId: null as string | null,
       formData: {
+        companyId: '',
         name: '',
         description: '',
+        streetName: '',
         city: '',
         postcode: '',
         country: '',
+        pricePerDay: null,
       } as FormData,
       domainCityFilterOptions: [{ label: 'Toutes', value: 'all' }] as Array<{
         label: string;
         value: string;
       }>,
       selectedDomainFile: null as File | null,
+      pendingCreateImages: [] as File[],
       selectedDomainImageUrl: '' as string,
       selectedDomainImageUrls: [] as string[],
       isImageSaving: false,
@@ -206,6 +294,9 @@ export default defineComponent({
     async loadDomains() {
       this.isLoading = true;
       try {
+        if (this.companies.length === 0) {
+          await this.loadCompanies();
+        }
         this.domains = await getDomains();
         this.domainCityFilterOptions = [
           { label: 'Toutes', value: 'all' },
@@ -230,6 +321,18 @@ export default defineComponent({
         this.isLoading = false;
       }
     },
+    async loadCompanies() {
+      try {
+        this.companies = await getValidatedCompanies();
+      } catch (error: any) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Impossible de charger les entreprises validées',
+          life: 3000,
+        });
+      }
+    },
     openCreateDialog() {
       this.dialogMode = 'create';
       this.resetForm();
@@ -242,11 +345,14 @@ export default defineComponent({
       this.selectedDomainImageUrl = String(domain.imageUrl || '');
       this.selectedDomainImageUrls = domain.imageUrls || [domain.imageUrl || ''].filter(Boolean);
       this.formData = {
+        companyId: String((domain as any).companyId || ''),
         name: domain.name || '',
         description: domain.description || '',
+        streetName: String((domain as any).streetName || ''),
         city: domain.city || '',
         postcode: domain.postcode || '',
         country: domain.country || '',
+        pricePerDay: (domain as any).pricePerDay != null ? Number((domain as any).pricePerDay) : null,
       };
       this.dialogVisible = true;
     },
@@ -254,26 +360,42 @@ export default defineComponent({
       const authStore = useAuthStore();
       if (!authStore.user?.userId) return;
 
+      if (!this.formData.companyId) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Champ requis',
+          detail: 'Sélectionnez une entreprise',
+          life: 3000,
+        });
+        return;
+      }
+
       this.isSaving = true;
       try {
-        // Use a fixed system company UUID for admin-created domains
-        const systemCompanyId = '00000000-0000-0000-0000-000000000000';
-        
         if (this.dialogMode === 'create') {
-          await createDomain({
+          const createdDomain = await createDomain({
             name: this.formData.name,
             description: this.formData.description,
             city: this.formData.city,
             postcode: this.formData.postcode,
             country: this.formData.country,
-            streetName: '',
-            companyId: systemCompanyId,
+            streetName: this.formData.streetName,
+            pricePerDay: this.formData.pricePerDay ?? undefined,
+            companyId: this.formData.companyId,
             userCreateId: String(authStore.user.userId),
           });
+
+          const uploadFailures = await this.uploadPendingCreateDomainImages(
+            String((createdDomain as any).domainId || ''),
+          );
+
           this.$toast.add({
-            severity: 'success',
+            severity: uploadFailures.length > 0 ? 'warn' : 'success',
             summary: 'Succès',
-            detail: 'Lieu créé avec succès',
+            detail:
+              uploadFailures.length > 0
+                ? `Lieu créé, mais ${uploadFailures.length} photo(s) n'ont pas pu être téléversées`
+                : 'Lieu créé avec succès',
             life: 3000,
           });
         } else if (this.selectedDomainId) {
@@ -283,7 +405,9 @@ export default defineComponent({
             city: this.formData.city,
             postcode: this.formData.postcode,
             country: this.formData.country,
-            streetName: '',
+            streetName: this.formData.streetName,
+            pricePerDay: this.formData.pricePerDay ?? undefined,
+            companyId: this.formData.companyId,
             userUpdateId: String(authStore.user.userId),
           });
           this.$toast.add({
@@ -306,6 +430,75 @@ export default defineComponent({
         this.isSaving = false;
       }
     },
+    onCreateImagesSelected(event: Event) {
+      const target = event.target as HTMLInputElement;
+      const files = Array.from(target.files || []);
+      if (files.length === 0) {
+        return;
+      }
+
+      const availableSlots = Math.max(0, 5 - this.pendingCreateImages.length);
+      if (availableSlots === 0) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Limite atteinte',
+          detail: 'Vous pouvez ajouter au maximum 5 photos',
+          life: 3000,
+        });
+        target.value = '';
+        return;
+      }
+
+      const nextFiles: File[] = [...this.pendingCreateImages];
+
+      for (const file of files.slice(0, availableSlots)) {
+        const validationError = this.validateImage(file);
+        if (!validationError) {
+          nextFiles.push(file);
+          continue;
+        }
+
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Fichier ignoré',
+          detail: `${file.name}: ${validationError}`,
+          life: 3000,
+        });
+      }
+
+      if (files.length > availableSlots) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Limite atteinte',
+          detail: `Seules ${availableSlots} image(s) supplémentaire(s) ont été ajoutées`,
+          life: 3000,
+        });
+      }
+
+      this.pendingCreateImages = nextFiles.slice(0, 5);
+      target.value = '';
+    },
+    removePendingCreateImage(index: number) {
+      this.pendingCreateImages = this.pendingCreateImages.filter((_, i) => i !== index);
+    },
+    async uploadPendingCreateDomainImages(domainId: string): Promise<string[]> {
+      if (!domainId || this.pendingCreateImages.length === 0) return [];
+
+      this.isImageSaving = true;
+      const failedFiles: string[] = [];
+      try {
+        for (const file of this.pendingCreateImages) {
+          try {
+            await uploadDomainImage(domainId, file);
+          } catch (_error) {
+            failedFiles.push(file.name);
+          }
+        }
+        return failedFiles;
+      } finally {
+        this.isImageSaving = false;
+      }
+    },
     async deleteDomain(domainId: string) {
       if (!confirm('Êtes-vous sûr de vouloir supprimer ce lieu ?')) return;
 
@@ -326,6 +519,10 @@ export default defineComponent({
           life: 3000,
         });
       }
+    },
+    goToDomainProduct(domainId: string) {
+      if (!domainId) return;
+      router.push(`/productDetails/${domainId}`);
     },
     validateImage(file: File): string | null {
       if (!UI.ALLOWED_IMAGE_TYPES.includes(file.type as (typeof UI.ALLOWED_IMAGE_TYPES)[number])) {
@@ -416,14 +613,18 @@ export default defineComponent({
     resetForm() {
       this.selectedDomainId = null;
       this.selectedDomainFile = null;
+      this.pendingCreateImages = [];
       this.selectedDomainImageUrl = '';
       this.selectedDomainImageUrls = [];
       this.formData = {
+        companyId: '',
         name: '',
         description: '',
+        streetName: '',
         city: '',
         postcode: '',
         country: '',
+        pricePerDay: null,
       };
     },
   },
@@ -450,6 +651,7 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.loadCompanies();
     this.loadDomains();
   },
 });

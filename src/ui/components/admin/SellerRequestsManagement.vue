@@ -134,7 +134,7 @@ import Dropdown from 'primevue/dropdown';
 import AdminEmptyState from '@/ui/components/admin/components/AdminEmptyState.vue';
 import AdminSectionHeader from '@/ui/components/admin/components/AdminSectionHeader.vue';
 import AdminTableToolbar from '@/ui/components/admin/components/AdminTableToolbar.vue';
-import { getCompanies, updateCompany, deleteCompany } from '@/services/company';
+import { getPendingCompanies, updateCompany, deleteCompany } from '@/services/company';
 import { useAuthStore } from '@/stores/authStore';
 import type { Company } from '@/types/company';
 
@@ -174,10 +174,7 @@ export default defineComponent({
     async loadSellerRequests() {
       this.isLoading = true;
       try {
-        const allCompanies = await getCompanies();
-        // Filtrer les entreprises non approuvées (status = "pending" ou similaire)
-        // Adapter selon votre logique métier
-        this.sellerRequests = allCompanies;
+        this.sellerRequests = await getPendingCompanies();
         this.sellerCityFilterOptions = [
           { label: 'Toutes', value: 'all' },
           ...Array.from(
@@ -213,10 +210,8 @@ export default defineComponent({
 
       this.isApproving = true;
       try {
-        // Ajouter un status "approved" ou mettre à jour selon votre logique
         await updateCompany((this.selectedRequest as any).companyId as string, {
-          ...this.selectedRequest,
-          companyId: (this.selectedRequest as any).companyId,
+          status: 'VALIDATED',
           userUpdateId: String(authStore.user.userId),
         });
 

@@ -8,6 +8,16 @@ export const getCompanies = async (): Promise<Company[]> => {
   return data
 }
 
+export const getValidatedCompanies = async (): Promise<Company[]> => {
+  const { data } = await apiClient.get<Company[]>('company/validated')
+  return data
+}
+
+export const getPendingCompanies = async (): Promise<Company[]> => {
+  const { data } = await apiClient.get<Company[]>('company/pending-validation')
+  return data
+}
+
 // Récupérer un company par ID
 export const getCompany = async (id: string): Promise<Company> => {
   const { data } = await apiClient.get<Company>(`company/${id}`)
@@ -21,7 +31,7 @@ export const createCompany = async (payload: CreateCompany): Promise<Company> =>
 }
 
 // Mettre à jour un company
-export const updateCompany = async (id: string, payload: Company): Promise<Company> => {
+export const updateCompany = async (id: string, payload: Partial<Company>): Promise<Company> => {
   const { data } = await apiClient.patch<Company>(`/company/${id}`, payload)
   return data
 }

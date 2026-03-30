@@ -150,6 +150,9 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
+  upload: [file: File]
+  remove: [index: number]
+  reorder: [images: string[]]
   'update:imageUrls': [value: string[]]
 }>()
 
@@ -201,13 +204,17 @@ const validateImage = (file: File): string | null => {
 }
 
 const uploadImage = async () => {
-  if (!selectedFile.value || !props.onUpload) return
+  if (!selectedFile.value) return
 
   isUploading.value = true
   errorMessage.value = ''
 
   try {
-    await props.onUpload(selectedFile.value)
+    if (props.onUpload) {
+      await props.onUpload(selectedFile.value)
+    } else {
+      emit('upload', selectedFile.value)
+    }
     selectedFile.value = null
     if (selectFile.value) selectFile.value.value = ''
   } catch (error) {
@@ -225,13 +232,15 @@ const cancelUpload = () => {
 }
 
 const handleRemoveImage = async (index: number) => {
-  if (!props.onRemove) return
-
   isUploading.value = true
   errorMessage.value = ''
 
   try {
-    await props.onRemove(index)
+    if (props.onRemove) {
+      await props.onRemove(index)
+    } else {
+      emit('remove', index)
+    }
   } catch (error) {
     errorMessage.value = 'Erreur lors de la suppression'
     console.error(error)
@@ -241,8 +250,6 @@ const handleRemoveImage = async (index: number) => {
 }
 
 const moveImage = async (index: number, direction: number) => {
-  if (!props.onReorder) return
-
   const newImages = [...(imageUrls.value ?? [])]
   const newIndex = index + direction
 
@@ -253,7 +260,11 @@ const moveImage = async (index: number, direction: number) => {
   newImages[newIndex] = temp ?? ''
 
   try {
-    await props.onReorder(newImages)
+    if (props.onReorder) {
+      await props.onReorder(newImages)
+    } else {
+      emit('reorder', newImages)
+    }
   } catch (error) {
     errorMessage.value = 'Erreur lors de la réorganisation'
     console.error(error)

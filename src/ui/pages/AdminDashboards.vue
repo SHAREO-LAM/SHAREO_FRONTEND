@@ -7,7 +7,7 @@
         <div class="color-strip mt-4" />
       </div>
 
-      <TabView class="admin-tabs">
+      <TabView v-model:activeIndex="activeTabIndex" class="admin-tabs">
         <!-- Users Tab -->
         <TabPanel header="Utilisateurs" value="users" leftIcon="pi pi-users">
           <div class="py-4">
@@ -35,30 +35,58 @@
             <SellerRequestsManagement />
           </div>
         </TabPanel>
+
+        <!-- Validated Companies Tab -->
+        <TabPanel header="Entreprises" value="validated-companies" leftIcon="pi pi-building">
+          <div class="py-4">
+            <ValidatedCompaniesManagement ref="validatedCompaniesRef" />
+          </div>
+        </TabPanel>
       </TabView>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick } from 'vue';
+import Button from 'primevue/button';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import UsersManagement from '@/ui/components/admin/UsersManagement.vue';
 import DomainsManagement from '@/ui/components/admin/DomainsManagement.vue';
 import EquipmentsManagement from '@/ui/components/admin/EquipmentsManagement.vue';
 import SellerRequestsManagement from '@/ui/components/admin/SellerRequestsManagement.vue';
+import ValidatedCompaniesManagement from '@/ui/components/admin/ValidatedCompaniesManagement.vue';
 import { useAuthStore } from '@/stores/authStore';
 
 export default defineComponent({
   name: 'AdminDashboard',
   components: {
+    Button,
     TabView,
     TabPanel,
     UsersManagement,
     DomainsManagement,
     EquipmentsManagement,
     SellerRequestsManagement,
+    ValidatedCompaniesManagement,
+  },
+  data() {
+    return {
+      activeTabIndex: 0,
+    };
+  },
+  methods: {
+    async openCreateCompanyFromDashboard() {
+      // Entreprises tab is the 5th tab (index 4)
+      this.activeTabIndex = 4;
+      await nextTick();
+
+      const child = this.$refs.validatedCompaniesRef as any;
+      if (child && typeof child.openCreateCompanyDialog === 'function') {
+        child.openCreateCompanyDialog();
+      }
+    },
   },
   mounted() {
     const authStore = useAuthStore();

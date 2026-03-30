@@ -133,8 +133,20 @@
 
         <div>
           <label>Type équipement</label>
-          <Select v-model="form.equipementTypeId" :options="equipementTypes" optionLabel="name"
-            optionValue="equipementTypeId" placeholder="Choisir" class="w-full" />
+          <input
+            v-model="equipmentTypeInput"
+            list="vendor-equipment-types-list"
+            type="text"
+            class="p-inputtext p-component w-full"
+            placeholder="Rechercher un type, sinon il sera créé"
+          />
+          <datalist id="vendor-equipment-types-list">
+            <option
+              v-for="type in equipementTypes"
+              :key="String((type as any).equipementTypeId || (type as any).id || '')"
+              :value="String((type as any).name || '')"
+            />
+          </datalist>
         </div>
 
         <div>
@@ -332,7 +344,6 @@ import Dialog from "primevue/dialog"
 import InputText from "primevue/inputtext"
 import InputNumber from "primevue/inputnumber"
 import Textarea from "primevue/textarea"
-import Select from "primevue/select"
 import DeleteConfirmDialog from "@/ui/components/dashboard/DeleteConfirmDialog.vue"
 import DashboardStats from "@/ui/components/dashboard/DashboardStats.vue"
 import Tabs from "primevue/tabs"
@@ -349,7 +360,12 @@ import {
   deleteEquipementImage as deleteEquipementImageRequest
 } from "@/services/equipementCompany"
 
-import { fetchEquipementTypes } from "@/services/equipement"
+import {
+  fetchEquipementTypes,
+  fetchEquipementCategories,
+  createEquipementCategory,
+  createEquipementType,
+} from "@/services/equipement"
 
 import type {
   CreateEquipementCompany,
@@ -395,7 +411,6 @@ export default defineComponent({
     InputText,
     InputNumber,
     Textarea,
-    Select,
     DeleteConfirmDialog,
     DashboardStats,
     EquipementsTable,
@@ -423,6 +438,8 @@ export default defineComponent({
 
     const equipments = ref<EquipementCompanyReadDto[]>([])
     const equipementTypes = ref<EquipementType[]>([])
+    const equipementCategories = ref<Array<{ id: string; name: string; code: string }>>([])
+    const equipmentTypeInput = ref("")
     const equipToDelete = ref<EquipementCompanyReadDto | null>(null)
 
 
@@ -552,6 +569,12 @@ export default defineComponent({
         equipments.value = await getEquipementsCompanyById(authStore.user.companyId)
         domains.value = await getDomainsByCompanyId(authStore.user.companyId)
         equipementTypes.value = await fetchEquipementTypes()
+        const categories = await fetchEquipementCategories()
+        equipementCategories.value = (categories || []).map((category: any) => ({
+          id: String(category.equipementCategoryId || category.id || ''),
+          name: String(category.name || ''),
+          code: String(category.code || ''),
+        })).filter((category: { id: string }) => category.id.length > 0)
 
       } catch (err) {
         console.error('Erreur récupération équipements/domaines/types :', err)
@@ -562,15 +585,105 @@ export default defineComponent({
 
     onMounted(loadData)
 
+    const normalizeLabel = (value: string): string =>
+      String(value || '').trim().toLowerCase()
+
+    const toCode = (value: string): string =>
+      String(value || '')
+        .normalize('NFD')
+        .replace(/[^\x00-\x7F]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .toUpperCase()
+
+    const uniqueCode = (baseValue: string, usedCodes: Set<string>): string => {
+      const safeBase = toCode(baseValue) || 'CATEGORY'
+      if (!usedCodes.has(safeBase)) return safeBase
+
+      let index = 2
+      let candidate = `${safeBase}_${index}`
+      while (usedCodes.has(candidate)) {
+        index += 1
+        candidate = `${safeBase}_${index}`
+      }
+      return candidate
+    }
+
+    const resolveEquipementTypeId = async (): Promise<string> => {
+      const inputName = String(equipmentTypeInput.value || '').trim()
+      if (!inputName) return ''
+
+      const normalizedInput = normalizeLabel(inputName)
+      const existingType = (equipementTypes.value as any[]).find(
+        (item) => normalizeLabel(String(item.name || '')) === normalizedInput
+      )
+
+      if (existingType) {
+        const existingId = String(existingType.equipementTypeId || existingType.id || '')
+        formEquipement.value.equipementTypeId = existingId
+        equipmentTypeInput.value = String(existingType.name || inputName)
+        return existingId
+      }
+
+      const usedCodes = new Set<string>([
+        ...equipementCategories.value.map((item) => String(item.code || '').toUpperCase()),
+        ...(equipementTypes.value as any[]).map((item) => String(item.code || '').toUpperCase()),
+      ])
+
+      let category = equipementCategories.value.find(
+        (item) => normalizeLabel(item.name) === normalizedInput,
+      )
+
+      if (!category) {
+        const categoryCode = uniqueCode(inputName, usedCodes)
+        const createdCategory = await createEquipementCategory({
+          name: inputName,
+          code: categoryCode,
+          userCreateId: String(authStore.user?.userId || ''),
+        })
+
+        category = {
+          id: String(createdCategory.equipementCategoryId || createdCategory.id || ''),
+          name: String(createdCategory.name || inputName),
+          code: String(createdCategory.code || categoryCode),
+        }
+
+        equipementCategories.value.push(category)
+      }
+
+      const typeCode = uniqueCode(inputName, usedCodes)
+      const createdType = await createEquipementType({
+        name: inputName,
+        code: typeCode,
+        equipementCategoryId: String(category.id),
+        userCreateId: String(authStore.user?.userId || ''),
+      })
+
+      const createdTypeId = String(createdType.equipementTypeId || createdType.id || '')
+      formEquipement.value.equipementTypeId = createdTypeId
+      equipmentTypeInput.value = inputName
+
+      equipementTypes.value = await fetchEquipementTypes()
+      return createdTypeId
+    }
+
 
     const handleCreateEquipement = async (item: Partial<CreateEquipementCompany>) => {
 
       submitError.value = null
 
-      if (!item.displayName || !item.pricePerDay || !item.equipementTypeId) {
+      if (!item.displayName || !item.pricePerDay || !equipmentTypeInput.value.trim()) {
         submitError.value = "Nom, prix et type requis"
         return
       }
+
+      const resolvedTypeId = await resolveEquipementTypeId()
+      if (!resolvedTypeId) {
+        submitError.value = "Type équipement requis"
+        return
+      }
+
+      item.equipementTypeId = resolvedTypeId
       item.companyId = authStore.user?.companyId
       isSubmitting.value = true
 
@@ -590,6 +703,7 @@ export default defineComponent({
           pricePerDay: undefined,
           stock: "1"
         }
+        equipmentTypeInput.value = ""
 
       } catch {
 
@@ -674,7 +788,7 @@ export default defineComponent({
 
 
     const viewEquipement = (row: EquipementCompanyReadDto) => {
-      router.push(`/productDetails/${row.equipementCompanyId}`)
+      router.push(`/productDetails/${row.equipementCompanyId}?type=equipment`)
     }
 
 
@@ -905,6 +1019,7 @@ export default defineComponent({
       isSubmitting,
       submitError,
       form: formEquipement,
+      equipmentTypeInput,
       editForm: editFormEquipement,
       equipments,
       equipementTypes,
