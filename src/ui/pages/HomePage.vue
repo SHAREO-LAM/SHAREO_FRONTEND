@@ -265,6 +265,15 @@ export default defineComponent({
       }))
     }
 
+    const formatDateForQuery = (date: Date | null) => {
+      if (!date) return ''
+
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+
     const handleSearch = () => {
       const targetRoute = selectedCategory.value === 'venue' ? ROUTES.COMMON.DOMAINS.name : ROUTES.COMMON.EQUIPMENTS.name
 
@@ -273,8 +282,8 @@ export default defineComponent({
         query: {
           q: searchQuery.value || '',
           location: location.value || '',
-          startDate: startDate.value?.toISOString() ?? '',
-          endDate: endDate.value?.toISOString() ?? '',
+          startDate: formatDateForQuery(startDate.value),
+          endDate: formatDateForQuery(endDate.value),
         },
       })
     }

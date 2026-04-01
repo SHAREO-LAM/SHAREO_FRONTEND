@@ -1,6 +1,6 @@
 <template>
   <CatalogBase title="Tous les équipements" searchPlaceholder="Rechercher un équipement..." detailType="equipment"
-    :filterConfig="filterConfig" :fetchItems="fetchItems">
+    :filterConfig="filterConfig" :fetchItems="fetchItems" :availabilityChecker="checkAvailability">
     <template #itemMeta="{ item, view }">
       <div v-if="typeof item.stock === 'number'" class="flex items-center gap-1 text-sm"
         :class="view === 'grid' ? 'text-gray-300' : 'text-gray-600'">
@@ -15,7 +15,7 @@
 import { defineComponent } from 'vue'
 import CatalogBase from '@/ui/components/CatalogBase.vue'
 import type { CatalogBaseItem, FilterConfig } from '@/ui/components/catalogTypes'
-import { getEquipementsCompany } from '@/services/equipementCompany'
+import { checkEquipmentAvailability, getEquipementsCompany } from '@/services/equipementCompany'
 import type { EquipementCompanyReadDto } from '@/types/equipementCompany'
 
 export default defineComponent({
@@ -53,10 +53,16 @@ export default defineComponent({
     }
   },
   methods: {
+    checkAvailability(itemId: string, startDate: string, endDate: string) {
+      return checkEquipmentAvailability(itemId, startDate, endDate, 1)
+    },
     async fetchItems(): Promise<CatalogBaseItem[]> {
       const equipements = await getEquipementsCompany()
 
-      type EquipementCompanyLike = EquipementCompanyReadDto
+      type EquipementCompanyLike = EquipementCompanyReadDto & {
+        city?: string | null
+        company?: { city?: string | null }
+      }
 
       return (equipements as EquipementCompanyLike[]).map((equipement) => {
         const imageFromArray = Array.isArray(equipement.imageUrls)
@@ -80,6 +86,7 @@ export default defineComponent({
           image,
           pricePerDay: equipement.pricePerDay ?? undefined,
           stock,
+          city: equipement.city ?? equipement.company?.city ?? undefined,
         }
       })
     },

@@ -11,6 +11,7 @@ type BaseCartItem = {
   endDate?: string
   quantity?: string
   unitPrice: number
+  imageUrl: string
 }
 
 export type CartItem =

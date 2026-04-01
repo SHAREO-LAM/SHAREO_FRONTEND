@@ -43,7 +43,12 @@
       </Column>
       <Column field="description" header="Description" style="width: 30%" sortable>
         <template #body="slotProps">
-          <span class="text-sm text-gray-600 truncate">{{ slotProps.data.description }}</span>
+          <span
+            class="text-sm text-gray-600 domain-description-cell"
+            :title="String(slotProps.data.description || '')"
+          >
+            {{ slotProps.data.description }}
+          </span>
         </template>
       </Column>
       <Column field="city" header="Ville" style="width: 15%" sortable />
@@ -656,3 +661,14 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.domain-description-cell {
+  display: inline-block;
+  width: 320px;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

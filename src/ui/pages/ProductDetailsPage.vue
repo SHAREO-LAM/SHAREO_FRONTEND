@@ -349,8 +349,25 @@ export default defineComponent({
 
       return `${year}-${month}-${day}`;
     },
+    getPrimaryProductImage(): string {
+      if (this.productType === 'domain') {
+        const imageFromArray = this.domain?.imageUrls?.find((url) => Boolean(url));
+        if (imageFromArray) return imageFromArray;
+        if (this.domain?.imageUrl) return this.domain.imageUrl;
+      }
+
+      if (this.productType === 'equipment') {
+        const imageFromArray = this.equipement?.imageUrls?.find((url) => Boolean(url));
+        if (imageFromArray) return imageFromArray;
+        if (this.equipement?.imageUrl) return this.equipement.imageUrl;
+      }
+
+      return 'https://placehold.co/400x300';
+    },
     handleBookNow() {
       if (!this.company) return
+
+      const productImage = this.getPrimaryProductImage();
 
       const newCartItem = this.productType === 'equipment'
     ? {
@@ -362,7 +379,8 @@ export default defineComponent({
         startDate: this.formatDateLocal(this.startDate),
         endDate: this.formatDateLocal(this.endDate),
         quantity: this.quantity.toString(),
-        unitPrice: this.totalPrice
+        unitPrice: this.totalPrice,
+        imageUrl: productImage,
       } as CartItem
     : {
         type: 'domain',
@@ -372,7 +390,8 @@ export default defineComponent({
         product: this.domain!,
         startDate: this.formatDateLocal(this.startDate),
         endDate: this.formatDateLocal(this.endDate),
-        unitPrice: this.totalPrice
+        unitPrice: this.totalPrice,
+        imageUrl: productImage,
       } as CartItem;
 
       if (this.checkItemAlreadyInCart(newCartItem)) {

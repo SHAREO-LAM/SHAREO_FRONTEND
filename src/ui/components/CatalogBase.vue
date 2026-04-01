@@ -23,7 +23,7 @@
             rounded
             icon="pi pi-bars"
             label="Filtres"
-            class="theme-text-strong mobile-filters-trigger lg:hidden"
+            class="theme-text-strong mobile-filters-trigger lg:invisible"
             @click="mobileFiltersVisible = true"
           />
         </div>
@@ -193,6 +193,7 @@ import type { CatalogBaseItem, CatalogDetailType, FilterConfig } from './catalog
 
 type TextFilters = Record<string, string>
 type NumberFilters = Record<string, number | null>
+type AvailabilityMap = Record<string, boolean>
 
 export default defineComponent({
   name: 'CatalogBase',
@@ -208,6 +209,11 @@ export default defineComponent({
     detailType: { type: String as PropType<CatalogDetailType>, required: true },
     filterConfig: { type: Array as PropType<FilterConfig[]>, default: () => [] },
     fetchItems: { type: Function as PropType<() => Promise<CatalogBaseItem[]>>, required: true },
+    availabilityChecker: {
+      type: Function as PropType<(itemId: string, startDate: string, endDate: string) => Promise<boolean>>,
+      required: false,
+      default: undefined,
+    },
   },
   data() {
     const buildDefaults = (config: FilterConfig[]) => {
@@ -242,6 +248,7 @@ export default defineComponent({
       startDate: '' as string,
       endDate: '' as string,
       mobileFiltersVisible: false,
+      availabilityMap: {} as AvailabilityMap,
     }
   },
   computed: {
@@ -275,7 +282,9 @@ export default defineComponent({
           items = items.filter((item) => typeof item[cfg.itemKey] === 'number' && (item[cfg.itemKey] as number) <= max)
         }
       }
-      if (this.startDate && this.endDate) {
+      if (this.startDate && this.endDate && this.availabilityChecker) {
+        items = items.filter((item) => this.availabilityMap[String(item.id)] === true)
+      } else if (this.startDate && this.endDate) {
         const start = new Date(this.startDate)
         const end = new Date(this.endDate)
 
@@ -306,15 +315,33 @@ export default defineComponent({
     }
 
     if (typeof query.startDate === "string") {
-      this.startDate = query.startDate
+      this.startDate = this.normalizeDateInput(query.startDate)
     }
 
     if (typeof query.endDate === "string") {
-      this.endDate = query.endDate
+      this.endDate = this.normalizeDateInput(query.endDate)
     }
     this.loadData()
   },
   methods: {
+    normalizeDateInput(value: string) {
+      const trimmed = value.trim()
+      if (!trimmed) return ''
+
+      const match = trimmed.match(/^\d{4}-\d{2}-\d{2}/)
+      if (match) return match[0]
+
+      const parsedDate = new Date(trimmed)
+      if (Number.isNaN(parsedDate.getTime())) return ''
+
+      const year = parsedDate.getFullYear()
+      const month = String(parsedDate.getMonth() + 1).padStart(2, '0')
+      const day = String(parsedDate.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    },
+    hasValidDateRange() {
+      return Boolean(this.startDate && this.endDate)
+    },
     filterKey(f: FilterConfig) {
       if (f.kind === 'text') return `text:${f.stateKey}`
       return `range:${f.minKey}:${f.maxKey}`
@@ -363,6 +390,7 @@ export default defineComponent({
 
       try {
         this.items = await this.fetchItems()
+        await this.refreshAvailability()
       } catch (err) {
         this.error = 'Erreur lors du chargement des données. Veuillez réessayer.'
         console.error('Erreur de chargement:', err)
@@ -379,12 +407,37 @@ export default defineComponent({
       }
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
     },
-    applyFilters() {
+    async refreshAvailability() {
+      if (!this.availabilityChecker || !this.hasValidDateRange()) {
+        this.availabilityMap = {}
+        return
+      }
+
+      const checks = await Promise.all(
+        this.items.map(async (item) => {
+          const itemId = String(item.id)
+
+          try {
+            const available = await this.availabilityChecker!(itemId, this.startDate, this.endDate)
+            return [itemId, available] as const
+          } catch (err) {
+            console.warn('Erreur lors de la vérification de disponibilité', itemId, err)
+            return [itemId, false] as const
+          }
+        }),
+      )
+
+      this.availabilityMap = Object.fromEntries(checks)
+    },
+    async applyFilters() {
       this.filtersText = { ...this.filtersTextDraft }
       this.filtersNumber = { ...this.filtersNumberDraft }
+      this.startDate = this.normalizeDateInput(this.startDate)
+      this.endDate = this.normalizeDateInput(this.endDate)
+      await this.refreshAvailability()
     },
-    applyFiltersAndCloseMobile() {
-      this.applyFilters()
+    async applyFiltersAndCloseMobile() {
+      await this.applyFilters()
       this.mobileFiltersVisible = false
     },
     resetFilters() {
@@ -396,6 +449,9 @@ export default defineComponent({
       this.searchQuery = ''
       this.sortBy = 'name'
       this.sortOrder = 'asc'
+      this.startDate = ''
+      this.endDate = ''
+      this.availabilityMap = {}
     },
     resetFiltersAndCloseMobile() {
       this.resetFilters()

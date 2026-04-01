@@ -1,6 +1,6 @@
 <template>
   <CatalogBase title="Tous les domaines" searchPlaceholder="Rechercher un domaine..." detailType="domain"
-    :filterConfig="filterConfig" :fetchItems="fetchItems">
+    :filterConfig="filterConfig" :fetchItems="fetchItems" :availabilityChecker="checkAvailability">
     <template #itemMeta="{ item, view }">
       <div v-if="item.city || item.postcode" class="flex items-center gap-1 text-sm"
         :class="view === 'grid' ? 'text-gray-700' : 'text-gray-600'">
@@ -20,7 +20,7 @@
 import { defineComponent } from 'vue'
 import CatalogBase from '@/ui/components/CatalogBase.vue'
 import type { CatalogBaseItem, FilterConfig } from '@/ui/components/catalogTypes'
-import { getDomains } from '@/services/domain'
+import { checkDomainAvailability, getDomains } from '@/services/domain'
 import type { UpdateDomainDto } from '@/types/domain'
 
 export default defineComponent({
@@ -58,6 +58,9 @@ export default defineComponent({
     }
   },
   methods: {
+    checkAvailability(itemId: string, startDate: string, endDate: string) {
+      return checkDomainAvailability(itemId, startDate, endDate)
+    },
     async fetchItems(): Promise<CatalogBaseItem[]> {
       const domains = await getDomains()
 

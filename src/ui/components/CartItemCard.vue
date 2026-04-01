@@ -4,7 +4,7 @@
     <div class="flex flex-col w-32 flex-shrink-0">
       <div class="w-full h-24 rounded-lg overflow-hidden">
         <img
-          :src="image"
+          :src="displayImage"
           alt="Produit"
           class="w-full h-full object-cover"
         />
@@ -183,7 +183,27 @@ export default defineComponent({
       return this.item.unitPrice
     },
 
-    image(): string {
+    displayImage(): string {
+      const product = this.item.product as {
+        imageUrls?: unknown
+        imageUrl?: unknown
+      }
+
+      if (Array.isArray(product.imageUrls)) {
+        const firstImage = product.imageUrls.find((url) => typeof url === 'string' && url.trim().length > 0)
+        if (typeof firstImage === 'string') {
+          return firstImage
+        }
+      }
+
+      if (typeof product.imageUrl === 'string' && product.imageUrl.trim().length > 0) {
+        return product.imageUrl
+      }
+
+      if (typeof this.item.imageUrl === 'string' && this.item.imageUrl.trim().length > 0) {
+        return this.item.imageUrl
+      }
+
       return 'https://placehold.co/400x300'
     }
   },

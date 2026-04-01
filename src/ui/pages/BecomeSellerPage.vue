@@ -384,7 +384,7 @@ export default defineComponent({
 
         // Associer l'utilisateur à la compagnie
         const userCompanyData: CreateUserCompany = {
-          companyId: (company as any).id as string,
+          companyId: String((company as any).companyId ?? ''),
           userId: String(authStore.user.userId) as string,
           userCreateId: String(authStore.user.userId),
         };
